@@ -16,6 +16,11 @@ public class BaseCard : MonoBehaviour
     [SerializeField]
     private List<CardEffect> cardEffects;
 
+    BaseCard()
+    {
+        cardEffects = new List<CardEffect>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
