@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BaseCard : MonoBehaviour
 {
+    private CardType cardType;
     public string Name { get; set; }
 
     private int manaCost;
@@ -16,9 +17,10 @@ public class BaseCard : MonoBehaviour
     [SerializeField]
     private List<CardEffect> cardEffects;
 
-    BaseCard()
+    public BaseCard(CardType type)
     {
         cardEffects = new List<CardEffect>();
+        cardType = type;
     }
 
     // Start is called before the first frame update
