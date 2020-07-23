@@ -155,6 +155,12 @@ public class ProceduralCardGenerator : ICardGenerator
 
             EffectType effectType = getRandomValueExcluding(random, model, new EffectType[] { EffectType.NONE },
                 CardEnums.GetValidFlags<TriggerCondition, EffectType>(cardEffect.triggerCondition));
+
+            // This means that there isn't an effect that meets this condition
+            if (effectType == EffectType.NONE)
+            {
+                continue;
+            }
             float powerLevel = GenerateCardEffect(random, model, cardEffect, effectType, powerBudget);
             cardDesc.cardEffects.Add(cardEffect);
             powerBudget -= powerLevel;
