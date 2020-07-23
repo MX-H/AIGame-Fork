@@ -18,17 +18,17 @@ namespace Mirror.Weaver
                     ProcessSiteClass(td);
                 }
             }
-            if (Weaver.WeaveLists.generateContainerClass != null)
+            if (Weaver.WeaveLists.GenerateContainerClass != null)
             {
-                moduleDef.Types.Add(Weaver.WeaveLists.generateContainerClass);
-                Weaver.CurrentAssembly.MainModule.ImportReference(Weaver.WeaveLists.generateContainerClass);
+                moduleDef.Types.Add(Weaver.WeaveLists.GenerateContainerClass);
+                Weaver.CurrentAssembly.MainModule.ImportReference(Weaver.WeaveLists.GenerateContainerClass);
 
-                foreach (MethodDefinition f in Weaver.WeaveLists.generatedReadFunctions)
+                foreach (MethodDefinition f in Weaver.WeaveLists.GeneratedReadFunctions)
                 {
                     Weaver.CurrentAssembly.MainModule.ImportReference(f);
                 }
 
-                foreach (MethodDefinition f in Weaver.WeaveLists.generatedWriteFunctions)
+                foreach (MethodDefinition f in Weaver.WeaveLists.GeneratedWriteFunctions)
                 {
                     Weaver.CurrentAssembly.MainModule.ImportReference(f);
                 }
@@ -183,7 +183,7 @@ namespace Mirror.Weaver
                 return;
 
             // Events use an "Invoke" method to call the delegate.
-            // this code replaces the "Invoke" instruction with the generated "Call***" instruction which send the event to the server.
+            // this code replaces the "Invoke" instruction with the Generated "Call***" instruction which send the event to the server.
             // but the "Invoke" instruction is called on the event field - where the "call" instruction is not.
             // so the earlier instruction that loads the event field is replaced with a Noop.
 

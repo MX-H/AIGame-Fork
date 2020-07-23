@@ -9,7 +9,7 @@ namespace Mirror.Weaver
         const string CmdPrefix = "InvokeCmd";
 
         /*
-            // generates code like:
+            // Generates code like:
             public void CmdThrust(float thrusting, int spin)
             {
                 NetworkWriter networkWriter = new NetworkWriter();
@@ -79,7 +79,7 @@ namespace Mirror.Weaver
         }
 
         /*
-            // generates code like:
+            // Generates code like:
             protected static void InvokeCmdCmdThrust(NetworkBehaviour obj, NetworkReader reader)
             {
                 if (!NetworkServer.active)

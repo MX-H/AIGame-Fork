@@ -371,17 +371,17 @@ namespace Mirror
         //   in editor and in build
         //   => .gameObject.scene.buildIndex filters out disabled scenes by
         //      default
-        // * generated sceneIds absolutely need to set scene dirty and force the
+        // * Generated sceneIds absolutely need to set scene dirty and force the
         //   user to resave.
         //   => Undo.RecordObject does that perfectly.
-        // * sceneIds should never be generated temporarily for unopened scenes
+        // * sceneIds should never be Generated temporarily for unopened scenes
         //   when building, otherwise editor and build get out of sync
         //   => BuildPipeline.isBuildingPlayer check solves that
         void AssignSceneID()
         {
             // we only ever assign sceneIds at edit time, never at runtime.
             // by definition, only the original scene objects should get one.
-            // -> if we assign at runtime then server and client would generate
+            // -> if we assign at runtime then server and client would Generate
             //    different random numbers!
             if (Application.isPlaying)
                 return;
@@ -403,15 +403,15 @@ namespace Mirror
                 if (BuildPipeline.isBuildingPlayer)
                     throw new Exception("Scene " + gameObject.scene.path + " needs to be opened and resaved before building, because the scene object " + name + " has no valid sceneId yet.");
 
-                // if we generate the sceneId then we MUST be sure to set dirty
+                // if we Generate the sceneId then we MUST be sure to set dirty
                 // in order to save the scene object properly. otherwise it
-                // would be regenerated every time we reopen the scene, and
+                // would be reGenerated every time we reopen the scene, and
                 // upgrading would be very difficult.
                 // -> Undo.RecordObject is the new EditorUtility.SetDirty!
                 // -> we need to call it before changing.
                 Undo.RecordObject(this, "Generated SceneId");
 
-                // generate random sceneId part (0x00000000FFFFFFFF)
+                // Generate random sceneId part (0x00000000FFFFFFFF)
                 uint randomId = GetRandomUInt();
 
                 // only assign if not a duplicate of an existing scene id
@@ -425,7 +425,7 @@ namespace Mirror
             }
 
             // add to sceneIds dict no matter what
-            // -> even if we didn't generate anything new, because we still need
+            // -> even if we didn't Generate anything new, because we still need
             //    existing sceneIds in there to check duplicates
             sceneIds[sceneId] = this;
         }
@@ -1024,7 +1024,7 @@ namespace Mirror
             if (observers.ContainsKey(conn.connectionId))
             {
                 // if we try to add a connectionId that was already added, then
-                // we may have generated one that was already in use.
+                // we may have Generated one that was already in use.
                 return;
             }
 

@@ -9,9 +9,9 @@ public class CardGeneratorDemo : MonoBehaviour
     public CardDisplay display;
     public CardHistogram model;
 
+    private ICardGenerator cardGenerator;
     void Start()
     {
-        
     }
 
     // Update is called once per frame
@@ -19,7 +19,9 @@ public class CardGeneratorDemo : MonoBehaviour
     {
         if (Input.GetKeyDown("space"))
         {
-            display.SetCardDescription(CardGenerator.generateCard((int)Random.Range(0, 10000), model));
+            model.Update();
+            ICardGenerator cardGenerator = new ProceduralCardGenerator(model);
+            display.SetCardDescription(cardGenerator.GenerateCard((int)Random.Range(0, 10000)));
         }
     }
 }

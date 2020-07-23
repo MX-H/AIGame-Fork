@@ -18,10 +18,10 @@ namespace Mirror.Weaver
         // [SyncEvent] invoke functions that should be replaced. dict<originalEventName, replacement>
         public Dictionary<string, MethodDefinition> replaceEvents = new Dictionary<string, MethodDefinition>();
 
-        public List<MethodDefinition> generatedReadFunctions = new List<MethodDefinition>();
-        public List<MethodDefinition> generatedWriteFunctions = new List<MethodDefinition>();
+        public List<MethodDefinition> GeneratedReadFunctions = new List<MethodDefinition>();
+        public List<MethodDefinition> GeneratedWriteFunctions = new List<MethodDefinition>();
 
-        public TypeDefinition generateContainerClass;
+        public TypeDefinition GenerateContainerClass;
 
         // amount of SyncVars per class. dict<className, amount>
         public Dictionary<string, int> numSyncVars = new Dictionary<string, int>();
@@ -175,9 +175,9 @@ namespace Mirror.Weaver
 
         internal static void ConfirmGeneratedCodeClass()
         {
-            if (WeaveLists.generateContainerClass == null)
+            if (WeaveLists.GenerateContainerClass == null)
             {
-                WeaveLists.generateContainerClass = new TypeDefinition("Mirror", "GeneratedNetworkCode",
+                WeaveLists.GenerateContainerClass = new TypeDefinition("Mirror", "GeneratedNetworkCode",
                         TypeAttributes.BeforeFieldInit | TypeAttributes.Class | TypeAttributes.AnsiClass | TypeAttributes.Public | TypeAttributes.AutoClass,
                         objectType);
 
@@ -187,7 +187,7 @@ namespace Mirror.Weaver
                 method.Body.Instructions.Add(Instruction.Create(OpCodes.Call, Resolvers.ResolveMethod(objectType, CurrentAssembly, ".ctor")));
                 method.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
 
-                WeaveLists.generateContainerClass.Methods.Add(method);
+                WeaveLists.GenerateContainerClass.Methods.Add(method);
             }
         }
 
@@ -532,7 +532,7 @@ namespace Mirror.Weaver
             {
                 bool modified = false;
 
-                // We need to do 2 passes, because SyncListStructs might be referenced from other modules, so we must make sure we generate them first.
+                // We need to do 2 passes, because SyncListStructs might be referenced from other modules, so we must make sure we Generate them first.
                 System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
                 foreach (TypeDefinition td in moduleDefinition.Types)
                 {

@@ -48,17 +48,17 @@ namespace Mirror.Weaver
             }
             if (td.IsDerivedFrom(Weaver.ComponentType))
             {
-                Weaver.Error($"Cannot generate reader for component type {variable.Name}. Use a supported type or provide a custom reader", variable);
+                Weaver.Error($"Cannot Generate reader for component type {variable.Name}. Use a supported type or provide a custom reader", variable);
                 return null;
             }
             if (variable.FullName == Weaver.ObjectType.FullName)
             {
-                Weaver.Error($"Cannot generate reader for {variable.Name}. Use a supported type or provide a custom reader", variable);
+                Weaver.Error($"Cannot Generate reader for {variable.Name}. Use a supported type or provide a custom reader", variable);
                 return null;
             }
             if (variable.FullName == Weaver.ScriptableObjectType.FullName)
             {
-                Weaver.Error($"Cannot generate reader for {variable.Name}. Use a supported type or provide a custom reader", variable);
+                Weaver.Error($"Cannot Generate reader for {variable.Name}. Use a supported type or provide a custom reader", variable);
                 return null;
             }
             if (variable.IsByReference)
@@ -69,12 +69,12 @@ namespace Mirror.Weaver
             }
             if (td.HasGenericParameters && !td.FullName.StartsWith("System.ArraySegment`1", System.StringComparison.Ordinal))
             {
-                Weaver.Error($"Cannot generate reader for generic variable {variable.Name}. Use a supported type or provide a custom reader", variable);
+                Weaver.Error($"Cannot Generate reader for generic variable {variable.Name}. Use a supported type or provide a custom reader", variable);
                 return null;
             }
             if (td.IsInterface)
             {
-                Weaver.Error($"Cannot generate reader for interface {variable.Name}. Use a supported type or provide a custom reader", variable);
+                Weaver.Error($"Cannot Generate reader for interface {variable.Name}. Use a supported type or provide a custom reader", variable);
                 return null;
             }
 
@@ -103,10 +103,10 @@ namespace Mirror.Weaver
         static void RegisterReadFunc(string name, MethodDefinition newReaderFunc)
         {
             readFuncs[name] = newReaderFunc;
-            Weaver.WeaveLists.generatedReadFunctions.Add(newReaderFunc);
+            Weaver.WeaveLists.GeneratedReadFunctions.Add(newReaderFunc);
 
             Weaver.ConfirmGeneratedCodeClass();
-            Weaver.WeaveLists.generateContainerClass.Methods.Add(newReaderFunc);
+            Weaver.WeaveLists.GenerateContainerClass.Methods.Add(newReaderFunc);
         }
 
         static MethodDefinition GenerateArrayReadFunc( TypeReference variable, int recursionCount)
@@ -257,7 +257,7 @@ namespace Mirror.Weaver
             worker.Append(worker.Create(OpCodes.Stloc_1));
 
             // loop through array and deserialize each element
-            // generates code like this
+            // Generates code like this
             // for (int i=0; i< length ; i++)
             // {
             //     value[i] = reader.ReadXXX();

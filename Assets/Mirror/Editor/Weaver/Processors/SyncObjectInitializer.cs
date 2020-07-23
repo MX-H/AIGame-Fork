@@ -15,7 +15,7 @@ namespace Mirror.Weaver
             GenerateSyncObjectRegistration(methodWorker, fd);
         }
 
-        // generates 'syncListInt = new SyncListInt()' if user didn't do that yet
+        // Generates 'syncListInt = new SyncListInt()' if user didn't do that yet
         static void GenerateSyncObjectInstanceInitializer(ILProcessor ctorWorker, FieldDefinition fd)
         {
             // check the ctor's instructions for an Stfld op-code for this specific sync list field.
@@ -72,7 +72,7 @@ namespace Mirror.Weaver
         }
 
         /*
-            // generates code like:
+            // Generates code like:
             this.InitSyncObject(m_sizes);
         */
         static void GenerateSyncObjectRegistration(ILProcessor methodWorker, FieldDefinition fd)

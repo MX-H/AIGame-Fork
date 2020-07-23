@@ -55,27 +55,27 @@ namespace Mirror.Weaver
             }
             if (td.IsDerivedFrom(Weaver.ComponentType))
             {
-                Weaver.Error($"Cannot generate writer for component type {variable.Name}. Use a supported type or provide a custom writer", variable);
+                Weaver.Error($"Cannot Generate writer for component type {variable.Name}. Use a supported type or provide a custom writer", variable);
                 return null;
             }
             if (variable.FullName == Weaver.ObjectType.FullName)
             {
-                Weaver.Error($"Cannot generate writer for {variable.Name}. Use a supported type or provide a custom writer", variable);
+                Weaver.Error($"Cannot Generate writer for {variable.Name}. Use a supported type or provide a custom writer", variable);
                 return null;
             }
             if (variable.FullName == Weaver.ScriptableObjectType.FullName)
             {
-                Weaver.Error($"Cannot generate writer for {variable.Name}. Use a supported type or provide a custom writer", variable);
+                Weaver.Error($"Cannot Generate writer for {variable.Name}. Use a supported type or provide a custom writer", variable);
                 return null;
             }
             if (td.HasGenericParameters && !td.FullName.StartsWith("System.ArraySegment`1", System.StringComparison.Ordinal))
             {
-                Weaver.Error($"Cannot generate writer for generic type {variable.Name}. Use a supported type or provide a custom writer", variable);
+                Weaver.Error($"Cannot Generate writer for generic type {variable.Name}. Use a supported type or provide a custom writer", variable);
                 return null;
             }
             if (td.IsInterface)
             {
-                Weaver.Error($"Cannot generate writer for interface {variable.Name}. Use a supported type or provide a custom writer", variable);
+                Weaver.Error($"Cannot Generate writer for interface {variable.Name}. Use a supported type or provide a custom writer", variable);
                 return null;
             }
 
@@ -104,10 +104,10 @@ namespace Mirror.Weaver
         static void RegisterWriteFunc(string name, MethodDefinition newWriterFunc)
         {
             writeFuncs[name] = newWriterFunc;
-            Weaver.WeaveLists.generatedWriteFunctions.Add(newWriterFunc);
+            Weaver.WeaveLists.GeneratedWriteFunctions.Add(newWriterFunc);
 
             Weaver.ConfirmGeneratedCodeClass();
-            Weaver.WeaveLists.generateContainerClass.Methods.Add(newWriterFunc);
+            Weaver.WeaveLists.GenerateContainerClass.Methods.Add(newWriterFunc);
         }
 
         static MethodDefinition GenerateClassOrStructWriterFunction(TypeReference variable, int recursionCount)
@@ -326,7 +326,7 @@ namespace Mirror.Weaver
             worker.Append(worker.Create(OpCodes.Call, GetWriteFunc(Weaver.int32Type)));
 
             // Loop through the ArraySegment<T> and call the writer for each element.
-            // generates this:
+            // Generates this:
             // for (int i=0; i< length; i++)
             // {
             //    writer.Write(value.Array[i + value.Offset]);

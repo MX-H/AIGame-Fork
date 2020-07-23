@@ -1,4 +1,4 @@
-// this class generates OnSerialize/OnDeserialize when inheriting from MessageBase
+// this class Generates OnSerialize/OnDeserialize when inheriting from MessageBase
 
 using System.Linq;
 using Mono.CecilX;

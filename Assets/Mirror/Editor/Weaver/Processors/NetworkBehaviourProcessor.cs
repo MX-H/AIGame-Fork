@@ -59,7 +59,7 @@ namespace Mirror.Weaver
         }
 
         /*
-        generates code like:
+        Generates code like:
             if (!NetworkClient.active)
               Debug.LogError((object) "Command function CmdRespawn called on server.");
 
@@ -77,7 +77,7 @@ namespace Mirror.Weaver
             worker.Append(label);
         }
         /*
-        generates code like:
+        Generates code like:
             if (!NetworkServer.active)
               Debug.LogError((object) "Command CmdMsgWhisper called on client.");
         */
@@ -262,7 +262,7 @@ namespace Mirror.Weaver
         }
 
         /*
-            // This generates code like:
+            // This Generates code like:
             NetworkBehaviour.RegisterCommandDelegate(base.GetType(), "CmdThrust", new NetworkBehaviour.CmdDelegate(ShipControl.InvokeCmdCmdThrust));
         */
         void GenerateRegisterCommandDelegate(ILProcessor awakeWorker, MethodReference registerMethod, MethodDefinition func, string cmdName)
@@ -363,7 +363,7 @@ namespace Mirror.Weaver
             serWorker.Append(serWorker.Create(OpCodes.Call, Weaver.NetworkBehaviourDirtyBitsReference));
             serWorker.Append(serWorker.Create(OpCodes.Call, Writers.GetWriteFunc(Weaver.uint64Type)));
 
-            // generate a writer call for any dirty variable in this class
+            // Generate a writer call for any dirty variable in this class
 
             // start at number of syncvars in parent
             int dirtyBit = Weaver.GetSyncVarStart(netBehaviourSubclass.BaseType.FullName);
@@ -413,7 +413,7 @@ namespace Mirror.Weaver
                 serWorker.Append(serWorker.Create(OpCodes.Call, Weaver.logErrorReference));
             }
 
-            // generate: return dirtyLocal
+            // Generate: return dirtyLocal
             serWorker.Append(serWorker.Create(OpCodes.Ldloc_0));
             serWorker.Append(serWorker.Create(OpCodes.Ret));
             netBehaviourSubclass.Methods.Add(serialize);

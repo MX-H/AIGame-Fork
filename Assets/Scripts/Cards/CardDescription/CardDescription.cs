@@ -7,5 +7,5 @@ public class CardDescription
     public string name;
     public int manaCost;
     public CardType cardType;
-    public List<CardEffectDescription> cardEffects;
+    public List<CardEffectDescription> cardEffects = new List<CardEffectDescription>();
 }

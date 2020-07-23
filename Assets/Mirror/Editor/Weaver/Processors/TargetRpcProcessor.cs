@@ -52,7 +52,7 @@ namespace Mirror.Weaver
             return rpc;
         }
 
-        /* generates code like:
+        /* Generates code like:
             public void TargetTest (NetworkConnection conn, int param)
             {
                 NetworkWriter writer = new NetworkWriter ();

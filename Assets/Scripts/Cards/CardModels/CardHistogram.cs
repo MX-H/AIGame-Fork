@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 [CreateAssetMenu(fileName = "New Model", menuName = "CardHistogram", order = 51)]
 public class CardHistogram : ScriptableObject
@@ -9,8 +10,11 @@ public class CardHistogram : ScriptableObject
     private class EnumHistogram
     {
 #if UNITY_EDITOR
-        private string id;
+        [SerializeField]
+        public readonly string id;
 #endif
+        [SerializeField]
+        public readonly System.Type type;
         private class IndexMap : Dictionary<int, int> { }
 
         [SerializeField]
@@ -24,7 +28,7 @@ public class CardHistogram : ScriptableObject
             if (!keyIndexMap.ContainsKey(key))
             {
                 keyIndexMap[key] = values.Count;
-                values.Add(0);
+                values.Add(1);
             }
         }
 
@@ -33,6 +37,7 @@ public class CardHistogram : ScriptableObject
 #if UNITY_EDITOR
             id = t.Name;
 #endif
+            type = t;
             keyIndexMap = new IndexMap();
             values = new List<int>();
             int i = 0;
@@ -40,6 +45,14 @@ public class CardHistogram : ScriptableObject
             {
                 keyIndexMap[val] = i++;
                 values.Add(1);
+            }
+        }
+
+        public void Update()
+        {
+            foreach (int val in System.Enum.GetValues(type))
+            {
+                ValidateKey(val);
             }
         }
 
@@ -77,6 +90,17 @@ public class CardHistogram : ScriptableObject
             return total;
         }
 
+        public int GetTotal(IEnumerable<int> keys)
+        {
+            int total = 0;
+            foreach (int key in keys)
+            {
+                ValidateKey(key);
+                total += values[keyIndexMap[key]];
+            }
+            return total;
+        }
+
         public int GetValue(int key)
         {
             ValidateKey(key);
@@ -94,12 +118,27 @@ public class CardHistogram : ScriptableObject
     public CardHistogram()
     {
         typeIndexMap = new Dictionary<System.Type, int>();
-        int i = 0;
         histograms = new List<EnumHistogram>();
         foreach (System.Type t in CardEnums.EnumTypes)
         {
-            typeIndexMap[t] = i++;
+            typeIndexMap[t] = histograms.Count;
             histograms.Add(new EnumHistogram(t));
+        }
+    }
+
+    public void Update()
+    {
+        foreach (System.Type t in CardEnums.EnumTypes)
+        {
+            if (typeIndexMap.ContainsKey(t))
+            {
+                histograms[typeIndexMap[t]].Update();
+            }
+            else
+            {
+                typeIndexMap[t] = histograms.Count;
+                histograms.Add(new EnumHistogram(t));
+            }
         }
     }
 
@@ -133,6 +172,15 @@ public class CardHistogram : ScriptableObject
         if (typeIndexMap.ContainsKey(typeof(T)))
         {
             return histograms[typeIndexMap[typeof(T)]].GetTotal();
+        }
+        return 0;
+    }
+
+    public int GetTotal<T>(IEnumerable<T> keys) where T : System.Enum
+    {
+        if (typeIndexMap.ContainsKey(typeof(T)))
+        {
+            return histograms[typeIndexMap[typeof(T)]].GetTotal(keys.Cast<int>());
         }
         return 0;
     }

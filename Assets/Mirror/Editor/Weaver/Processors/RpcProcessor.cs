@@ -36,7 +36,7 @@ namespace Mirror.Weaver
         }
 
         /*
-         * generates code like:
+         * Generates code like:
 
             public void RpcTest (int param)
             {
