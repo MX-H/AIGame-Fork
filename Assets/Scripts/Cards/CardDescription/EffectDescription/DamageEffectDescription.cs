@@ -11,6 +11,6 @@ public class DamageEffectDescription : IEffectDescription
 
     public override string CardText()
     {
-        return (effectType == EffectType.HEAL_DAMAGE ? "heal " : "take ") + amount.ToString() + " damage";
+        return (effectType == EffectType.HEAL_DAMAGE ? "heal(s) " : "take(s) ") + amount.ToString() + " damage";
     }
 }

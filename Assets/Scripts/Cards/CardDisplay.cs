@@ -31,7 +31,7 @@ public class CardDisplay : MonoBehaviour
         {
             name.text = cardDesc.name;
             mana.text = cardDesc.manaCost.ToString();
-            typeText.text = cardDesc.cardType.ToString();
+            typeText.text = CardParsing.Parse(cardDesc.cardType).ToUpper();
 
             string effectText = "";
 
@@ -44,11 +44,11 @@ public class CardDisplay : MonoBehaviour
                     if (cardDesc is CreatureCardDescription creatureDesc)
                     {
                         creatureFields.SetActive(true);
-                        creatureType.text = creatureDesc.creatureType.ToString();
+                        creatureType.text = CardParsing.Parse(creatureDesc.creatureType).ToUpper();
                         atk.text = creatureDesc.attack.ToString();
                         def.text = creatureDesc.health.ToString();
                         bool first = true;
-                        foreach (KeywordAttributes a in creatureDesc.attributes)
+                        foreach (KeywordAttribute a in creatureDesc.attributes)
                         {
                             if (first)
                             {
@@ -58,11 +58,11 @@ public class CardDisplay : MonoBehaviour
                             {
                                 effectText += ", ";
                             }
-                            effectText += a.ToString();
+                            effectText += CardParsing.Parse(a);
                         }
                         if (!first)
                         {
-                            effectText += '\n';
+                            effectText += "\n\n";
                         }
                     }
 

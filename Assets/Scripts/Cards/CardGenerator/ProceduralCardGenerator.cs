@@ -77,12 +77,12 @@ public class ProceduralCardGenerator : ICardGenerator
     {
         CreatureCardDescription card = new CreatureCardDescription();
         card.creatureType = getRandomValue<CreatureType>(random, model);
-        card.manaCost = (int)getRandomValue<ManaCost>(random, model) + 1;
+        card.manaCost = (int)getRandomValue<ManaCost>(random, model);
         card.name = "A creature card";
 
         // Decide on power budget
 
-        float powerBudget = CardEnums.ManaPowerBudgets[card.manaCost - 1];
+        float powerBudget = CardEnums.ManaPowerBudgets[card.manaCost];
 
         // Decide on stats
         card.attack = random.Next(card.manaCost);
@@ -92,7 +92,7 @@ public class ProceduralCardGenerator : ICardGenerator
         int amount = random.Next(2);
         for (int i = 0; i < amount; i++)
         {
-            card.attributes.Add(getRandomValue<KeywordAttributes>(random, model));
+            card.attributes.Add(getRandomValue<KeywordAttribute>(random, model));
         }
 
         // Decide on effects
@@ -105,10 +105,10 @@ public class ProceduralCardGenerator : ICardGenerator
     {
         CardDescription card = new CardDescription();
         card.cardType = CardType.SPELL;
-        card.manaCost = (int)getRandomValue<ManaCost>(random, model) + 1;
+        card.manaCost = (int)getRandomValue<ManaCost>(random, model);
         card.name = "A spell card";
 
-        float powerBudget = CardEnums.ManaPowerBudgets[card.manaCost - 1];
+        float powerBudget = CardEnums.ManaPowerBudgets[card.manaCost];
         GenerateCardEffects(random, model, card, powerBudget);
 
         return card;
@@ -118,10 +118,10 @@ public class ProceduralCardGenerator : ICardGenerator
     {
         CardDescription card = new CardDescription();
         card.cardType = CardType.TRAP;
-        card.manaCost = (int)getRandomValue<ManaCost>(random, model) + 1;
+        card.manaCost = (int)getRandomValue<ManaCost>(random, model);
         card.name = "A trap card";
 
-        float powerBudget = CardEnums.ManaPowerBudgets[card.manaCost - 1];
+        float powerBudget = CardEnums.ManaPowerBudgets[card.manaCost];
         GenerateCardEffects(random, model, card, powerBudget);
 
         return card;
@@ -134,7 +134,7 @@ public class ProceduralCardGenerator : ICardGenerator
         // A trap card only has one trigger condition
         if (cardDesc.cardType == CardType.TRAP)
         {
-            getRandomValue(random, model, CardEnums.GetValidFlags<CardType, TriggerCondition>(CardType.TRAP));
+            getRandomValue(random, model, CardEnums.GetValidFlags<TriggerCondition>(CardType.TRAP));
         }
 
         int effectCount = 0;
@@ -150,11 +150,11 @@ public class ProceduralCardGenerator : ICardGenerator
                 cardEffect.triggerCondition = TriggerCondition.NONE;
             }
             else {
-                cardEffect.triggerCondition = getRandomValue(random, model, CardEnums.GetValidFlags<CardType, TriggerCondition>(cardDesc.cardType));
+                cardEffect.triggerCondition = getRandomValue(random, model, CardEnums.GetValidFlags<TriggerCondition>(cardDesc.cardType));
             }
 
             EffectType effectType = getRandomValueExcluding(random, model, new EffectType[] { EffectType.NONE },
-                CardEnums.GetValidFlags<TriggerCondition, EffectType>(cardEffect.triggerCondition));
+                CardEnums.GetValidFlags<EffectType>(cardEffect.triggerCondition));
 
             // This means that there isn't an effect that meets this condition
             if (effectType == EffectType.NONE)
@@ -209,8 +209,8 @@ public class ProceduralCardGenerator : ICardGenerator
                 break;
         }
 
-        effectDesc.targetType = getRandomValue(random, model, CardEnums.GetValidFlags<EffectType, TargetType>(effect));
-        effectDesc.targettingType = getRandomValue(random, model, CardEnums.GetValidFlags<TargetType, TargettingType>(effectDesc.targetType));
+        effectDesc.targetType = getRandomValue(random, model, CardEnums.GetValidFlags<TargetType>(effect));
+        effectDesc.targettingType = getRandomValue(random, model, CardEnums.GetValidFlags<TargettingType>(new object[] { effectDesc.targetType }));
 
         return powerLevel;
     }

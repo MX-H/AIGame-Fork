@@ -10,6 +10,6 @@ public class SummonEffectDescription : IEffectDescription
     { }
     public override string CardText()
     {
-        return "summon(s) " + amount.ToString() + " " + tokenType.ToString() + " token(s)";
+        return "summon(s) " + amount.ToString() + " " + CardParsing.Parse(tokenType) + " token(s)";
     }
 }

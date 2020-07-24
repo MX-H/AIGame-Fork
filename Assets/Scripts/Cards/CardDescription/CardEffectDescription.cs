@@ -11,7 +11,7 @@ public class CardEffectDescription
 
     public string CardText()
     {
-        return ((triggerCondition == TriggerCondition.NONE) ? "" : triggerCondition.ToString() + ": ")
+        return ((triggerCondition == TriggerCondition.NONE) ? "" : CardParsing.Parse(triggerCondition) + ": ")
             + TargetsToString() + " " + effectType.CardText();
     }
 
@@ -30,6 +30,9 @@ public class CardEffectDescription
             case TargettingType.ALL:
                 output += "all ";
                 break;
+            case TargettingType.UP_TO_TARGET:
+                output += "up to X ";
+                break;
             case TargettingType.EXCEPT:
                 output += "all ";
                 break;
@@ -47,7 +50,7 @@ public class CardEffectDescription
                 output += "card(s)";
                 break;
             case TargetType.PLAYERS:
-                output += "players(s)";
+                output += "player(s)";
                 break;
             case TargetType.CREATURE_CARDS:
                 output += "creature card(s)";
