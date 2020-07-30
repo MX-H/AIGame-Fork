@@ -65,7 +65,7 @@ static public class CardParsing
         switch (c)
         {
             case CardType.CREATURE:
-                return "Unit";
+                return "Creature";
             case CardType.SPELL:
                 return "Spell";
             case CardType.TRAP:

@@ -129,8 +129,6 @@ public class ProceduralCardGenerator : ICardGenerator
 
     static private void GenerateCardEffects(System.Random random, CardHistogram model, CardDescription cardDesc, float powerBudget)
     {
-        TriggerCondition trapCondition = TriggerCondition.NONE;
-
         // A trap card only has one trigger condition
         if (cardDesc.cardType == CardType.TRAP)
         {
@@ -143,9 +141,9 @@ public class ProceduralCardGenerator : ICardGenerator
             // Generate effects
             CardEffectDescription cardEffect = new CardEffectDescription();
 
-            if ((cardDesc.cardType == CardType.TRAP || cardDesc.cardType == CardType.SPELL) && effectCount > 0)
+            if (cardDesc.cardType == CardType.SPELL || (cardDesc.cardType == CardType.TRAP && effectCount > 0))
             {
-                // After the first condition of a one time use card (spell or trap) all further effects of
+                // After the first condition of a trap or after casting a spell all further effects of
                 // the card should just resolve so trigger cond is NONE
                 cardEffect.triggerCondition = TriggerCondition.NONE;
             }

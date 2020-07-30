@@ -4,6 +4,12 @@ using System;
 using UnityEngine;
 using System.Linq;
 
+public enum Classification
+{
+    POSITIVE,
+    NEUTRAL,
+    NEGATIVE
+}
 public enum CardType
 {
     CREATURE,
@@ -74,12 +80,11 @@ public enum CreatureType
     HUMAN
 }
 
-public enum Qualifier
+public enum QualifierType
 {
     NONE,
     CARD_TYPE,
-    CREATURE_TYPE,
-    ALLIANCE
+    CREATURE_TYPE
 }
 
 public enum EffectType
@@ -133,7 +138,7 @@ static class CardEnums
             typeof(TargetType),
             typeof(TargettingType),
             typeof(CreatureType),
-            typeof(Qualifier),
+            typeof(QualifierType),
             typeof(EffectType),
             typeof(ManaCost),
             typeof(DrawModifier),
