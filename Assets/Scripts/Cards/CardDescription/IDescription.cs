@@ -6,5 +6,5 @@ public interface IDescription
 {
     double PowerLevel();
     Alignment GetAlignment();
-    string CardText();
+    string CardText(bool plural);
 }

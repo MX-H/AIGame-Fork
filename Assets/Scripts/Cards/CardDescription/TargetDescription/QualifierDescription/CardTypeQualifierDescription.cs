@@ -9,7 +9,7 @@ public class CardTypeQualifierDescription : IQualifierDescription
     {
     }
 
-    public override string CardText()
+    public override string CardText(bool plural)
     {
         return CardParsing.Parse(cardType);
     }

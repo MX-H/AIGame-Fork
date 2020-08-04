@@ -13,7 +13,7 @@ public abstract class IEffectDescription : IDescription
         effectType = effect;
     }
 
-    public abstract string CardText();
+    public abstract string CardText(bool plural);
     public abstract Alignment GetAlignment();
     public abstract double PowerLevel();
 }

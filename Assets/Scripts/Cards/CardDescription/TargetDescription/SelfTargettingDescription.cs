@@ -7,7 +7,7 @@ public class SelfTargettingDescription : ITargettingDescription
     public SelfTargettingDescription() : base(TargetType.PLAYERS, TargettingType.SELF)
     {
     }
-    public override string CardText()
+    public override string CardText(bool plural)
     {
         return "you";
     }
@@ -21,6 +21,11 @@ public class SelfTargettingDescription : ITargettingDescription
     {
         return 1.0;
     }
+
+    public override bool RequiresPluralEffect()
+    {
+        return false;
+    }
 }
 
 public class SelfTargettingProceduralGenerator : IProceduralTargettingGenerator
@@ -33,10 +38,5 @@ public class SelfTargettingProceduralGenerator : IProceduralTargettingGenerator
     public override ITargettingDescription GetDescriptionType()
     {
         return new SelfTargettingDescription();
-    }
-
-    public override double GetMinCost()
-    {
-        return 0.0;
     }
 }

@@ -12,14 +12,17 @@ public class UpToXTargetDescription : IQualifiableTargettingDescription
     {
     }
 
-    public override string CardText()
+    public override string CardText(bool plural)
     {
         return "up to " + amount.ToString() + " target " + QualifierText() + CardParsing.Parse(targetType, amount != 1);
     }
-
     public override double PowerLevel()
     {
         return QualifierPowerLevel() * (amount + 0.5);
+    }
+    public override bool RequiresPluralEffect()
+    {
+        return amount == 1;
     }
 }
 
@@ -60,6 +63,8 @@ public class UpToXProceduralGenerator : IProceduralTargettingGenerator
 
     public override double GetMinCost()
     {
-        return 0.0;
+        UpToXTargetDescription desc = new UpToXTargetDescription(targetType);
+        desc.amount = 1;
+        return desc.PowerLevel();
     }
 }

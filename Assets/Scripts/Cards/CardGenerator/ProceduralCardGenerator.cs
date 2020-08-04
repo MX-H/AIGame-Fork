@@ -39,6 +39,8 @@ public class ProceduralCardGenerator : ICardGenerator
 
         // Decide on power budget
         double powerBudget = PowerBudget.ManaPowerBudgets[card.manaCost];
+        double powerMargin = PowerBudget.ManaPowerMargin[card.manaCost];
+        double powerLimit = PowerBudget.ManaPowerLimit[card.manaCost];
         card.name = "A creature card (" + powerBudget.ToString() + ")";
 
         // Decide on stats
@@ -53,7 +55,7 @@ public class ProceduralCardGenerator : ICardGenerator
         }
 
         // Decide on effects
-        GenerateCardEffects(random, model, card, powerBudget);
+        GenerateCardEffects(random, model, card, powerBudget, powerMargin, powerLimit);
 
         return card;
     }
@@ -65,9 +67,11 @@ public class ProceduralCardGenerator : ICardGenerator
         card.manaCost = (int)ProceduralUtils.GetRandomValue<ManaCost>(random, model);
 
         double powerBudget = PowerBudget.ManaPowerBudgets[card.manaCost];
+        double powerMargin = PowerBudget.ManaPowerMargin[card.manaCost];
+        double powerLimit = PowerBudget.ManaPowerLimit[card.manaCost];
         card.name = "A spell card(" + powerBudget.ToString() + ")";
 
-        GenerateCardEffects(random, model, card, powerBudget);
+        GenerateCardEffects(random, model, card, powerBudget, powerMargin, powerLimit);
 
         return card;
     }
@@ -79,14 +83,16 @@ public class ProceduralCardGenerator : ICardGenerator
         card.manaCost = (int)ProceduralUtils.GetRandomValue<ManaCost>(random, model);
 
         double powerBudget = PowerBudget.ManaPowerBudgets[card.manaCost];
+        double powerMargin = PowerBudget.ManaPowerMargin[card.manaCost];
+        double powerLimit = PowerBudget.ManaPowerLimit[card.manaCost];
         card.name = "A trap card(" + powerBudget.ToString() + ")";
 
-        GenerateCardEffects(random, model, card, powerBudget);
+        GenerateCardEffects(random, model, card, powerBudget, powerMargin, powerLimit);
 
         return card;
     }
 
-    static private void GenerateCardEffects(System.Random random, IHistogram model, CardDescription cardDesc, double powerBudget)
+    static private void GenerateCardEffects(System.Random random, IHistogram model, CardDescription cardDesc, double powerBudget, double powerMargin, double powerLimit)
     {
         // A trap card only has one trigger condition
         if (cardDesc.cardType == CardType.TRAP)
@@ -94,19 +100,23 @@ public class ProceduralCardGenerator : ICardGenerator
             ProceduralUtils.GetRandomValue(random, model, CardEnums.GetValidFlags<TriggerCondition>(CardType.TRAP));
         }
 
-        double maxPowerBudget = powerBudget * PowerBudget.ABSOLUTE_MARGIN;
-
         int effectCount = 0;
 
         List<TriggerCondition> triggerBlacklist = new List<TriggerCondition>();
 
-        while (cardDesc.PowerLevel() < powerBudget && effectCount < 5)
+        while ((cardDesc.PowerLevel() + PowerBudget.FLAT_EFFECT_COST) < powerBudget && effectCount < EffectConstants.MAX_CARD_EFFECTS)
         {
             // Generate effects
             CardEffectDescription cardEffect = new CardEffectDescription();
-            double allowableBudget = maxPowerBudget - cardDesc.PowerLevel() - PowerBudget.FLAT_EFFECT_COST;
-            if (allowableBudget <= 0)
+
+            // Create effects with a power level ranging between using max limit of budget, or uniformly distributing the min budget
+            double maxAllowableBudget = powerLimit - cardDesc.PowerLevel() - PowerBudget.FLAT_EFFECT_COST;
+            double minAllowableBudget = (powerBudget - cardDesc.PowerLevel() - PowerBudget.FLAT_EFFECT_COST) / (EffectConstants.MAX_CARD_EFFECTS - effectCount);
+
+            SortedSet<EffectType> candidatesWithinBudget = ProceduralUtils.GetEffectsWithinBudget(maxAllowableBudget);
+            if (candidatesWithinBudget.Count == 0)
             {
+                Debug.Log("No effects are valid for budget " + maxAllowableBudget);
                 break;
             }
 
@@ -122,7 +132,7 @@ public class ProceduralCardGenerator : ICardGenerator
 
             bool validEffect = false;
 
-            SortedSet<EffectType> effectCandidates = new SortedSet<EffectType>(CardEnums.GetValidFlags<EffectType>(cardEffect.triggerCondition).Intersect(ProceduralUtils.GetEffectsWithinBudget(allowableBudget)));
+            SortedSet<EffectType> effectCandidates = new SortedSet<EffectType>(CardEnums.GetValidFlags<EffectType>(cardEffect.triggerCondition).Intersect(candidatesWithinBudget));
             effectCandidates.Remove(EffectType.NONE);
 
             while (!validEffect && effectCandidates.Count > 0)
@@ -140,7 +150,7 @@ public class ProceduralCardGenerator : ICardGenerator
                     break;
                 }
 
-                validEffect = GenerateCardEffect(random, model, cardEffect, effectType, allowableBudget / 2, allowableBudget, true);
+                validEffect = GenerateCardEffect(random, model, cardEffect, effectType, minAllowableBudget, maxAllowableBudget, true);
             }
 
             // This means that there isn't an effect that meets this condition
@@ -151,7 +161,7 @@ public class ProceduralCardGenerator : ICardGenerator
             }
             else
             {
-                Debug.Log("No valid effect could be generated for trigger <" + cardEffect.triggerCondition.ToString() + "> with budget " + allowableBudget);
+                Debug.Log("No valid effect could be generated for trigger <" + cardEffect.triggerCondition.ToString() + "> with budget " + maxAllowableBudget);
             }
 
             // Add to black list so we don't get multiple effects that trigger on same condition
@@ -160,6 +170,78 @@ public class ProceduralCardGenerator : ICardGenerator
                 triggerBlacklist.Add(cardEffect.triggerCondition);
             }
         }
+
+        // Generate a draw back
+        if (cardDesc.PowerLevel() > powerMargin)
+        {
+            // TODO: Drawback should be one of, additional cost, negative effect, or negative modification to existing effect
+            // For now just add additional effect
+
+            CardEffectDescription cardEffect = new CardEffectDescription();
+
+            double currPower = cardDesc.PowerLevel();
+
+            double maxAllowableBudget = (cardDesc.PowerLevel() - powerBudget - PowerBudget.FLAT_EFFECT_COST) / PowerBudget.DOWNSIDE_WEIGHT;
+            double minAllowableBudget = (cardDesc.PowerLevel() - powerMargin - PowerBudget.FLAT_EFFECT_COST) / PowerBudget.DOWNSIDE_WEIGHT;
+
+            bool validEffect = false;
+
+
+            SortedSet<EffectType> candidatesWithinBudget = ProceduralUtils.GetEffectsWithinBudget(maxAllowableBudget);
+            if (candidatesWithinBudget.Count == 0)
+            {
+                validEffect = true;
+                Debug.Log("No effects are valid for budget " + maxAllowableBudget);
+            }
+
+
+            while (!validEffect)
+            {
+                if (cardDesc.cardType == CardType.SPELL || (cardDesc.cardType == CardType.TRAP))
+                {
+                    // After the first condition of a trap or after casting a spell all further effects of
+                    // the card should just resolve so trigger cond is NONE
+                    cardEffect.triggerCondition = TriggerCondition.NONE;
+                }
+                else
+                {
+                    cardEffect.triggerCondition = ProceduralUtils.GetRandomValueExcluding(random, model, triggerBlacklist, CardEnums.GetValidFlags<TriggerCondition>(cardDesc.cardType));
+                }
+
+                SortedSet<EffectType> effectCandidates = new SortedSet<EffectType>(CardEnums.GetValidFlags<EffectType>(cardEffect.triggerCondition).Intersect(candidatesWithinBudget));
+                effectCandidates.Remove(EffectType.NONE);
+
+                while (!validEffect && effectCandidates.Count > 0)
+                {
+                    EffectType effectType = ProceduralUtils.GetRandomValueExcluding(random, model, new EffectType[] { EffectType.NONE },
+                        CardEnums.GetValidFlags<EffectType>(cardEffect.triggerCondition));
+                    // This means that there isn't an effect that meets this condition
+                    if (effectType == EffectType.NONE)
+                    {
+                        // Add to black list so we don't get multiple effects that trigger on same condition
+                        if (cardEffect.triggerCondition != TriggerCondition.NONE)
+                        {
+                            triggerBlacklist.Add(cardEffect.triggerCondition);
+                        }
+                        break;
+                    }
+
+                    validEffect = GenerateCardEffect(random, model, cardEffect, effectType, minAllowableBudget, maxAllowableBudget, false);
+                }
+
+                // This means that there isn't an effect that meets this condition
+                if (validEffect)
+                {
+                    cardDesc.cardEffects.Add(cardEffect);
+                }
+                else
+                {
+                    Debug.Log("No valid effect could be generated for trigger <" + cardEffect.triggerCondition.ToString() + "> with budget " + -maxAllowableBudget);
+                }
+            }
+
+        }
+
     }
 
     static private bool GenerateCardEffect(System.Random random, IHistogram model, CardEffectDescription effectDesc, EffectType effect, double minBudget, double maxBudget, bool positive)
@@ -176,6 +258,11 @@ public class ProceduralCardGenerator : ICardGenerator
             double temp = minBudget;
             minBudget = maxBudget;
             maxBudget = temp;
+        }
+        // Always allow for default targetting (multiplier 1.0x)
+        if (maxBudget < 1.0)
+        {
+            maxBudget = 1.0;
         }
 
         TargetType targetType = TargetType.CREATURES;
@@ -254,6 +341,13 @@ public class ProceduralCardGenerator : ICardGenerator
             }
 
             allowableTargetting.IntersectWith(CardEnums.GetValidFlags<TargettingType>(targetType));
+
+            // Special case
+            // Up to can never be a downside because you can choose 0 targets
+            if (!positive)
+            {
+                allowableTargetting.Remove(TargettingType.UP_TO_TARGET);
+            }
         }
 
         // Could not find any valid targetting to achieve the desired alignment

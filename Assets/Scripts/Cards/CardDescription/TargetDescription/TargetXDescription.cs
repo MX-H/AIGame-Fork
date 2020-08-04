@@ -11,9 +11,9 @@ public class TargetXDescription : IQualifiableTargettingDescription
     {
     }
 
-    public override string CardText()
+    public override string CardText(bool plural)
     {
-        bool plural = amount != 1;
+        plural = amount != 1;
         string targetString = QualifierText() + CardParsing.Parse(targetType, plural);
         return (plural ? amount.ToString() + " target " : "target ") + targetString;
     }
@@ -21,6 +21,11 @@ public class TargetXDescription : IQualifiableTargettingDescription
     public override double PowerLevel()
     {
         return QualifierPowerLevel() * amount;
+    }
+
+    public override bool RequiresPluralEffect()
+    {
+        return amount == 1;
     }
 }
 
@@ -61,6 +66,8 @@ public class TargetXProceduralGenerator : IProceduralTargettingGenerator
 
     public override double GetMinCost()
     {
-        return 0.0;
+        TargetXDescription desc = new TargetXDescription(targetType);
+        desc.amount = 1;
+        return desc.PowerLevel();
     }
 }

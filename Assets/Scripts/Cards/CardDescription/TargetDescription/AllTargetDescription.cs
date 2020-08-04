@@ -9,14 +9,19 @@ public class AllTargetDescription : IQualifiableTargettingDescription
     {
     }
 
-    public override string CardText()
+    public override string CardText(bool plural)
     {
         return "all " + QualifierText() + CardParsing.Parse(targetType, true);
     }
 
     public override double PowerLevel()
     {
-        return ((GetAlignment() == Alignment.NEUTRAL) ?  2.0 : 4.0) * QualifierPowerLevel();
+        return ((GetAlignment() == Alignment.NEUTRAL) ?  1.5 : 3.0) * QualifierPowerLevel();
+    }
+
+    public override bool RequiresPluralEffect()
+    {
+        return false;
     }
 }
 
@@ -31,10 +36,5 @@ public class AllTargetProceduralGenerator : IProceduralTargettingGenerator
     public override ITargettingDescription GetDescriptionType()
     {
         return new AllTargetDescription(targetType);
-    }
-
-    public override double GetMinCost()
-    {
-        return GetDescriptionType().PowerLevel();
     }
 }

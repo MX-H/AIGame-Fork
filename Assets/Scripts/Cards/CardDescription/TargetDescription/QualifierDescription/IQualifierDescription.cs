@@ -12,7 +12,7 @@ public abstract class IQualifierDescription : IDescription
         qualifierType = qualifier;
     }
 
-    public abstract string CardText();
+    public abstract string CardText(bool plural = false);
     public abstract Alignment GetAlignment();
     public abstract double PowerLevel();
 }

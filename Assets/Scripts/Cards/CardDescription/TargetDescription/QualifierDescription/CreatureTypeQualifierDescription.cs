@@ -10,7 +10,7 @@ public class CreatureTypeQualifierDescription : IQualifierDescription
     {
     }
 
-    public override string CardText()
+    public override string CardText(bool plural)
     {
         return (isNegated ? "non-" : "") + CardParsing.Parse(creatureType);
     }

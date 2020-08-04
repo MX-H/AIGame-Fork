@@ -14,7 +14,9 @@ public abstract class ITargettingDescription : IDescription
         targettingType = targetting;
     }
 
-    public abstract string CardText();
+    public abstract bool RequiresPluralEffect();
+
+    public abstract string CardText(bool plural = false);
     public abstract Alignment GetAlignment();
     public abstract double PowerLevel();
 }
@@ -76,6 +78,9 @@ public abstract class IProceduralTargettingGenerator : ITargettingGenerator
     }
 
     // Min budget used to cull
-    public abstract double GetMinCost();
+    public virtual double GetMinCost()
+    {
+        return GetDescriptionType().PowerLevel();
+    }
     public abstract ITargettingDescription GetDescriptionType();
 }

@@ -7,9 +7,9 @@ public class NegateEffectDescription : IEffectDescription
     public NegateEffectDescription() : base(EffectType.NEGATE)
     { }
 
-    public override string CardText()
+    public override string CardText(bool plural)
     {
-        return "is(are) negated";
+        return (plural ? "is" : "are") + " negated";
     }
 
     public override Alignment GetAlignment()

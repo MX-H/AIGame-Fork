@@ -7,7 +7,7 @@ public class FoeTargettingDescription : ITargettingDescription
     public FoeTargettingDescription() : base(TargetType.PLAYERS, TargettingType.FOE)
     {
     }
-    public override string CardText()
+    public override string CardText(bool plural)
     {
         return "opponent";
     }
@@ -21,6 +21,11 @@ public class FoeTargettingDescription : ITargettingDescription
     {
         return 1.0;
     }
+
+    public override bool RequiresPluralEffect()
+    {
+        return true;
+    }
 }
 
 public class FoeTargettingProceduralGenerator : IProceduralTargettingGenerator
@@ -33,10 +38,5 @@ public class FoeTargettingProceduralGenerator : IProceduralTargettingGenerator
     public override ITargettingDescription GetDescriptionType()
     {
         return new FoeTargettingDescription();
-    }
-
-    public override double GetMinCost()
-    {
-        return 0.0;
     }
 }

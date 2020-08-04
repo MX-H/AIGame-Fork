@@ -9,7 +9,7 @@ public class CardDescription : IDescription
     public CardType cardType;
     public List<CardEffectDescription> cardEffects = new List<CardEffectDescription>();
 
-    public string CardText()
+    public string CardText(bool plural)
     {
         return "";
     }
@@ -29,7 +29,7 @@ public class CardDescription : IDescription
                 power += effect.PowerLevel();
             }
             else {
-                power += effect.PowerLevel() * PowerBudget.DOWNSIDE_WEIGHT;
+                power -= effect.PowerLevel() * PowerBudget.DOWNSIDE_WEIGHT;
             }
         }
         return power;

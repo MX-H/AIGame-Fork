@@ -6,6 +6,14 @@ static public class CardParsing
 {
     static private readonly string PARSE_ERROR = "MISSING STRING";
 
+    static public string CapitalizeSentence(string s)
+    {
+        if (s.Length > 0)
+        {
+            s = s[0].ToString().ToUpper() + s.Substring(1);
+        }
+        return s;
+    }
     static public string Parse(KeywordAttribute a)
     {
         switch (a)

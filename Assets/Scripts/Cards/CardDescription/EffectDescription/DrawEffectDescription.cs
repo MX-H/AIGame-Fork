@@ -12,9 +12,9 @@ public class DrawEffectDescription : IEffectDescription
         drawModifier = DrawModifier.SELF;
     }
 
-    public override string CardText() 
+    public override string CardText(bool plural) 
     {
-        return "draw(s) " + amount.ToString() + " card(s)";
+        return (plural ? "draws " : "draw ") + amount.ToString() + ((amount == 1) ? " card" : " cards");
     }
 
     public override Alignment GetAlignment()
@@ -55,6 +55,8 @@ public class DrawEffectProceduralGenerator : IProceduralEffectGenerator
 
     public override double GetMinCost()
     {
-        return PowerBudget.UNIT_COST;
+        DrawEffectDescription desc = new DrawEffectDescription();
+        desc.amount = 1;
+        return desc.PowerLevel();
     }
 }

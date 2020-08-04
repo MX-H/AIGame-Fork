@@ -77,7 +77,18 @@ public class CardDisplay : MonoBehaviour
 
             foreach (CardEffectDescription effect in cardDesc.cardEffects)
             {
-                effectText += effect.CardText() + "(" + effect.PowerLevel().ToString() + ")\n";
+                string effectString = effect.CardText() + "(";
+                if (effect.GetAlignment() == Alignment.NEGATIVE)
+                {
+                    effectString += (-(PowerBudget.DOWNSIDE_WEIGHT * effect.PowerLevel())).ToString();
+
+                }
+                else
+                {
+                    effectString += effect.PowerLevel().ToString();
+                }
+                effectString += ").\n";
+                effectText += effectString;
             }
 
             textBox.text = effectText;

@@ -9,10 +9,10 @@ public class CardEffectDescription : IDescription
     public ITargettingDescription targettingType;
     public IEffectDescription effectType;
 
-    public string CardText()
+    public string CardText(bool plural = false)
     {
         return ((triggerCondition == TriggerCondition.NONE) ? "" : CardParsing.Parse(triggerCondition) + ": ")
-            + targettingType.CardText() + " " + effectType.CardText();
+            + CardParsing.CapitalizeSentence(targettingType.CardText() + " " + effectType.CardText(targettingType.RequiresPluralEffect()));
     }
 
     public Alignment GetAlignment()

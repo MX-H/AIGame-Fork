@@ -11,14 +11,19 @@ public class ExceptTargetDescription : IQualifiableTargettingDescription
     {
     }
 
-    public override string CardText()
+    public override string CardText(bool plural)
     {
         return "all " + QualifierText() + CardParsing.Parse(targetType, true) + " except " + targetDescription.CardText();
     }
 
     public override double PowerLevel()
     {
-        return 4.0 * QualifierPowerLevel();
+        return ((GetAlignment() == Alignment.NEUTRAL) ? 2.0 : 3.5) * QualifierPowerLevel();
+    }
+
+    public override bool RequiresPluralEffect()
+    {
+        return false;
     }
 }
 
@@ -36,10 +41,5 @@ public class ExceptTargetProceduralGenerator : IProceduralTargettingGenerator
     public override ITargettingDescription GetDescriptionType()
     {
         return new ExceptTargetDescription(targetType);
-    }
-
-    public override double GetMinCost()
-    {
-        return GetDescriptionType().PowerLevel();
     }
 }

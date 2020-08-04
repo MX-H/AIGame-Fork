@@ -9,9 +9,9 @@ public class SummonEffectDescription : IEffectDescription
     public CreatureType tokenType;
     public SummonEffectDescription() : base(EffectType.SUMMON_TOKEN)
     { }
-    public override string CardText()
+    public override string CardText(bool plural)
     {
-        return "summon(s) " + amount.ToString() + " " + CardParsing.Parse(tokenType) + " token(s)";
+        return (plural ? "summons " : "summon ") + amount.ToString() + " " + CardParsing.Parse(tokenType) + ((amount == 1) ? " token" : " tokens");
     }
 
     public override Alignment GetAlignment()
@@ -21,7 +21,7 @@ public class SummonEffectDescription : IEffectDescription
 
     public override double PowerLevel()
     {
-        return (amount - 0.5) * PowerBudget.UNIT_COST;
+        return 3 * (amount - 0.5) * PowerBudget.UNIT_COST;
     }
 }
 
@@ -52,6 +52,8 @@ public class SummonEffectProceduralGenerator : IProceduralEffectGenerator
 
     public override double GetMinCost()
     {
-        return PowerBudget.UNIT_COST;
+        SummonEffectDescription desc = new SummonEffectDescription();
+        desc.amount = 1;
+        return desc.PowerLevel();
     }
 }

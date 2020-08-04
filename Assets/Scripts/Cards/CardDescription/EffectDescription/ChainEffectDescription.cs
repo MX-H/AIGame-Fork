@@ -11,7 +11,7 @@ public class ChainEffectDescription : IEffectDescription
     {
     }
 
-    public override string CardText()
+    public override string CardText(bool plural)
     {
         throw new System.NotImplementedException();
     }

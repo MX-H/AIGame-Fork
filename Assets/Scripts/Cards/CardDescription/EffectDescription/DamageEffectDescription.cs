@@ -10,9 +10,19 @@ public class DamageEffectDescription : IEffectDescription
     {
     }
 
-    public override string CardText()
+    public override string CardText(bool plural)
     {
-        return ((effectType == EffectType.HEAL_DAMAGE) ? "heal(s) " : "take(s) ") + amount.ToString() + " damage";
+        string text = "";
+        if (effectType == EffectType.HEAL_DAMAGE)
+        {
+            text += plural ? "heals " : "heal ";
+        }
+        else
+        {
+            text += plural ? "takes " : "take ";
+        }
+        text += amount.ToString() + " damage";
+        return text;
     }
     public override Alignment GetAlignment()
     {
@@ -20,7 +30,7 @@ public class DamageEffectDescription : IEffectDescription
     }
     public override double PowerLevel()
     {
-        return ((effectType == EffectType.HEAL_DAMAGE) ? 2.0 : 1.0) * (amount - 0.5) * PowerBudget.UNIT_COST;
+        return ((effectType == EffectType.HEAL_DAMAGE) ? 1.0 / 2.0 : 1.0) * (amount - 0.5) * PowerBudget.UNIT_COST;
     }
 }
 
@@ -55,6 +65,8 @@ public class DamageEffectProceduralGenerator : IProceduralEffectGenerator
 
     public override double GetMinCost()
     {
-        return 0.0;
+        DamageEffectDescription desc = new DamageEffectDescription(heal);
+        desc.amount = 1;
+        return desc.PowerLevel();
     }
 }
