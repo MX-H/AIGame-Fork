@@ -2,16 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AllTargetDescription : ITargettingDescription
-{
-    IQualifierDescription qualifier;
 
-    public AllTargetDescription(TargetType target) : base(target, TargettingType.TARGET)
+public class AllTargetDescription : IQualifiableTargettingDescription
+{
+    public AllTargetDescription(TargetType target) : base(target, TargettingType.ALL)
     {
     }
 
-    public override Classification GetClassification()
+    public override string CardText()
     {
-        return (qualifier == null) ? Classification.NEUTRAL : qualifier.GetClassification();
+        return "all " + QualifierText() + CardParsing.Parse(targetType, true);
+    }
+
+    public override double PowerLevel()
+    {
+        return ((GetAlignment() == Alignment.NEUTRAL) ?  2.0 : 4.0) * QualifierPowerLevel();
+    }
+}
+
+public class AllTargetProceduralGenerator : IProceduralTargettingGenerator
+{
+    public override ITargettingDescription Generate()
+    {
+        AllTargetDescription desc = new AllTargetDescription(targetType);
+        return desc;
+    }
+
+    public override ITargettingDescription GetDescriptionType()
+    {
+        return new AllTargetDescription(targetType);
+    }
+
+    public override double GetMinCost()
+    {
+        return GetDescriptionType().PowerLevel();
     }
 }

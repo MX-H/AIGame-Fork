@@ -2,20 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChainEffectDescription : MonoBehaviour
+public class ChainEffectDescription : IEffectDescription
 {
     IEffectDescription effect1;
     IEffectDescription effect2;
 
-    // Start is called before the first frame update
-    void Start()
+    public ChainEffectDescription(): base(EffectType.NONE)
     {
-        
     }
 
-    // Update is called once per frame
-    void Update()
+    public override string CardText()
     {
-        
+        throw new System.NotImplementedException();
+    }
+
+    public override Alignment GetAlignment()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public override double PowerLevel()
+    {
+        throw new System.NotImplementedException();
     }
 }

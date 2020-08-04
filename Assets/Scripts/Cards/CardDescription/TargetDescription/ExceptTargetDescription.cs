@@ -2,26 +2,44 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ExceptTargetDescription : ITargettingDescription
-{
-    IQualifierDescription qualifier;
 
-    public ExceptTargetDescription(TargetType target) : base(target, TargettingType.TARGET)
+public class ExceptTargetDescription : IQualifiableTargettingDescription
+{
+    public ITargettingDescription targetDescription;
+
+    public ExceptTargetDescription(TargetType target) : base(target, TargettingType.EXCEPT)
     {
     }
 
-    public override Classification GetClassification()
+    public override string CardText()
     {
-        if (qualifier != null)
-        {
-            switch (qualifier.GetClassification())
-            {
-                case Classification.POSITIVE:
-                    return Classification.NEGATIVE;
-                case Classification.NEGATIVE:
-                    return Classification.POSITIVE;
-            }
-        }
-        return Classification.NEUTRAL;
+        return "all " + QualifierText() + CardParsing.Parse(targetType, true) + " except " + targetDescription.CardText();
+    }
+
+    public override double PowerLevel()
+    {
+        return 4.0 * QualifierPowerLevel();
+    }
+}
+
+public class ExceptTargetProceduralGenerator : IProceduralTargettingGenerator
+{
+    public override ITargettingDescription Generate()
+    {
+        ExceptTargetDescription desc = new ExceptTargetDescription(targetType);
+        IProceduralTargettingGenerator targetGen = ProceduralUtils.GetProceduralGenerator(TargettingType.TARGET);
+        targetGen.SetupParameters(targetType, random, model, minAllocatedBudget, maxAllocatedBudget);
+        desc.targetDescription = targetGen.Generate();
+        return desc;
+    }
+
+    public override ITargettingDescription GetDescriptionType()
+    {
+        return new ExceptTargetDescription(targetType);
+    }
+
+    public override double GetMinCost()
+    {
+        return GetDescriptionType().PowerLevel();
     }
 }

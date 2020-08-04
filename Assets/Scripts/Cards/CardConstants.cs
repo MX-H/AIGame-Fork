@@ -8,6 +8,7 @@ public static class PowerBudget
     public static readonly double DOWNSIDE_WEIGHT = -1.5;
     public static readonly double ALLOWABLE_MARGIN = 1.25;
     public static readonly double ABSOLUTE_MARGIN = 1.50;
+    public static readonly double FLAT_EFFECT_COST = 0.5;
 
     private static double ManaFunction(int mana)
     {

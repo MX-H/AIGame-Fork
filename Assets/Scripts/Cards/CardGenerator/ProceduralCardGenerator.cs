@@ -6,8 +6,8 @@ using System.Linq;
 
 public class ProceduralCardGenerator : ICardGenerator
 {
-    private CardHistogram model;
-    public ProceduralCardGenerator(CardHistogram m)
+    private IHistogram model;
+    public ProceduralCardGenerator(IHistogram m)
     {
         model = m;
     }
@@ -16,7 +16,7 @@ public class ProceduralCardGenerator : ICardGenerator
     {
         // First select the card type
         System.Random random = new System.Random(seed);
-        CardType t = getRandomValue<CardType>(random, model);
+        CardType t = ProceduralUtils.GetRandomValue<CardType>(random, model);
 
         switch (t)
         {
@@ -31,58 +31,15 @@ public class ProceduralCardGenerator : ICardGenerator
         return new CardDescription();
     }
 
-    static private T getRandomValue<T>(System.Random random, CardHistogram model) where T : Enum
-    {
-        return getRandomValue<T>(random, model, (T[])Enum.GetValues(typeof(T)));
-    }
-    static private T getRandomValue<T>(System.Random random, CardHistogram model, IEnumerable<T> whitelist) where T : Enum
-    {
-        int result = random.Next(model.GetTotal<T>(whitelist));
-        foreach (T t in whitelist)
-        {
-            result -= model.GetValue<T>(t);
-            if (result < 0)
-            {
-                return t;
-            }
-        }
-
-        // Should never get here
-        Debug.Log("Wasn't able to generate a random value for " + typeof(T).ToString() + ", returning first value");
-        return (T)Enum.GetValues(typeof(T)).GetValue(0);
-    }
-    static private T getRandomValueExcluding<T>(System.Random random, CardHistogram model, IEnumerable<T> blacklist) where T : Enum
-    {
-        return getRandomValueExcluding<T>(random, model, blacklist, (T[])Enum.GetValues(typeof(T)));
-    }
-    static private T getRandomValueExcluding<T>(System.Random random, CardHistogram model, IEnumerable<T> blacklist, IEnumerable<T> whitelist) where T : Enum
-    {
-        whitelist = whitelist.Except(blacklist);
-        int result = random.Next(model.GetTotal<T>(whitelist));
-        foreach (T t in whitelist)
-        {
-            result -= model.GetValue<T>(t);
-            if (result < 0)
-            {
-                return t;
-            }
-        }
-
-        // Should never get here
-        Debug.Log("Wasn't able to generate a random value for " + typeof(T).ToString() + ", returning first value");
-        return (T)Enum.GetValues(typeof(T)).GetValue(0);
-    }
-
-    static private CardDescription GenerateCreatureCard(System.Random random, CardHistogram model)
+    static private CardDescription GenerateCreatureCard(System.Random random, IHistogram model)
     {
         CreatureCardDescription card = new CreatureCardDescription();
-        card.creatureType = getRandomValue<CreatureType>(random, model);
-        card.manaCost = (int)getRandomValue<ManaCost>(random, model);
-        card.name = "A creature card";
+        card.creatureType = ProceduralUtils.GetRandomValue<CreatureType>(random, model);
+        card.manaCost = (int)ProceduralUtils.GetRandomValue<ManaCost>(random, model);
 
         // Decide on power budget
-
-        float powerBudget = CardEnums.ManaPowerBudgets[card.manaCost];
+        double powerBudget = PowerBudget.ManaPowerBudgets[card.manaCost];
+        card.name = "A creature card (" + powerBudget.ToString() + ")";
 
         // Decide on stats
         card.attack = random.Next(card.manaCost);
@@ -92,7 +49,7 @@ public class ProceduralCardGenerator : ICardGenerator
         int amount = random.Next(2);
         for (int i = 0; i < amount; i++)
         {
-            card.attributes.Add(getRandomValue<KeywordAttribute>(random, model));
+            card.attributes.Add(ProceduralUtils.GetRandomValue<KeywordAttribute>(random, model));
         }
 
         // Decide on effects
@@ -101,45 +58,57 @@ public class ProceduralCardGenerator : ICardGenerator
         return card;
     }
 
-    static private CardDescription GenerateSpellCard(System.Random random, CardHistogram model)
+    static private CardDescription GenerateSpellCard(System.Random random, IHistogram model)
     {
         CardDescription card = new CardDescription();
         card.cardType = CardType.SPELL;
-        card.manaCost = (int)getRandomValue<ManaCost>(random, model);
-        card.name = "A spell card";
+        card.manaCost = (int)ProceduralUtils.GetRandomValue<ManaCost>(random, model);
 
-        float powerBudget = CardEnums.ManaPowerBudgets[card.manaCost];
+        double powerBudget = PowerBudget.ManaPowerBudgets[card.manaCost];
+        card.name = "A spell card(" + powerBudget.ToString() + ")";
+
         GenerateCardEffects(random, model, card, powerBudget);
 
         return card;
     }
 
-    static private CardDescription GenerateTrapCard(System.Random random, CardHistogram model)
+    static private CardDescription GenerateTrapCard(System.Random random, IHistogram model)
     {
         CardDescription card = new CardDescription();
         card.cardType = CardType.TRAP;
-        card.manaCost = (int)getRandomValue<ManaCost>(random, model);
-        card.name = "A trap card";
+        card.manaCost = (int)ProceduralUtils.GetRandomValue<ManaCost>(random, model);
 
-        float powerBudget = CardEnums.ManaPowerBudgets[card.manaCost];
+        double powerBudget = PowerBudget.ManaPowerBudgets[card.manaCost];
+        card.name = "A trap card(" + powerBudget.ToString() + ")";
+
         GenerateCardEffects(random, model, card, powerBudget);
 
         return card;
     }
 
-    static private void GenerateCardEffects(System.Random random, CardHistogram model, CardDescription cardDesc, float powerBudget)
+    static private void GenerateCardEffects(System.Random random, IHistogram model, CardDescription cardDesc, double powerBudget)
     {
         // A trap card only has one trigger condition
         if (cardDesc.cardType == CardType.TRAP)
         {
-            getRandomValue(random, model, CardEnums.GetValidFlags<TriggerCondition>(CardType.TRAP));
+            ProceduralUtils.GetRandomValue(random, model, CardEnums.GetValidFlags<TriggerCondition>(CardType.TRAP));
         }
 
+        double maxPowerBudget = powerBudget * PowerBudget.ABSOLUTE_MARGIN;
+
         int effectCount = 0;
-        while (powerBudget > 0 || effectCount >= 5)
+
+        List<TriggerCondition> triggerBlacklist = new List<TriggerCondition>();
+
+        while (cardDesc.PowerLevel() < powerBudget && effectCount < 5)
         {
             // Generate effects
             CardEffectDescription cardEffect = new CardEffectDescription();
+            double allowableBudget = maxPowerBudget - cardDesc.PowerLevel() - PowerBudget.FLAT_EFFECT_COST;
+            if (allowableBudget <= 0)
+            {
+                break;
+            }
 
             if (cardDesc.cardType == CardType.SPELL || (cardDesc.cardType == CardType.TRAP && effectCount > 0))
             {
@@ -148,68 +117,206 @@ public class ProceduralCardGenerator : ICardGenerator
                 cardEffect.triggerCondition = TriggerCondition.NONE;
             }
             else {
-                cardEffect.triggerCondition = getRandomValue(random, model, CardEnums.GetValidFlags<TriggerCondition>(cardDesc.cardType));
+                cardEffect.triggerCondition = ProceduralUtils.GetRandomValueExcluding(random, model, triggerBlacklist, CardEnums.GetValidFlags<TriggerCondition>(cardDesc.cardType));
             }
 
-            EffectType effectType = getRandomValueExcluding(random, model, new EffectType[] { EffectType.NONE },
-                CardEnums.GetValidFlags<EffectType>(cardEffect.triggerCondition));
+            bool validEffect = false;
+
+            SortedSet<EffectType> effectCandidates = new SortedSet<EffectType>(CardEnums.GetValidFlags<EffectType>(cardEffect.triggerCondition).Intersect(ProceduralUtils.GetEffectsWithinBudget(allowableBudget)));
+            effectCandidates.Remove(EffectType.NONE);
+
+            while (!validEffect && effectCandidates.Count > 0)
+            {
+                EffectType effectType = ProceduralUtils.GetRandomValueExcluding(random, model, new EffectType[] { EffectType.NONE },
+                    CardEnums.GetValidFlags<EffectType>(cardEffect.triggerCondition));
+                // This means that there isn't an effect that meets this condition
+                if (effectType == EffectType.NONE)
+                {
+                    // Add to black list so we don't get multiple effects that trigger on same condition
+                    if (cardEffect.triggerCondition != TriggerCondition.NONE)
+                    {
+                        triggerBlacklist.Add(cardEffect.triggerCondition);
+                    }
+                    break;
+                }
+
+                validEffect = GenerateCardEffect(random, model, cardEffect, effectType, allowableBudget / 2, allowableBudget, true);
+            }
 
             // This means that there isn't an effect that meets this condition
-            if (effectType == EffectType.NONE)
+            if (validEffect)
             {
-                continue;
+                cardDesc.cardEffects.Add(cardEffect);
+                effectCount++;
             }
-            float powerLevel = GenerateCardEffect(random, model, cardEffect, effectType, powerBudget);
-            cardDesc.cardEffects.Add(cardEffect);
-            powerBudget -= powerLevel;
-            effectCount++;
+            else
+            {
+                Debug.Log("No valid effect could be generated for trigger <" + cardEffect.triggerCondition.ToString() + "> with budget " + allowableBudget);
+            }
+
+            // Add to black list so we don't get multiple effects that trigger on same condition
+            if (cardEffect.triggerCondition != TriggerCondition.NONE)
+            {
+                triggerBlacklist.Add(cardEffect.triggerCondition);
+            }
         }
     }
 
-    static private float GenerateCardEffect(System.Random random, CardHistogram model, CardEffectDescription effectDesc, EffectType effect, float powerBudget)
+    static private bool GenerateCardEffect(System.Random random, IHistogram model, CardEffectDescription effectDesc, EffectType effect, double minBudget, double maxBudget, bool positive)
     {
-        float powerLevel = 5.0f; // Every effect adds a base powerlevel
+        IProceduralEffectGenerator effectGen = ProceduralUtils.GetProceduralGenerator(effect);
+        effectGen.SetupParameters(random, model, minBudget, maxBudget);
+        effectDesc.effectType = effectGen.Generate();
 
-        switch (effect)
+        // Adjust budgets
+        minBudget /= effectDesc.effectType.PowerLevel();
+        maxBudget /= effectDesc.effectType.PowerLevel();
+        if (minBudget > maxBudget)
         {
-            case EffectType.DRAW_CARDS:
-                {
-                    DrawEffectDescription drawEffect = new DrawEffectDescription();
-                    drawEffect.drawModifier = getRandomValue<DrawModifier>(random, model);
-                    drawEffect.amount = random.Next(1, 3);
-                    effectDesc.effectType = drawEffect;
-                }
-                break;
-            case EffectType.DEAL_DAMAGE:
-            case EffectType.HEAL_DAMAGE:
-                {
-                    DamageEffectDescription damageEffect = new DamageEffectDescription(effect == EffectType.HEAL_DAMAGE);
-                    damageEffect.amount = random.Next(1, 3);
-                    effectDesc.effectType = damageEffect;
-                }
-                break;
-            case EffectType.SUMMON_TOKEN:
-                {
-                    SummonEffectDescription summonEffect = new SummonEffectDescription();
-                    summonEffect.amount = random.Next(1, 2);
-                    summonEffect.tokenType = getRandomValue<CreatureType>(random, model);
-                    effectDesc.effectType = summonEffect;
-                }
-                break;
-            case EffectType.NEGATE:
-                {
-                    NegateEffectDescription negateEffect = new NegateEffectDescription();
-                    effectDesc.effectType = negateEffect;
-                }
-                break;
-            default:
-                Debug.Log("Didn't set an IEffectDescription for " + effect);
-                break;
+            double temp = minBudget;
+            minBudget = maxBudget;
+            maxBudget = temp;
         }
 
-        effectDesc.targetType = getRandomValue(random, model, CardEnums.GetValidFlags<TargetType>(effect));
-        effectDesc.targettingType = getRandomValue(random, model, CardEnums.GetValidFlags<TargettingType>(new object[] { effectDesc.targetType }));
+        TargetType targetType = TargetType.CREATURES;
+        SortedSet<TargetType> validTargets = CardEnums.GetValidFlags<TargetType>(effect);
+        SortedSet<TargettingType> allowableTargetting = new SortedSet<TargettingType>();
+        SortedSet<QualifierType> allowableQualifiers = new SortedSet<QualifierType>();
 
-        return powerLevel;
+        while (validTargets.Count > 0 && allowableTargetting.Count == 0)
+        {
+            targetType = ProceduralUtils.GetRandomValue(random, model, validTargets);
+            validTargets.Remove(targetType);
+
+            switch (effectDesc.effectType.GetAlignment())
+            {
+                case Alignment.POSITIVE:
+                    if (positive)
+                    {
+                        allowableTargetting = ProceduralUtils.GetTargettingByAlignment(Alignment.POSITIVE);
+
+                        allowableQualifiers = ProceduralUtils.GetQualifiersByAlignment(Alignment.NEUTRAL);
+                        allowableQualifiers.UnionWith(ProceduralUtils.GetQualifiersByAlignment(Alignment.POSITIVE));
+                        allowableQualifiers.IntersectWith(CardEnums.GetValidFlags<QualifierType>(targetType));
+                        if (allowableQualifiers.Count > 0)
+                        {
+                            allowableTargetting.UnionWith(ProceduralUtils.GetTargettingByAlignment(Alignment.NEUTRAL));
+                        }
+                    }
+                    else
+                    {
+                        allowableTargetting = ProceduralUtils.GetTargettingByAlignment(Alignment.NEGATIVE);
+
+                        allowableQualifiers = ProceduralUtils.GetQualifiersByAlignment(Alignment.NEGATIVE);
+                        allowableQualifiers.IntersectWith(CardEnums.GetValidFlags<QualifierType>(targetType));
+                        if (allowableQualifiers.Count > 0)
+                        {
+                            allowableTargetting.UnionWith(ProceduralUtils.GetTargettingByAlignment(Alignment.NEUTRAL));
+                        }
+                    }
+                    break;
+                case Alignment.NEGATIVE:
+                    if (positive)
+                    {
+                        allowableTargetting = ProceduralUtils.GetTargettingByAlignment(Alignment.NEGATIVE);
+
+                        allowableQualifiers = ProceduralUtils.GetQualifiersByAlignment(Alignment.NEUTRAL);
+                        allowableQualifiers.UnionWith(ProceduralUtils.GetQualifiersByAlignment(Alignment.NEGATIVE));
+                        allowableQualifiers.IntersectWith(CardEnums.GetValidFlags<QualifierType>(targetType));
+                        if (allowableQualifiers.Count > 0)
+                        {
+                            allowableTargetting.UnionWith(ProceduralUtils.GetTargettingByAlignment(Alignment.NEUTRAL));
+                        }
+                    }
+                    else
+                    {
+                        allowableTargetting = ProceduralUtils.GetTargettingByAlignment(Alignment.POSITIVE);
+                        allowableQualifiers = ProceduralUtils.GetQualifiersByAlignment(Alignment.POSITIVE);
+                        allowableQualifiers.IntersectWith(CardEnums.GetValidFlags<QualifierType>(targetType));
+                        if (allowableQualifiers.Count > 0)
+                        {
+                            allowableTargetting.UnionWith(ProceduralUtils.GetTargettingByAlignment(Alignment.NEUTRAL));
+                        }
+                    }
+                    break;
+                default:
+                    if (positive)
+                    {
+                        allowableTargetting = new SortedSet<TargettingType>((TargettingType[])Enum.GetValues(typeof(TargettingType)));
+                        allowableQualifiers = new SortedSet<QualifierType>((QualifierType[])Enum.GetValues(typeof(QualifierType)));
+                        allowableQualifiers.IntersectWith(CardEnums.GetValidFlags<QualifierType>(targetType));
+                    }
+                    else
+                    {
+                        allowableTargetting = new SortedSet<TargettingType>();
+                    }
+                    break;
+            }
+
+            allowableTargetting.IntersectWith(CardEnums.GetValidFlags<TargettingType>(targetType));
+        }
+
+        // Could not find any valid targetting to achieve the desired alignment
+        if (allowableTargetting.Count == 0)
+        {
+            SortedSet<TargetType> targets = CardEnums.GetValidFlags<TargetType>(effect);
+
+            Debug.Log("Wasn't able to generate targets for effect <" + effect.ToString() + ">");
+            return false;
+        }
+
+
+        // Attempt to narrow down the targetting pool
+        SortedSet<TargettingType> targettingWithinBudget = new SortedSet<TargettingType>(allowableTargetting.Intersect(ProceduralUtils.GetTargettingWithinBudget(maxBudget)));
+        if (targettingWithinBudget.Count > 0)
+        {
+            allowableTargetting = targettingWithinBudget;
+        }
+        else
+        {
+            Debug.Log("Unable to narrow down targetting types for <" + effect.ToString() + ", "  + targetType.ToString() + "> for budget " + maxBudget);
+        }
+
+        TargettingType targettingType = ProceduralUtils.GetRandomValue(random, model, allowableTargetting);
+        IProceduralTargettingGenerator targettingGen = ProceduralUtils.GetProceduralGenerator(targettingType);
+        targettingGen.SetupParameters(targetType, random, model, minBudget, maxBudget);
+        effectDesc.targettingType = targettingGen.Generate();
+        
+        // Adjust budgets
+        minBudget /= effectDesc.targettingType.PowerLevel();
+        maxBudget /= effectDesc.targettingType.PowerLevel();
+        if (minBudget > maxBudget)
+        {
+            double temp = minBudget;
+            minBudget = maxBudget;
+            maxBudget = temp;
+        }
+
+
+        if (effectDesc.targettingType is IQualifiableTargettingDescription qualifiable)
+        {
+            // Generate a possible qualifier
+
+            // Attempt to narrow down the qualifier pool
+            SortedSet<QualifierType> qualifiersWithinBudget = new SortedSet<QualifierType>(allowableQualifiers.Intersect(ProceduralUtils.GetQualifiersWithinBudget(maxBudget)));
+            if (targettingWithinBudget.Count > 0)
+            {
+                allowableQualifiers = qualifiersWithinBudget;
+            }
+            else
+            {
+                Debug.Log("Unable to narrow down qualifier types for <" + effect.ToString() + ", " + targetType.ToString() + "> for budget " + maxBudget);
+            }
+
+            QualifierType qualifier = ProceduralUtils.GetRandomValue(random, model, allowableQualifiers);
+            if (qualifier != QualifierType.NONE)
+            {
+                IProceduralQualifierGenerator qualifierGen = ProceduralUtils.GetProceduralGenerator(qualifier);
+                qualifierGen.SetupParameters(random, model, minBudget, maxBudget);
+                qualifiable.qualifier = qualifierGen.Generate();
+            }
+        }
+
+        return true;
     }
 }

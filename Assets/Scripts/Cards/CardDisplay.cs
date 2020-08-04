@@ -77,7 +77,7 @@ public class CardDisplay : MonoBehaviour
 
             foreach (CardEffectDescription effect in cardDesc.cardEffects)
             {
-                effectText += effect.CardText() + '\n';
+                effectText += effect.CardText() + "(" + effect.PowerLevel().ToString() + ")\n";
             }
 
             textBox.text = effectText;

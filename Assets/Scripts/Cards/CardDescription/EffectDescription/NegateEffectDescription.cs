@@ -11,4 +11,32 @@ public class NegateEffectDescription : IEffectDescription
     {
         return "is(are) negated";
     }
+
+    public override Alignment GetAlignment()
+    {
+        return Alignment.NEGATIVE;
+    }
+
+    public override double PowerLevel()
+    {
+        return PowerBudget.UNIT_COST * 3;
+    }
+}
+
+public class NegateEffectProceduralGenerator : IProceduralEffectGenerator
+{
+    public override IEffectDescription Generate()
+    {
+        return new NegateEffectDescription();
+    }
+
+    public override IEffectDescription GetDescriptionType()
+    {
+        return new NegateEffectDescription();
+    }
+
+    public override double GetMinCost()
+    {
+        return GetDescriptionType().PowerLevel();
+    }
 }

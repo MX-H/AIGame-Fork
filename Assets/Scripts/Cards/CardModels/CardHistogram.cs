@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Linq;
 
 [CreateAssetMenu(fileName = "New Model", menuName = "CardHistogram", order = 51)]
-public class CardHistogram : ScriptableObject
+public class CardHistogram : IHistogram
 {
     [System.Serializable]
     private class EnumHistogram
@@ -158,7 +158,7 @@ public class CardHistogram : ScriptableObject
         }
     }
 
-    public int GetValue<T>(T key) where T : System.Enum
+    public override int GetValue<T>(T key)
     {
         if (typeIndexMap.ContainsKey(typeof(T)))
         {
@@ -167,7 +167,7 @@ public class CardHistogram : ScriptableObject
         return 0;
     }
 
-    public int GetTotal<T>() where T : System.Enum
+    public override int GetTotal<T>()
     {
         if (typeIndexMap.ContainsKey(typeof(T)))
         {
@@ -176,7 +176,7 @@ public class CardHistogram : ScriptableObject
         return 0;
     }
 
-    public int GetTotal<T>(IEnumerable<T> keys) where T : System.Enum
+    public override int GetTotal<T>(IEnumerable<T> keys)
     {
         if (typeIndexMap.ContainsKey(typeof(T)))
         {

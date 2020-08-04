@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 using System.Linq;
 
-public enum Classification
+public enum Alignment
 {
     POSITIVE,
     NEUTRAL,
@@ -147,9 +147,6 @@ static class CardEnums
         };
 
 
-    public static SortedSet<EffectType> PositiveEffects;    // Positive towards self
-    public static SortedSet<EffectType> NegativeEffects;    // Negative towards self
-
     private static Dictionary<(Type T1, Type T2), dynamic> FlagSets;
     private static void RegisterFlagSet<T1, T2>(bool empty = true)
     {
@@ -182,7 +179,7 @@ static class CardEnums
             {
                 FlagSets[(key.GetType(), typeof(T))][key] = new SortedSet<T>();
             }
-            return FlagSets[(key.GetType(), typeof(T))][key];
+            return new SortedSet<T>(FlagSets[(key.GetType(), typeof(T))][key]);
         }
         Debug.Assert(false, "Flags are undefined for <" + key.GetType().ToString() + "," + typeof(T).ToString() + ">");
         return new SortedSet<T>();
@@ -203,6 +200,22 @@ static class CardEnums
             5.0f
         };
 
+    public static Alignment CombineAlignments(Alignment a, Alignment b)
+    {
+        // Neutral turns everything positive except another neutral
+
+        switch (a)
+        {
+            case Alignment.NEUTRAL:
+                return (b == Alignment.NEUTRAL) ? Alignment.NEUTRAL : Alignment.POSITIVE;
+            case Alignment.POSITIVE:
+                return (b == Alignment.NEGATIVE) ? Alignment.NEGATIVE : Alignment.POSITIVE;
+            case Alignment.NEGATIVE:
+                return (b == Alignment.POSITIVE) ? Alignment.NEGATIVE : Alignment.POSITIVE;
+        }
+        return Alignment.NEUTRAL;
+    }
+
     static CardEnums()
     {
         FlagSets = new Dictionary<(Type T1, Type T2), dynamic>();
@@ -219,8 +232,8 @@ static class CardEnums
         RegisterFlagSet<CardType, TriggerCondition>();
         RegisterFlagSet<TriggerCondition, TargettingType>(false);
 
-        PositiveEffects = new SortedSet<EffectType>() { EffectType.DRAW_CARDS, EffectType.HEAL_DAMAGE, EffectType.SUMMON_TOKEN };
-        NegativeEffects = new SortedSet<EffectType>() { EffectType.DEAL_DAMAGE, EffectType.NEGATE};
+        RegisterFlagSet<QualifierType, TargetType>();
+        RegisterFlagSet<TargetType, QualifierType>();
 
         // Valid target types for effects
         RegisterFlags(EffectType.DRAW_CARDS, new TargetType[] { TargetType.PLAYERS });
@@ -265,6 +278,10 @@ static class CardEnums
         // Targetting types for specific triggers
         RemoveFlags(TriggerCondition.ON_SELF_DAMAGE_DEALT, new TargettingType[] { TargettingType.TARGET, TargettingType.UP_TO_TARGET });
         RemoveFlags(TriggerCondition.ON_SELF_DAMAGE_TAKEN, new TargettingType[] { TargettingType.TARGET, TargettingType.UP_TO_TARGET });
+
+        RegisterFlags(QualifierType.NONE, (TargetType[])Enum.GetValues(typeof(TargetType)));
+        RegisterFlags(QualifierType.CREATURE_TYPE, new TargetType[] { TargetType.CREATURES });
+        RegisterFlags(QualifierType.CARD_TYPE, new TargetType[] { TargetType.CARDS });
     }
 
     static private void RegisterFlags<T1, T2>(T1 key, IEnumerable<T2> flags, bool storeReverse = true)

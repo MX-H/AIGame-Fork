@@ -6,14 +6,43 @@ public class CreatureTypeQualifierDescription : IQualifierDescription
 {
     public bool isNegated;
     public CreatureType creatureType;
-    public CreatureTypeQualifierDescription(CreatureType creature, bool negate) : base(QualifierType.CREATURE_TYPE)
+    public CreatureTypeQualifierDescription() : base(QualifierType.CREATURE_TYPE)
     {
-        creatureType = creature;
-        isNegated = negate;
     }
 
-    public override Classification GetClassification()
+    public override string CardText()
     {
-        return isNegated ? Classification.NEGATIVE : Classification.POSITIVE;
+        return (isNegated ? "non-" : "") + CardParsing.Parse(creatureType);
+    }
+
+    public override Alignment GetAlignment()
+    {
+        return isNegated ? Alignment.NEGATIVE : Alignment.POSITIVE;
+    }
+
+    public override double PowerLevel()
+    {
+        return PowerBudget.UNIT_COST * 0.9;
+    }
+}
+
+public class CreatureQualifierProceduralGenerator : IProceduralQualifierGenerator
+{
+    public override IQualifierDescription Generate()
+    {
+        CreatureTypeQualifierDescription desc = new CreatureTypeQualifierDescription();
+        desc.creatureType = ProceduralUtils.GetRandomValue<CreatureType>(random, model);
+
+        return desc;
+    }
+
+    public override IQualifierDescription GetDescriptionType()
+    {
+        return new CreatureTypeQualifierDescription();
+    }
+
+    public override double GetMinCost()
+    {
+        return 0.0;
     }
 }

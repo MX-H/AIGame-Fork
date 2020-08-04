@@ -73,4 +73,44 @@ static public class CardParsing
         }
         return PARSE_ERROR;
     }
+
+    static public string Parse(TargetType t, bool plural)
+    {
+        switch (t)
+        {
+            case TargetType.CREATURES:
+                return plural ? "creatures" : "creature";
+            case TargetType.SET_TRAPS:
+                return plural ? "set traps" : "set trap";
+            case TargetType.CARDS:
+                return plural ? "cards" : "card";
+            case TargetType.PLAYERS:
+                return plural ? "players" : "player";
+            case TargetType.CREATURE_CARDS:
+                return plural ? "creature cards" : "creature card";
+            case TargetType.SPELL_CARDS:
+                return plural ? "spell cards" : "spell card";
+            case TargetType.TRAP_CARDS:
+                return plural ? "trap cards" : "trap card";
+            case TargetType.PERMANENT:
+                return plural ? "permanents" : "permanent";
+            case TargetType.DAMAGEABLE:
+                return Parse(TargetType.CREATURES, plural) + " or " + Parse(TargetType.PLAYERS, plural);
+            case TargetType.ACTIVE_TRAPS:
+                return plural ? "traps" : "trap";
+            case TargetType.SPELLS:
+                return plural ? "spells" : "spell";
+            case TargetType.EFFECTS:
+                return plural ? "effects" : "effect";
+            case TargetType.SPELLS_AND_TRAPS:
+                return Parse(TargetType.SPELLS, plural) + " or " + Parse(TargetType.ACTIVE_TRAPS, plural);
+            case TargetType.SPELLS_AND_EFFECTS:
+                return Parse(TargetType.SPELLS, plural) + " or " + Parse(TargetType.EFFECTS, plural);
+            case TargetType.TRAPS_AND_EFFECTS:
+                return Parse(TargetType.ACTIVE_TRAPS, plural) + " or " + Parse(TargetType.EFFECTS, plural);
+            case TargetType.STACK_ITEMS:
+                return Parse(TargetType.SPELLS, plural) + ", " + Parse(TargetType.ACTIVE_TRAPS, plural) + ", or " + Parse(TargetType.PLAYERS, plural);
+        }
+        return PARSE_ERROR;
+    }
 }
