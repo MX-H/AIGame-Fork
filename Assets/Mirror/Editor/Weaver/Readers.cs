@@ -48,17 +48,17 @@ namespace Mirror.Weaver
             }
             if (td.IsDerivedFrom(Weaver.ComponentType))
             {
-                Weaver.Error($"Cannot Generate reader for component type {variable.Name}. Use a supported type or provide a custom reader", variable);
+                Weaver.Error($"Cannot generate reader for component type {variable.Name}. Use a supported type or provide a custom reader", variable);
                 return null;
             }
             if (variable.FullName == Weaver.ObjectType.FullName)
             {
-                Weaver.Error($"Cannot Generate reader for {variable.Name}. Use a supported type or provide a custom reader", variable);
+                Weaver.Error($"Cannot generate reader for {variable.Name}. Use a supported type or provide a custom reader", variable);
                 return null;
             }
             if (variable.FullName == Weaver.ScriptableObjectType.FullName)
             {
-                Weaver.Error($"Cannot Generate reader for {variable.Name}. Use a supported type or provide a custom reader", variable);
+                Weaver.Error($"Cannot generate reader for {variable.Name}. Use a supported type or provide a custom reader", variable);
                 return null;
             }
             if (variable.IsByReference)
@@ -69,12 +69,12 @@ namespace Mirror.Weaver
             }
             if (td.HasGenericParameters && !td.FullName.StartsWith("System.ArraySegment`1", System.StringComparison.Ordinal))
             {
-                Weaver.Error($"Cannot Generate reader for generic variable {variable.Name}. Use a supported type or provide a custom reader", variable);
+                Weaver.Error($"Cannot generate reader for generic variable {variable.Name}. Use a supported type or provide a custom reader", variable);
                 return null;
             }
             if (td.IsInterface)
             {
-                Weaver.Error($"Cannot Generate reader for interface {variable.Name}. Use a supported type or provide a custom reader", variable);
+                Weaver.Error($"Cannot generate reader for interface {variable.Name}. Use a supported type or provide a custom reader", variable);
                 return null;
             }
 
@@ -103,13 +103,13 @@ namespace Mirror.Weaver
         static void RegisterReadFunc(string name, MethodDefinition newReaderFunc)
         {
             readFuncs[name] = newReaderFunc;
-            Weaver.WeaveLists.GeneratedReadFunctions.Add(newReaderFunc);
+            Weaver.WeaveLists.generatedReadFunctions.Add(newReaderFunc);
 
             Weaver.ConfirmGeneratedCodeClass();
-            Weaver.WeaveLists.GenerateContainerClass.Methods.Add(newReaderFunc);
+            Weaver.WeaveLists.generateContainerClass.Methods.Add(newReaderFunc);
         }
 
-        static MethodDefinition GenerateArrayReadFunc( TypeReference variable, int recursionCount)
+        static MethodDefinition GenerateArrayReadFunc(TypeReference variable, int recursionCount)
         {
             if (!variable.IsArrayType())
             {
@@ -257,7 +257,7 @@ namespace Mirror.Weaver
             worker.Append(worker.Create(OpCodes.Stloc_1));
 
             // loop through array and deserialize each element
-            // Generates code like this
+            // generates code like this
             // for (int i=0; i< length ; i++)
             // {
             //     value[i] = reader.ReadXXX();
@@ -332,7 +332,7 @@ namespace Mirror.Weaver
             TypeDefinition td = variable.Resolve();
 
             CreateNew(variable, worker, td);
-            DeserializeFields(variable, recursionCount, worker);
+            ReadAllFields(variable, recursionCount, worker);
 
             worker.Append(worker.Create(OpCodes.Ldloc_0));
             worker.Append(worker.Create(OpCodes.Ret));
@@ -373,17 +373,11 @@ namespace Mirror.Weaver
             }
         }
 
-        static void DeserializeFields(TypeReference variable, int recursionCount, ILProcessor worker)
+        static void ReadAllFields(TypeReference variable, int recursionCount, ILProcessor worker)
         {
             uint fields = 0;
-            foreach (FieldDefinition field in variable.Resolve().Fields)
+            foreach (FieldDefinition field in variable.FindAllPublicFields())
             {
-                if (field.IsStatic || field.IsPrivate)
-                    continue;
-
-                if (field.IsNotSerialized)
-                    continue;
-
                 // mismatched ldloca/ldloc for struct/class combinations is invalid IL, which causes crash at runtime
                 OpCode opcode = variable.IsValueType ? OpCodes.Ldloca : OpCodes.Ldloc;
                 worker.Append(worker.Create(opcode, 0));
@@ -403,6 +397,7 @@ namespace Mirror.Weaver
                 worker.Append(worker.Create(OpCodes.Stfld, fieldRef));
                 fields++;
             }
+
             if (fields == 0)
             {
                 Log.Warning($"{variable} has no public or non-static fields to deserialize");

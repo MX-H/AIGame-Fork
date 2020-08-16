@@ -18,17 +18,17 @@ namespace Mirror.Weaver
                     ProcessSiteClass(td);
                 }
             }
-            if (Weaver.WeaveLists.GenerateContainerClass != null)
+            if (Weaver.WeaveLists.generateContainerClass != null)
             {
-                moduleDef.Types.Add(Weaver.WeaveLists.GenerateContainerClass);
-                Weaver.CurrentAssembly.MainModule.ImportReference(Weaver.WeaveLists.GenerateContainerClass);
+                moduleDef.Types.Add(Weaver.WeaveLists.generateContainerClass);
+                Weaver.CurrentAssembly.MainModule.ImportReference(Weaver.WeaveLists.generateContainerClass);
 
-                foreach (MethodDefinition f in Weaver.WeaveLists.GeneratedReadFunctions)
+                foreach (MethodDefinition f in Weaver.WeaveLists.generatedReadFunctions)
                 {
                     Weaver.CurrentAssembly.MainModule.ImportReference(f);
                 }
 
-                foreach (MethodDefinition f in Weaver.WeaveLists.GeneratedWriteFunctions)
+                foreach (MethodDefinition f in Weaver.WeaveLists.generatedWriteFunctions)
                 {
                     Weaver.CurrentAssembly.MainModule.ImportReference(f);
                 }
@@ -57,7 +57,7 @@ namespace Mirror.Weaver
 
             if (md.Name == ".cctor" ||
                 md.Name == NetworkBehaviourProcessor.ProcessedFunctionName ||
-                md.Name.StartsWith("InvokeSyn"))
+                md.Name.StartsWith(Weaver.InvokeRpcPrefix))
                 return;
 
             if (md.Body != null && md.Body.Instructions != null)
@@ -183,13 +183,12 @@ namespace Mirror.Weaver
                 return;
 
             // Events use an "Invoke" method to call the delegate.
-            // this code replaces the "Invoke" instruction with the Generated "Call***" instruction which send the event to the server.
+            // this code replaces the "Invoke" instruction with the generated "Call***" instruction which send the event to the server.
             // but the "Invoke" instruction is called on the event field - where the "call" instruction is not.
             // so the earlier instruction that loads the event field is replaced with a Noop.
 
             // go backwards until find a ldfld instruction that matches ANY event
-            bool found = false;
-            while (iCount > 0 && !found)
+            while (iCount > 0)
             {
                 iCount -= 1;
                 Instruction inst = md.Body.Instructions[iCount];
@@ -200,11 +199,11 @@ namespace Mirror.Weaver
                     // find replaceEvent with matching name
                     // NOTE: original weaver compared .Name, not just the MethodDefinition,
                     //       that's why we use dict<string,method>.
-                    if (Weaver.WeaveLists.replaceEvents.TryGetValue(opField.Name, out MethodDefinition replacement))
+                    if (Weaver.WeaveLists.replaceEvents.TryGetValue(opField.FullName, out MethodDefinition replacement))
                     {
                         instr.Operand = replacement;
                         inst.OpCode = OpCodes.Nop;
-                        found = true;
+                        return;
                     }
                 }
             }

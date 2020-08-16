@@ -18,10 +18,10 @@ namespace Mirror.Weaver
         // [SyncEvent] invoke functions that should be replaced. dict<originalEventName, replacement>
         public Dictionary<string, MethodDefinition> replaceEvents = new Dictionary<string, MethodDefinition>();
 
-        public List<MethodDefinition> GeneratedReadFunctions = new List<MethodDefinition>();
-        public List<MethodDefinition> GeneratedWriteFunctions = new List<MethodDefinition>();
+        public List<MethodDefinition> generatedReadFunctions = new List<MethodDefinition>();
+        public List<MethodDefinition> generatedWriteFunctions = new List<MethodDefinition>();
 
-        public TypeDefinition GenerateContainerClass;
+        public TypeDefinition generateContainerClass;
 
         // amount of SyncVars per class. dict<className, amount>
         public Dictionary<string, int> numSyncVars = new Dictionary<string, int>();
@@ -29,6 +29,9 @@ namespace Mirror.Weaver
 
     internal static class Weaver
     {
+        public static string InvokeRpcPrefix => "InvokeUserCode_";
+        public static string SyncEventPrefix => "SendEventMessage_";
+
         public static WeaverLists WeaveLists { get; private set; }
         public static AssemblyDefinition CurrentAssembly { get; private set; }
         public static ModuleDefinition CorLibModule { get; private set; }
@@ -42,7 +45,7 @@ namespace Mirror.Weaver
 
         // Network types
         public static TypeReference NetworkBehaviourType;
-        public static TypeReference NetworkBehaviourType2;
+        public static TypeReference RemoteCallHelperType;
         public static TypeReference MonoBehaviourType;
         public static TypeReference ScriptableObjectType;
         public static TypeReference NetworkConnectionType;
@@ -151,7 +154,7 @@ namespace Mirror.Weaver
         }
 
         public static void Error(string message, MemberReference mr)
-        {    
+        {
             Log.Error($"{message} (at {mr})");
             WeavingFailed = true;
         }
@@ -175,9 +178,9 @@ namespace Mirror.Weaver
 
         internal static void ConfirmGeneratedCodeClass()
         {
-            if (WeaveLists.GenerateContainerClass == null)
+            if (WeaveLists.generateContainerClass == null)
             {
-                WeaveLists.GenerateContainerClass = new TypeDefinition("Mirror", "GeneratedNetworkCode",
+                WeaveLists.generateContainerClass = new TypeDefinition("Mirror", "GeneratedNetworkCode",
                         TypeAttributes.BeforeFieldInit | TypeAttributes.Class | TypeAttributes.AnsiClass | TypeAttributes.Public | TypeAttributes.AutoClass,
                         objectType);
 
@@ -187,7 +190,7 @@ namespace Mirror.Weaver
                 method.Body.Instructions.Add(Instruction.Create(OpCodes.Call, Resolvers.ResolveMethod(objectType, CurrentAssembly, ".ctor")));
                 method.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
 
-                WeaveLists.GenerateContainerClass.Methods.Add(method);
+                WeaveLists.generateContainerClass.Methods.Add(method);
             }
         }
 
@@ -272,8 +275,9 @@ namespace Mirror.Weaver
             NetworkServerGetLocalClientActive = Resolvers.ResolveMethod(NetworkServerType, CurrentAssembly, "get_localClientActive");
             NetworkClientGetActive = Resolvers.ResolveMethod(NetworkClientType, CurrentAssembly, "get_active");
 
-            CmdDelegateReference = NetAssembly.MainModule.GetType("Mirror.NetworkBehaviour/CmdDelegate");
+            CmdDelegateReference = NetAssembly.MainModule.GetType("Mirror.RemoteCalls.CmdDelegate");
             CmdDelegateConstructor = Resolvers.ResolveMethod(CmdDelegateReference, CurrentAssembly, ".ctor");
+
             CurrentAssembly.MainModule.ImportReference(gameObjectType);
             CurrentAssembly.MainModule.ImportReference(transformType);
 
@@ -281,7 +285,7 @@ namespace Mirror.Weaver
             NetworkIdentityType = CurrentAssembly.MainModule.ImportReference(networkIdentityTmp);
 
             NetworkBehaviourType = NetAssembly.MainModule.GetType("Mirror.NetworkBehaviour");
-            NetworkBehaviourType2 = CurrentAssembly.MainModule.ImportReference(NetworkBehaviourType);
+            RemoteCallHelperType = NetAssembly.MainModule.GetType("Mirror.RemoteCalls.RemoteCallHelper");
             NetworkConnectionType = NetAssembly.MainModule.GetType("Mirror.NetworkConnection");
 
             MonoBehaviourType = UnityAssembly.MainModule.GetType("UnityEngine.MonoBehaviour");
@@ -321,9 +325,9 @@ namespace Mirror.Weaver
             getSyncVarGameObjectReference = Resolvers.ResolveMethod(NetworkBehaviourType, CurrentAssembly, "GetSyncVarGameObject");
             setSyncVarNetworkIdentityReference = Resolvers.ResolveMethod(NetworkBehaviourType, CurrentAssembly, "SetSyncVarNetworkIdentity");
             getSyncVarNetworkIdentityReference = Resolvers.ResolveMethod(NetworkBehaviourType, CurrentAssembly, "GetSyncVarNetworkIdentity");
-            registerCommandDelegateReference = Resolvers.ResolveMethod(NetworkBehaviourType, CurrentAssembly, "RegisterCommandDelegate");
-            registerRpcDelegateReference = Resolvers.ResolveMethod(NetworkBehaviourType, CurrentAssembly, "RegisterRpcDelegate");
-            registerEventDelegateReference = Resolvers.ResolveMethod(NetworkBehaviourType, CurrentAssembly, "RegisterEventDelegate");
+            registerCommandDelegateReference = Resolvers.ResolveMethod(RemoteCallHelperType, CurrentAssembly, "RegisterCommandDelegate");
+            registerRpcDelegateReference = Resolvers.ResolveMethod(RemoteCallHelperType, CurrentAssembly, "RegisterRpcDelegate");
+            registerEventDelegateReference = Resolvers.ResolveMethod(RemoteCallHelperType, CurrentAssembly, "RegisterEventDelegate");
             getTypeReference = Resolvers.ResolveMethod(objectType, CurrentAssembly, "GetType");
             getTypeFromHandleReference = Resolvers.ResolveMethod(typeType, CurrentAssembly, "GetTypeFromHandle");
             logErrorReference = Resolvers.ResolveMethod(UnityAssembly.MainModule.GetType("UnityEngine.Debug"), CurrentAssembly, "LogError");
@@ -402,6 +406,21 @@ namespace Mirror.Weaver
 
             if (td.ImplementsInterface(IMessageBaseType))
             {
+                // process this and base classes from parent to child order
+
+                try
+                {
+                    TypeDefinition parent = td.BaseType.Resolve();
+                    // process parent
+                    WeaveMessage(parent);
+                }
+                catch (AssemblyResolutionException)
+                {
+                    // this can happen for plugins.
+                    //Console.WriteLine("AssemblyResolutionException: "+ ex.ToString());
+                }
+
+                // process this
                 MessageClassProcessor.Process(td);
                 modified = true;
             }
@@ -418,7 +437,7 @@ namespace Mirror.Weaver
         static bool WeaveSyncObject(TypeDefinition td)
         {
             bool modified = false;
-            
+
             // ignore generic classes
             // we can not process generic classes
             // we give error if a generic syncObject is used in NetworkBehaviour
@@ -532,7 +551,7 @@ namespace Mirror.Weaver
             {
                 bool modified = false;
 
-                // We need to do 2 passes, because SyncListStructs might be referenced from other modules, so we must make sure we Generate them first.
+                // We need to do 2 passes, because SyncListStructs might be referenced from other modules, so we must make sure we generate them first.
                 System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
                 foreach (TypeDefinition td in moduleDefinition.Types)
                 {
@@ -561,7 +580,7 @@ namespace Mirror.Weaver
             catch (Exception ex)
             {
                 Error(ex.ToString());
-                throw ex;
+                throw;
             }
         }
 
