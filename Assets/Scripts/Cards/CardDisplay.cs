@@ -8,7 +8,7 @@ public class CardDisplay : MonoBehaviour
     // Start is called before the first frame update
     private CardDescription cardDesc;
     public Image cardBack;
-    public Text name;
+    public Text cardName;
     public Text mana;
     public Text textBox;
 
@@ -29,7 +29,7 @@ public class CardDisplay : MonoBehaviour
     {
         if (cardDesc != null)
         {
-            name.text = cardDesc.name;
+            cardName.text = cardDesc.name;
             mana.text = cardDesc.manaCost.ToString();
             typeText.text = CardParsing.Parse(cardDesc.cardType).ToUpper();
 
