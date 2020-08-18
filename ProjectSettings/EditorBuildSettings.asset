@@ -11,7 +11,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/GameScene.unity
     guid: b0ade7d45b417e448854afabdf728b76
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/CardGeneratorScene.unity
     guid: 2a0b9a16596e8334d8ec109994a51ae1
+  - enabled: 1
+    path: Assets/Scenes/EdwinWIPScene.unity
+    guid: 2b624488734d283418941aeb6042954f
   m_configObjects: {}

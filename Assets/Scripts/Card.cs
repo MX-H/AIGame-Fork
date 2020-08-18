@@ -76,8 +76,7 @@ public class Card : MonoBehaviour
 
             transform.rotation = Quaternion.LookRotation(transform.position - Camera.main.transform.position, Camera.main.transform.up);
             transform.position += transform.forward * ((GameConstants.Z_LAYERS.DRAG_LAYER - transform.position.z) / transform.forward.z);
-
-
+            transform.rotation = Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up);
 
             Renderer rend = GetComponent<Renderer>();
             Vector3 extents = rend.bounds.extents;
@@ -99,7 +98,6 @@ public class Card : MonoBehaviour
                 Vector3 camTop = camCenter + Camera.main.transform.up * frustumHalfHeight;
                 transform.position += Vector3.Dot((camTop - topBound), Camera.main.transform.up) * Camera.main.transform.up;
             }
-
 
         }
     }

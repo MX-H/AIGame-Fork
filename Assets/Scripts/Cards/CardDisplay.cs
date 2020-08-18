@@ -2,21 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class CardDisplay : MonoBehaviour
 {
     // Start is called before the first frame update
     private CardDescription cardDesc;
-    public Image cardBack;
-    public Text cardName;
-    public Text mana;
-    public Text textBox;
+    public TextMeshProUGUI cardName;
+    public TextMeshProUGUI mana;
+    public TextMeshProUGUI textBox;
 
     public GameObject creatureFields;
-    public Text creatureType;
-    public Text atk;
-    public Text def;
-    public Text typeText;
+    public TextMeshProUGUI creatureType;
+    public TextMeshProUGUI atk;
+    public TextMeshProUGUI def;
+    public TextMeshProUGUI typeText;
     public Image templateImage;
     public Sprite[] cardTemplates;
 
@@ -41,7 +41,6 @@ public class CardDisplay : MonoBehaviour
             switch (cardDesc.cardType)
             {
                 case CardType.CREATURE:
-                    cardBack.color = new Color(1.0f, 0.5f, 0.5f);
                     if (cardDesc is CreatureCardDescription creatureDesc)
                     {
                         creatureFields.SetActive(true);
@@ -70,12 +69,10 @@ public class CardDisplay : MonoBehaviour
 
                     break;
                 case CardType.SPELL:
-                    cardBack.color = new Color(0.5f, 0.8f, 0.8f);
                     templateImage.sprite = cardTemplates[1];
 
                     break;
                 case CardType.TRAP:
-                    cardBack.color = new Color(0.5f, 0.5f, 1.0f);
                     templateImage.sprite = cardTemplates[2];
 
                     break;

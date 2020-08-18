@@ -55,14 +55,14 @@ public class Hand : MonoBehaviour
                     if (localPlayer)
                     {
                         cards[i].transform.rotation = Quaternion.LookRotation(cards[i].transform.position - Camera.main.transform.position, transform.up);
-                        cards[i].transform.localPosition = new Vector3(0, 0, (center - i) * 0.35f);
+                        cards[i].transform.localPosition = new Vector3(0, 0, (center - i) * 0.03f);
                         cards[i].transform.Rotate(new Vector3(0, 0, (i - center) * -5.0f));
 
                     }
                     else
                     {
                         cards[i].transform.rotation = Quaternion.LookRotation(Camera.main.transform.position - cards[i].transform.position, transform.up);
-                        cards[i].transform.localPosition = new Vector3(0, 0, (center - i) * 0.35f);
+                        cards[i].transform.localPosition = new Vector3(0, 0, (center - i) * 0.03f);
                         cards[i].transform.Rotate(new Vector3(0, 0, (i - center) * -5.0f));
                     }
 

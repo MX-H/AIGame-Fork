@@ -77,7 +77,7 @@ static public class CardParsing
             case CardType.SPELL:
                 return "Spell";
             case CardType.TRAP:
-                return "Trap";
+                return "Ambush";
         }
         return PARSE_ERROR;
     }
@@ -99,13 +99,13 @@ static public class CardParsing
             case TargetType.SPELL_CARDS:
                 return plural ? "spell cards" : "spell card";
             case TargetType.TRAP_CARDS:
-                return plural ? "trap cards" : "trap card";
+                return plural ? "ambush cards" : "ambush card";
             case TargetType.PERMANENT:
                 return plural ? "permanents" : "permanent";
             case TargetType.DAMAGEABLE:
                 return Parse(TargetType.CREATURES, plural) + " or " + Parse(TargetType.PLAYERS, plural);
             case TargetType.ACTIVE_TRAPS:
-                return plural ? "traps" : "trap";
+                return plural ? "ambushes" : "ambush";
             case TargetType.SPELLS:
                 return plural ? "spells" : "spell";
             case TargetType.EFFECTS:
