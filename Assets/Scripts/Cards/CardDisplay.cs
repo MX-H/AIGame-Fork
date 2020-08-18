@@ -17,7 +17,8 @@ public class CardDisplay : MonoBehaviour
     public Text atk;
     public Text def;
     public Text typeText;
-
+    public Image templateImage;
+    public Sprite[] cardTemplates;
 
     void Start()
     {
@@ -65,13 +66,18 @@ public class CardDisplay : MonoBehaviour
                             effectText += "\n\n";
                         }
                     }
+                    templateImage.sprite = cardTemplates[0];
 
                     break;
                 case CardType.SPELL:
                     cardBack.color = new Color(0.5f, 0.8f, 0.8f);
+                    templateImage.sprite = cardTemplates[1];
+
                     break;
                 case CardType.TRAP:
                     cardBack.color = new Color(0.5f, 0.5f, 1.0f);
+                    templateImage.sprite = cardTemplates[2];
+
                     break;
             }
 

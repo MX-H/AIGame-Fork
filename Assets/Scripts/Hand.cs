@@ -7,10 +7,23 @@ public class Hand : MonoBehaviour
 {
     public static readonly int MAX_HAND_SIZE = 10;
     public List<Card> cards = new List<Card>();
+    public bool localPlayer = true;
 
     // Start is called before the first frame update
     void Start()
     {
+        if (localPlayer)
+        {
+            transform.rotation = Quaternion.LookRotation(Camera.main.transform.forward, transform.up);
+        }
+        else
+        {
+            transform.rotation = Quaternion.LookRotation(-Camera.main.transform.forward, transform.up);
+            foreach (Card c in cards)
+            {
+                c.isDraggable = false;
+            }
+        }
     }
 
     // Update is called once per frame
@@ -18,6 +31,8 @@ public class Hand : MonoBehaviour
     {
         int inHand = 0;
         bool cardIsDragged = false;
+        float fanRadius = 20.0f;
+
         foreach (Card c in cards)
         {
             if (!c.dragging)
@@ -34,9 +49,27 @@ public class Hand : MonoBehaviour
             int count = 0;
             for (int i = 0; i < cards.Count; i++)
             {
-                if (!cards[i].dragging)
+                if (!cards[i].IsInteracting())
                 {
-                    cards[i].transform.localPosition = new Vector3((i - center) * 3.2f, 0, Mathf.Abs((center - i )) * 0.3f);
+
+                    if (localPlayer)
+                    {
+                        cards[i].transform.rotation = Quaternion.LookRotation(cards[i].transform.position - Camera.main.transform.position, transform.up);
+                        cards[i].transform.localPosition = new Vector3(0, 0, (center - i) * 0.35f);
+                        cards[i].transform.Rotate(new Vector3(0, 0, (i - center) * -5.0f));
+
+                    }
+                    else
+                    {
+                        cards[i].transform.rotation = Quaternion.LookRotation(Camera.main.transform.position - cards[i].transform.position, transform.up);
+                        cards[i].transform.localPosition = new Vector3(0, 0, (center - i) * 0.35f);
+                        cards[i].transform.Rotate(new Vector3(0, 0, (i - center) * -5.0f));
+                    }
+
+
+                    Vector3 translation = cards[i].transform.up * fanRadius - transform.up * fanRadius;
+                    cards[i].transform.Translate(translation, Space.World);
+
                     count++;
                 }
             }
@@ -45,7 +78,7 @@ public class Hand : MonoBehaviour
         // Want to resort the cards in hand if you are dragging cards
         if (cardIsDragged)
         {
-            cards = cards.OrderBy(x => x.transform.position.x).ToList();
+            cards = cards.OrderBy(x => Camera.main.WorldToScreenPoint(x.transform.position).x).ToList();
         }
 
     }

@@ -8,6 +8,6 @@ public static class GameConstants
 
     public static class Z_LAYERS
     {
-        public static readonly float DRAG_LAYER = -30;
+        public static readonly float DRAG_LAYER = -20;
     }
 }
