@@ -169,7 +169,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   display: {fileID: 10619989}
-  model: {fileID: 11400000, guid: 52615d636d5ed69489dfad6fb6890132, type: 2}
+  model: {fileID: 11400000, guid: bcbec90c9ba264943b094db842f9c18b, type: 2}
+  images: {fileID: 11400000, guid: 9730a333d1475fd488f7a8e43a6b6b5c, type: 2}
 --- !u!4 &267740228
 Transform:
   m_ObjectHideFlags: 0
@@ -264,12 +265,12 @@ PrefabInstance:
     - target: {fileID: 6984082546963517640, guid: 2faf7aeefa6dc28478cba9205d86306d,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 630
+      value: 1260
       objectReference: {fileID: 0}
     - target: {fileID: 6984082546963517640, guid: 2faf7aeefa6dc28478cba9205d86306d,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 880
+      value: 1760
       objectReference: {fileID: 0}
     - target: {fileID: 6984082546963517640, guid: 2faf7aeefa6dc28478cba9205d86306d,
         type: 3}
@@ -300,6 +301,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6984082546963517640, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6984082546963517640, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2faf7aeefa6dc28478cba9205d86306d, type: 3}
@@ -378,7 +389,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0

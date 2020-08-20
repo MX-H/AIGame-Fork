@@ -488,7 +488,7 @@ MonoBehaviour:
     type: 3}
   RoomScene: Assets/Scenes/GameLobby.unity
   GameplayScene: Assets/Scenes/GameScene.unity
-  allPlayersReady: 0
+  _allPlayersReady: 1
   roomSlots: []
   lobbyText: {fileID: 995217972}
 --- !u!4 &1482096734
@@ -554,8 +554,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 400, y: -300}
-  m_SizeDelta: {x: 750, y: 550}
+  m_AnchoredPosition: {x: 400, y: -225.1}
+  m_SizeDelta: {x: 799.9999, y: 450.19604}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1508453886
 MonoBehaviour:

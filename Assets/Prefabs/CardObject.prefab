@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 7450815162518780245}
   - component: {fileID: 6732878431069833815}
   - component: {fileID: 7826359536346464351}
+  - component: {fileID: 6806590907559381476}
+  - component: {fileID: 2164394742706655376}
   m_Layer: 0
   m_Name: CardObject
   m_TagString: Untagged
@@ -62,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 2fc09a7e8086eda4d9a5238c9fb66f4e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -108,12 +110,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34d4462d029d5314aa3204a45bf8ff86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  outline: {fileID: 0}
+  isTargettable: 0
   selected: 0
   dragging: 0
   hovering: 0
+  isRevealed: 0
   isDraggable: 0
-  startDragPos: {x: 0, y: 0, z: 0}
   currMousePos: {x: 0, y: 0, z: 0}
+  owner: {fileID: 0}
+  controller: {fileID: 0}
+  context: {fileID: 0}
+--- !u!114 &6806590907559381476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 629461156340415531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 705a57e3dc5aab9418467abc98af8571, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  renderers:
+  - {fileID: 7450815162518780245}
+--- !u!114 &2164394742706655376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 629461156340415531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &3284906620171089699
 GameObject:
   m_ObjectHideFlags: 0
@@ -141,7 +178,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3284906620171089699}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0.51}
+  m_LocalPosition: {x: 0, y: 0, z: 0.55}
   m_LocalScale: {x: 0.1, y: 1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 4621727232706058212}
@@ -264,7 +301,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -317,7 +354,7 @@ PrefabInstance:
     - target: {fileID: 1673071212794425727, guid: 2faf7aeefa6dc28478cba9205d86306d,
         type: 3}
       propertyPath: m_Name
-      value: CreatureCard
+      value: CardUI
       objectReference: {fileID: 0}
     - target: {fileID: 6984082546963517640, guid: 2faf7aeefa6dc28478cba9205d86306d,
         type: 3}
@@ -424,6 +461,11 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 6984082546963517643, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: referenceCard
+      value: 
+      objectReference: {fileID: 7826359536346464351}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2faf7aeefa6dc28478cba9205d86306d, type: 3}
 --- !u!224 &7380622844168367819 stripped

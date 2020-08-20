@@ -7,9 +7,11 @@ using System.Linq;
 public class ProceduralCardGenerator : ICardGenerator
 {
     private IHistogram model;
-    public ProceduralCardGenerator(IHistogram m)
+    private ImageGlossary images;
+    public ProceduralCardGenerator(IHistogram m, ImageGlossary i)
     {
         model = m;
+        images = i;
     }
 
     public override CardDescription GenerateCard(int seed)
@@ -21,17 +23,17 @@ public class ProceduralCardGenerator : ICardGenerator
         switch (t)
         {
             case CardType.CREATURE:
-                return GenerateCreatureCard(random, model);
+                return GenerateCreatureCard(random, model, images);
             case CardType.SPELL:
-                return GenerateSpellCard(random, model);
+                return GenerateSpellCard(random, model, images);
             case CardType.TRAP:
-                return GenerateTrapCard(random, model);
+                return GenerateTrapCard(random, model, images);
         }
 
         return new CardDescription();
     }
 
-    static private CardDescription GenerateCreatureCard(System.Random random, IHistogram model)
+    static private CardDescription GenerateCreatureCard(System.Random random, IHistogram model, ImageGlossary images)
     {
         CreatureCardDescription card = new CreatureCardDescription();
         card.creatureType = ProceduralUtils.GetRandomValue<CreatureType>(random, model);
@@ -41,12 +43,15 @@ public class ProceduralCardGenerator : ICardGenerator
         double powerBudget = PowerBudget.ManaPowerBudgets[card.manaCost];
         double powerMargin = PowerBudget.ManaPowerMargin[card.manaCost];
         double powerLimit = PowerBudget.ManaPowerLimit[card.manaCost];
-        card.name = "A creature card (" + powerBudget.ToString() + ")";
+        card.name = "A creature card";
+        //card.name += "(" + powerBudget.ToString() + ")";
+
 
         // Decide on stats
-        card.attack = random.Next(card.manaCost);
+        card.attack = random.Next(1, card.manaCost);
         card.health = card.manaCost - card.attack + 1;
 
+        /*
         // Decide on keyword attributes
         int amount = random.Next(2);
         for (int i = 0; i < amount; i++)
@@ -56,11 +61,14 @@ public class ProceduralCardGenerator : ICardGenerator
 
         // Decide on effects
         GenerateCardEffects(random, model, card, powerBudget, powerMargin, powerLimit);
+        */
+
+        card.image = ProceduralUtils.GetRandomTexture(random, images.GetCreatureImages(card.creatureType));
 
         return card;
     }
 
-    static private CardDescription GenerateSpellCard(System.Random random, IHistogram model)
+    static private CardDescription GenerateSpellCard(System.Random random, IHistogram model, ImageGlossary images)
     {
         CardDescription card = new CardDescription();
         card.cardType = CardType.SPELL;
@@ -69,14 +77,16 @@ public class ProceduralCardGenerator : ICardGenerator
         double powerBudget = PowerBudget.ManaPowerBudgets[card.manaCost];
         double powerMargin = PowerBudget.ManaPowerMargin[card.manaCost];
         double powerLimit = PowerBudget.ManaPowerLimit[card.manaCost];
-        card.name = "A spell card(" + powerBudget.ToString() + ")";
+        card.name = "A spell card"; 
+        //card.name += "(" + powerBudget.ToString() + ")";
 
         GenerateCardEffects(random, model, card, powerBudget, powerMargin, powerLimit);
+        card.image = ProceduralUtils.GetRandomTexture(random, images.GetSpellImages());
 
         return card;
     }
 
-    static private CardDescription GenerateTrapCard(System.Random random, IHistogram model)
+    static private CardDescription GenerateTrapCard(System.Random random, IHistogram model, ImageGlossary images)
     {
         CardDescription card = new CardDescription();
         card.cardType = CardType.TRAP;
@@ -85,9 +95,11 @@ public class ProceduralCardGenerator : ICardGenerator
         double powerBudget = PowerBudget.ManaPowerBudgets[card.manaCost];
         double powerMargin = PowerBudget.ManaPowerMargin[card.manaCost];
         double powerLimit = PowerBudget.ManaPowerLimit[card.manaCost];
-        card.name = "A trap card(" + powerBudget.ToString() + ")";
+        card.name = "A trap card";
+        //card.name += "(" + powerBudget.ToString() + ")";
 
         GenerateCardEffects(random, model, card, powerBudget, powerMargin, powerLimit);
+        card.image = ProceduralUtils.GetRandomTexture(random, images.GetTrapImages());
 
         return card;
     }

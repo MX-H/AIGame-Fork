@@ -8,6 +8,7 @@ public class CardDescription : IDescription
     public int manaCost;
     public CardType cardType;
     public List<CardEffectDescription> cardEffects = new List<CardEffectDescription>();
+    public Texture2D image;
 
     public string CardText(bool plural)
     {

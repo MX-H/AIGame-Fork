@@ -1,0 +1,205 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Mirror;
+
+[RequireComponent(typeof(NetworkIdentity))]
+public class Card : Targettable
+{
+    public CardInstance cardData;
+
+    public bool selected = false;
+    public bool dragging = false;
+    public bool hovering = false;
+    public bool isRevealed = false;
+
+    public bool isDraggable = true;
+
+    public Vector3 currMousePos;
+
+    private Vector3 savedPosition;
+    private Quaternion savedRotation;
+    private Vector3 savedScale;
+
+    public PlayerController owner;
+    public PlayerController controller;
+    public Hand context;
+
+
+    protected override void Start()
+    {
+        base.Start();
+        SaveTransform();
+    }
+
+    // Update is called once per frame
+    protected override void Update()
+    {
+        base.Update();
+        if (dragging)
+        {
+            transform.position = currMousePos;
+            Debug.DrawRay(currMousePos, Camera.main.transform.forward * 100, Color.red);
+
+        }
+    }
+
+    void OnMouseDown()
+    {
+        if (isDraggable && isRevealed && context != null)
+        {
+            dragging = true;
+            currMousePos = Camera.main.ScreenToWorldPoint(
+                Input.mousePosition + new Vector3(0, 0, transform.position.z - Camera.main.transform.position.z));
+
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            hovering = false;
+        }
+    }
+
+    void OnMouseDrag()
+    {
+        if (dragging)
+        {
+            currMousePos = Camera.main.ScreenToWorldPoint(
+                Input.mousePosition + new Vector3(0, 0, GameConstants.Z_LAYERS.HOVER_LAYER - Camera.main.transform.position.z));
+            transform.rotation = Quaternion.LookRotation(transform.position - Camera.main.transform.position, Camera.main.transform.up);
+        }
+    }
+
+    protected override void OnMouseEnter()
+    {
+        base.OnMouseEnter();
+        if (!IsInteracting() && isRevealed)
+        {
+            hovering = true;
+            SaveTransform();
+
+            HoverZoom();
+        }
+    }
+
+    void OnMouseUp()
+    {
+        if (dragging)
+        {
+            if (transform.position.y > GameConstants.Y_LAYERS.PLAY_LEVEL && IsTargettable() && controller.CanPlayCards())
+            {
+                controller.ClientRequestPlayCard(gameObject.GetComponent<NetworkIdentity>());
+            }
+            dragging = false;
+        }
+    }
+
+    void OnMouseOver()
+    {
+
+    }
+
+    protected override void OnMouseExit()
+    {
+        base.OnMouseExit();
+        if (hovering)
+        {
+            hovering = false;
+            RestoreTransform();
+        }
+    }
+
+    public bool IsInteracting()
+    {
+        return selected || dragging || hovering;
+    }
+
+    public void HoverZoom()
+    {
+        transform.rotation = Quaternion.LookRotation(transform.position - Camera.main.transform.position, Camera.main.transform.up);
+        transform.position += transform.forward * ((GameConstants.Z_LAYERS.HOVER_LAYER - transform.position.z) / transform.forward.z);
+        transform.rotation = Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up);
+
+        Renderer rend = GetComponent<Renderer>();
+        Vector3 extents = rend.bounds.extents;
+        Vector3 bottomBound = rend.bounds.center - new Vector3(0, extents.y, extents.z);
+        Vector3 topBound = rend.bounds.center - new Vector3(0, -extents.y, extents.z);
+
+        float distance = Vector3.Dot((bottomBound - Camera.main.transform.position), Camera.main.transform.forward);
+        float frustumHalfHeight = distance * Mathf.Tan(Camera.main.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        Vector3 camCenter = distance * Camera.main.transform.forward + Camera.main.transform.position;
+
+        // Keep hover zoom-in within camera bounds
+        if (Mathf.Abs(Vector3.Dot(bottomBound, Camera.main.transform.up)) > frustumHalfHeight)
+        {
+            Vector3 camBottom = camCenter - Camera.main.transform.up * frustumHalfHeight;
+            transform.position += Vector3.Dot((camBottom - bottomBound), Camera.main.transform.up) * Camera.main.transform.up;
+        }
+        else if (Mathf.Abs(Vector3.Dot(topBound, Camera.main.transform.up)) > frustumHalfHeight)
+        {
+            Vector3 camTop = camCenter + Camera.main.transform.up * frustumHalfHeight;
+            transform.position += Vector3.Dot((camTop - topBound), Camera.main.transform.up) * Camera.main.transform.up;
+        }
+    }
+
+    public void HoverZoomToCam()
+    {
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
+        screenPos.z = 0.0f;
+        Vector3 pos = Camera.main.ScreenToWorldPoint(
+            screenPos + new Vector3(0, 0, GameConstants.Z_LAYERS.HOVER_LAYER - Camera.main.transform.position.z));
+        transform.position = pos;
+        transform.rotation = Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up);
+
+        Renderer rend = GetComponent<Renderer>();
+        Vector3 extents = rend.bounds.extents;
+        Vector3 bottomBound = rend.bounds.center - new Vector3(0, extents.y, extents.z);
+        Vector3 topBound = rend.bounds.center - new Vector3(0, -extents.y, extents.z);
+
+        float distance = Vector3.Dot((bottomBound - Camera.main.transform.position), Camera.main.transform.forward);
+        float frustumHalfHeight = distance * Mathf.Tan(Camera.main.fieldOfView * 0.5f * Mathf.Deg2Rad);
+        Vector3 camCenter = distance * Camera.main.transform.forward + Camera.main.transform.position;
+
+        // Keep hover zoom-in within camera bounds
+        if (Mathf.Abs(Vector3.Dot(bottomBound, Camera.main.transform.up)) > frustumHalfHeight)
+        {
+            Vector3 camBottom = camCenter - Camera.main.transform.up * frustumHalfHeight;
+            transform.position += Vector3.Dot((camBottom - bottomBound), Camera.main.transform.up) * Camera.main.transform.up;
+        }
+        else if (Mathf.Abs(Vector3.Dot(topBound, Camera.main.transform.up)) > frustumHalfHeight)
+        {
+            Vector3 camTop = camCenter + Camera.main.transform.up * frustumHalfHeight;
+            transform.position += Vector3.Dot((camTop - topBound), Camera.main.transform.up) * Camera.main.transform.up;
+        }
+    }
+
+    private void SaveTransform()
+    {
+        savedPosition = transform.localPosition;
+        savedRotation = transform.localRotation;
+        savedScale = transform.localScale;
+    }
+
+    private void RestoreTransform()
+    {
+        transform.localPosition = savedPosition;
+        transform.localRotation = savedRotation;
+        transform.localScale = savedScale;
+    }
+
+    public override bool IsTargettable()
+    {
+        if (owner)
+        {
+            if (owner.CanPlayCards() && owner.isLocalPlayer)
+            {
+                if (cardData != null && cardData.GetManaCost() <= owner.currMana)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+            }
+        }
+        return false;
+    }
+}

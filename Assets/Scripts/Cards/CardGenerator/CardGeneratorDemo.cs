@@ -6,8 +6,9 @@ public class CardGeneratorDemo : MonoBehaviour
 {
     // Start is called before the first frame update
 
-    public CardDisplay display;
+    public CardUI display;
     public CardHistogram model;
+    public ImageGlossary images;
 
     private ICardGenerator cardGenerator;
     void Start()
@@ -20,8 +21,8 @@ public class CardGeneratorDemo : MonoBehaviour
         if (Input.GetKeyDown("space"))
         {
             model.Update();
-            ICardGenerator cardGenerator = new ProceduralCardGenerator(model);
-            display.SetCardDescription(cardGenerator.GenerateCard((int)Random.Range(0, 10000)));
+            ICardGenerator cardGenerator = new ProceduralCardGenerator(model, images);
+            display.SetCard(new CardInstance(cardGenerator.GenerateCard(Random.Range(0, 10000))));
         }
     }
 }

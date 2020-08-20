@@ -64,6 +64,8 @@ static public class CardParsing
                 return "Goblin";
             case CreatureType.HUMAN:
                 return "Human";
+            case CreatureType.FAERIE:
+                return "Faerie";
         }
         return PARSE_ERROR;
     }

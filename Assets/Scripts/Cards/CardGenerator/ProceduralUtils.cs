@@ -268,6 +268,11 @@ public static class ProceduralUtils
         return (T)Enum.GetValues(typeof(T)).GetValue(0);
     }
 
+    public static Texture2D GetRandomTexture(System.Random random, ImageBank ib)
+    {
+        return ib.GetTexture(random.Next(ib.GetSize()));
+    }
+
     static ProceduralUtils()
     {
         proceduralEffectGenerators = new Dictionary<EffectType, IProceduralEffectGenerator>();

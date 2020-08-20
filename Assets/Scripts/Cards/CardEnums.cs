@@ -76,8 +76,9 @@ public enum TriggerCondition
 
 public enum CreatureType
 {
+    HUMAN,
     GOBLIN,
-    HUMAN
+    FAERIE
 }
 
 public enum QualifierType
