@@ -46,7 +46,7 @@ public class Creature : Targettable
         if (card != null && card.cardData != null)
         {
             atkText.text = creatureState.GetAttack().ToString();
-            hpText.text = (creatureState.GetHealth() == creatureState.GetMaxHealth()) ? creatureState.GetHealth().ToString() : "<color=orange>" + creatureState.GetHealth().ToString() + "</color>";
+            hpText.text = (creatureState.GetHealth() == creatureState.GetMaxHealth()) ? creatureState.GetHealth().ToString() : "<color=yellow>" + creatureState.GetHealth().ToString() + "</color>";
         }
         else
         {
@@ -55,8 +55,9 @@ public class Creature : Targettable
         }
     }
 
-    void OnMouseDown()
+    protected override void OnMouseDown()
     {
+        base.OnMouseDown();
         if (IsDraggable())
         {
             dragging = true;
@@ -132,6 +133,55 @@ public class Creature : Targettable
     public override bool IsTargettable()
     {
         return IsDraggable();
+    }
+
+    public override bool IsTargettable(TargettingQuery targetQuery)
+    {
+        bool valid = false;
+
+        ITargettingDescription desc = targetQuery.targettingDesc;
+        if (desc.targettingType == TargettingType.EXCEPT)
+        {
+            ExceptTargetDescription exceptDesc = (ExceptTargetDescription)desc;
+            desc = exceptDesc.targetDescription;
+        }
+
+        switch (desc.targetType)
+        {
+            case TargetType.CREATURES:
+            case TargetType.PERMANENT:
+            case TargetType.DAMAGEABLE:
+                valid = true;
+                break;
+        }
+
+        if (valid)
+        {
+            IQualifiableTargettingDescription qualifiableDesc = (IQualifiableTargettingDescription)desc;
+            if (qualifiableDesc != null)
+            {
+                IQualifierDescription qualifier = qualifiableDesc.qualifier;
+                if (qualifier != null)
+                {
+                    switch (qualifier.qualifierType)
+                    {
+                        case QualifierType.NONE:
+                            break;
+                        case QualifierType.CREATURE_TYPE:
+                            {
+                                CreatureTypeQualifierDescription creatureQualifier = (CreatureTypeQualifierDescription)qualifier;
+                                valid = creatureQualifier.creatureType == card.cardData.GetCreatureType();
+                            }
+                            break;
+                        default:
+                            valid = false;
+                            break;
+                    }
+                }
+            }
+        }
+
+        return valid;
     }
 
     public bool IsDraggable()

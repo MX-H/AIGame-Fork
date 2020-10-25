@@ -212,6 +212,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37499b76cafae554fa210cca0c9741ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  outline: {fileID: 0}
+  isTargettable: 0
+  isSelected: 0
   player: {fileID: 0}
   healthDisplay: {fileID: 7303246354227345699}
   manaDisplay:
@@ -240,6 +243,8 @@ MonoBehaviour:
   renderers:
   - {fileID: 4019027067760987168}
   - {fileID: 4830225164835554051}
+  targetColor: {r: 0, g: 0.7529412, b: 0.2509804, a: 0.78431374}
+  selectColor: {r: 0, g: 0.57254905, b: 0.972549, a: 0.78431374}
 --- !u!1 &2768919262183560004
 GameObject:
   m_ObjectHideFlags: 0

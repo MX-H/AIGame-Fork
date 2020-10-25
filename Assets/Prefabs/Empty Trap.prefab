@@ -111,6 +111,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   outline: {fileID: 0}
   isTargettable: 0
+  isSelected: 0
   trapVisual: {fileID: 5336630532726948099}
   card: {fileID: 0}
   hovering: 0
@@ -130,6 +131,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   renderers:
   - {fileID: 7821702232456144979}
+  targetColor: {r: 0, g: 0.7529412, b: 0.2509804, a: 0.78431374}
+  selectColor: {r: 0, g: 0.57254905, b: 0.972549, a: 0.78431374}
 --- !u!114 &7633396912485838546
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -4,7 +4,7 @@ using UnityEngine;
 using Mirror;
 using TMPro;
 
-public class PlayerController : NetworkBehaviour
+public class PlayerController : Targettable
 {
     public Hand hand;
     public Deck deck;
@@ -27,9 +27,14 @@ public class PlayerController : NetworkBehaviour
     public Creature creaturePrefab;
     GameSession gameSession;
 
+    List<Targettable> selectedTargets; // Targets for current condition
+    List<List<Targettable>> allSelectedTargets;
+    List<ITargettingDescription> selectableTargetDescriptions;
+
     public override void OnStartServer()
     {
-
+        base.OnStartServer();
+        gameSession = FindObjectOfType<GameSession>();
     }
     public override void OnStartClient()
     {
@@ -39,8 +44,9 @@ public class PlayerController : NetworkBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         ClientScene.RegisterPrefab(cardPrefab.gameObject);
         ClientScene.RegisterPrefab(creaturePrefab.gameObject);
 
@@ -53,9 +59,120 @@ public class PlayerController : NetworkBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
+        base.Update();
+        if (gameSession.CanSelectTargets(this) && isLocalPlayer)
+        {
+            // Start target selections
+            if (selectableTargetDescriptions == null)
+            {
+                Card card = gameSession.GetPendingCard(this);
+                if (card != null)
+                {
+                    switch (card.cardData.GetCardType())
+                    {
+                        case CardType.CREATURE:
+                            selectableTargetDescriptions = card.cardData.GetSelectableTargets(TriggerCondition.ON_CREATURE_ENTER);
+                            break;
+                        case CardType.SPELL:
+                        case CardType.TRAP:
+                            selectableTargetDescriptions = card.cardData.GetSelectableTargets(TriggerCondition.NONE);
+                            break;
+                    }
 
+                    selectedTargets = new List<Targettable>();
+                    allSelectedTargets = new List<List<Targettable>>();
+
+                    SetTargettingQuery(selectableTargetDescriptions[0]);
+                }
+
+            }
+        }
+    }
+
+    public override bool IsTargettable()
+    {
+        return IsActivePlayer();
+    }
+
+    public override bool IsTargettable(TargettingQuery targetQuery)
+    {
+        bool valid = false;
+
+        ITargettingDescription desc = targetQuery.targettingDesc;
+        if (desc.targettingType == TargettingType.EXCEPT)
+        {
+            ExceptTargetDescription exceptDesc = (ExceptTargetDescription)desc;
+            desc = exceptDesc.targetDescription;
+        }
+        switch (desc.targetType)
+        {
+            case TargetType.PLAYERS:
+            case TargetType.DAMAGEABLE:
+                valid = true;
+                break;
+        }
+
+        if (valid)
+        {
+            IQualifiableTargettingDescription qualifiableDesc = (IQualifiableTargettingDescription)desc;
+            if (qualifiableDesc != null)
+            {
+                IQualifierDescription qualifier = qualifiableDesc.qualifier;
+                if (qualifier != null)
+                {
+                    switch (qualifier.qualifierType)
+                    {
+                        case QualifierType.NONE:
+                            break;
+                        default:
+                            valid = false;
+                            break;
+                    }
+                }
+            }
+        }
+
+        return valid;
+    }
+
+    [Server]
+    public void ServerAddCardToHand(NetworkIdentity playerId, int seed, NetworkIdentity id)
+    {
+        if (isServerOnly)
+        {
+            Card c = id.gameObject.GetComponent<Card>();
+
+            c.cardData = new CardInstance(playerId.GetComponent<PlayerController>(), seed);
+
+            c.owner = this;
+            c.controller = this;
+            c.isRevealed = true;
+            c.isDraggable = false;
+
+            hand.AddCard(c);
+        }
+
+        RpcAddCardToHand(playerId, seed, id);
+    }
+
+    [Server]
+    public void ServerAddExistingCardToHand(NetworkIdentity cardId)
+    {
+        if (isServerOnly)
+        {
+            Card c = cardId.GetComponent<Card>();
+            hand.AddCard(c);
+        }
+        RpcAddExistingCardToHand(cardId);
+    }
+
+    [ClientRpc]
+    public void RpcAddExistingCardToHand(NetworkIdentity cardId)
+    {
+        Card c = cardId.GetComponent<Card>();
+        hand.AddCard(c);
     }
 
     [ClientRpc]
@@ -73,6 +190,21 @@ public class PlayerController : NetworkBehaviour
         hand.AddCard(c);
     }
 
+    [Server]
+    public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId)
+    {
+        if (isServerOnly)
+        {
+            Creature creature = creatureId.gameObject.GetComponent<Creature>();
+            Card card = cardId.gameObject.GetComponent<Card>();
+            creature.controller = this;
+            creature.owner = this;
+            creature.SetCard(card);
+            arena.AddCreature(creature);
+        }
+        RpcPlayCreature(creatureId, cardId);
+    }
+
     [ClientRpc]
     public void RpcPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId)
     {
@@ -81,28 +213,61 @@ public class PlayerController : NetworkBehaviour
         creature.controller = this;
         creature.owner = this;
         creature.SetCard(card);
-        hand.RemoveCard(card);
         arena.AddCreature(creature);
     }
+
+    [Server]
+    public void ServerPlaySpell(NetworkIdentity cardId)
+    {
+        if (isServerOnly)
+        {
+        }
+        RpcPlaySpell(cardId);
+    }
+
 
     [ClientRpc]
     public void RpcPlaySpell(NetworkIdentity cardId)
     {
-        Card card = cardId.gameObject.GetComponent<Card>();
+    }
 
-        hand.RemoveCard(card);
-        card.gameObject.SetActive(false);
+    [Server]
+    public void ServerPlayTrap(NetworkIdentity cardId)
+    {
+        if (isServerOnly)
+        {
+            Card card = cardId.gameObject.GetComponent<Card>();
+            arena.AddTrap(card);
+        }
+        RpcPlayTrap(cardId);
     }
 
     [ClientRpc]
     public void RpcPlayTrap(NetworkIdentity cardId)
     {
         Card card = cardId.gameObject.GetComponent<Card>();
-
-        hand.RemoveCard(card);
         arena.AddTrap(card);
     }
 
+    [Server]
+    public void ServerRemoveCardFromHand(NetworkIdentity cardId)
+    {
+        if (isServerOnly)
+        {
+            Card card = cardId.gameObject.GetComponent<Card>();
+            hand.RemoveCard(card);
+            card.gameObject.SetActive(false);
+        }
+        RpcRemoveCardFromHand(cardId);
+    }
+
+    [ClientRpc]
+    public void RpcRemoveCardFromHand(NetworkIdentity cardId)
+    {
+        Card card = cardId.gameObject.GetComponent<Card>();
+        hand.RemoveCard(card);
+        card.gameObject.SetActive(false);
+    }
 
     [Server]
     public void ServerStartTurn()
@@ -118,6 +283,12 @@ public class PlayerController : NetworkBehaviour
     public void ServerPayCost(Card c)
     {
         currMana -= c.cardData.GetManaCost();
+    }
+
+    [Server]
+    public void ServerRefundCost(Card c)
+    {
+        currMana += c.cardData.GetManaCost();
     }
 
     [Command]
@@ -182,6 +353,15 @@ public class PlayerController : NetworkBehaviour
     }
 
     [Client]
+    public void ClientRequestCancelPlayCard()
+    {
+        if (isLocalPlayer)
+        {
+            CmdCancelPlayCard();
+        }
+    }
+
+    [Client]
     public void ClientRequestRemoveFromCombat(NetworkIdentity creature)
     {
         if (isLocalPlayer && CanMoveCreatures())
@@ -196,6 +376,16 @@ public class PlayerController : NetworkBehaviour
         gameSession.ServerRemoveFromCombat(netIdentity, creature);
     }
 
+    [Server]
+    public void ServerRemoveFromCombat(NetworkIdentity creature)
+    {
+        if (isServerOnly)
+        {
+            arena.RemoveFromCombat(creature.gameObject.GetComponent<Creature>());
+        }
+        RpcRemoveFromCombat(creature);
+    }
+
     [ClientRpc]
     public void RpcRemoveFromCombat(NetworkIdentity creature)
     {
@@ -206,6 +396,22 @@ public class PlayerController : NetworkBehaviour
         {
             CmdLeaveCombat();
         }
+    }
+
+    [Server]
+    public void ServerReceiveAttackers(NetworkIdentity[] attackers)
+    {
+        if (isServerOnly)
+        {
+            arena.SetState(Arena.State.BLOCKING);
+            List<Creature> creatures = new List<Creature>();
+            foreach (NetworkIdentity id in attackers)
+            {
+                creatures.Add(id.gameObject.GetComponent<Creature>());
+            }
+            arena.ReceiveAttackers(creatures);
+        }
+        RpcReceiveAttackers(attackers);
     }
 
     [ClientRpc]
@@ -235,6 +441,20 @@ public class PlayerController : NetworkBehaviour
         gameSession.ServerMoveToCombat(netIdentity, creature, ind);
     }
 
+    [Server]
+    public void ServerMoveToCombat(NetworkIdentity creature, int ind, bool declaringAttack)
+    {
+        if (isServerOnly)
+        {
+            if (declaringAttack)
+            {
+                arena.SetState(Arena.State.ATTACKING);
+            }
+            arena.MoveToCombat(creature.gameObject.GetComponent<Creature>(), ind);
+        }
+        RpcMoveToCombat(creature, ind, declaringAttack);
+    }
+
     [ClientRpc]
     public void RpcMoveToCombat(NetworkIdentity creature, int ind, bool declaringAttack)
     {
@@ -243,6 +463,16 @@ public class PlayerController : NetworkBehaviour
             arena.SetState(Arena.State.ATTACKING);
         }
         arena.MoveToCombat(creature.gameObject.GetComponent<Creature>(), ind);
+    }
+
+    [Server]
+    public void ServerLeaveCombat()
+    {
+        if (isServerOnly)
+        {
+            arena.SetState(Arena.State.NONE);
+        }
+        RpcLeaveCombat();
     }
 
     [ClientRpc]
@@ -280,9 +510,42 @@ public class PlayerController : NetworkBehaviour
         {
             if (hand.HasCard(c) && c.cardData.GetManaCost() <= currMana && CanPlayCards())
             {
-                gameSession.ServerPlayCard(netIdentity, card);
+                TriggerCondition trigger = (c.cardData.GetCardType() == CardType.CREATURE) ? TriggerCondition.ON_SELF_ENTER : TriggerCondition.NONE;
+
+                List<ITargettingDescription> targets = new List<ITargettingDescription>();
+
+                // Traps do not need conditions to be played from hand
+                if (c.cardData.GetCardType() != CardType.TRAP)
+                {
+                    targets = c.cardData.GetSelectableTargets(trigger);
+                }
+
+                // If need to select targets select targets first
+                if (targets.Count > 0)
+                {
+                    if (c.HasValidTargets(targets))
+                    {
+                        gameSession.ServerPlayCardAndSelectTargets(netIdentity, card);
+                    }
+                    else if (c.cardData.GetCardType() == CardType.CREATURE)
+                    {
+                        // Creatures do not need to have valid targets to be played, the enter effect just doesn't occur
+                        gameSession.ServerPlayCard(netIdentity, card);
+                    }
+                }
+                else
+                {
+                    // Resolve card
+                    gameSession.ServerPlayCard(netIdentity, card);
+                }
             }
         }
+    }
+
+    [Command]
+    private void CmdCancelPlayCard()
+    {
+        gameSession.ServerCancelPlayCard(netIdentity);
     }
 
     [Server]
@@ -301,6 +564,18 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    [Server]
+    public void ServerDestroyCreature(NetworkIdentity creatureId)
+    {
+        if (isServerOnly)
+        {
+            Creature creature = creatureId.gameObject.GetComponent<Creature>();
+            arena.RemoveCreature(creature);
+            discard.AddCreature(creature);
+        }
+        RpcDestroyCreature(creatureId);
+    }
+
     [ClientRpc]
     public void RpcDestroyCreature(NetworkIdentity creatureId)
     {
@@ -314,6 +589,69 @@ public class PlayerController : NetworkBehaviour
     {
         TextMeshProUGUI endGameText = GameObject.Find("GameOverText").GetComponent<TextMeshProUGUI>();
         endGameText.text = winner ? "VICTORY" : "DEFEAT";
+    }
+
+    public void ConfirmSelectedTargets()
+    {
+        if (isLocalPlayer && HasValidSelectedTargets())
+        {
+            allSelectedTargets.Add(selectedTargets);
+            foreach (Targettable t in selectedTargets)
+            {
+                t.Deselect();
+            }
+
+            if (allSelectedTargets.Count == selectableTargetDescriptions.Count)
+            {
+                // Send all selected targets to the server
+                RemoveTargettingQuery();
+
+                int[] indexes = new int[allSelectedTargets.Count];
+                int totalSize = 0;
+                for (int i = 0; i < allSelectedTargets.Count; i++)
+                {
+                    totalSize += allSelectedTargets[i].Count;
+                    indexes[i] = allSelectedTargets[i].Count;
+                }
+
+                NetworkIdentity[] targets = new NetworkIdentity[totalSize];
+                int ind = 0;
+                for (int i = 0; i < allSelectedTargets.Count; i++)
+                {
+                    for (int j = 0; j < allSelectedTargets[i].Count; j++, ind++)
+                    {
+                        targets[ind] = allSelectedTargets[i][j].GetComponent<NetworkIdentity>();
+                    }
+                }
+
+                CmdSendTargets(targets, indexes);
+            }
+            else
+            {
+                selectedTargets = new List<Targettable>();
+                SetTargettingQuery(selectableTargetDescriptions[allSelectedTargets.Count]);
+            }
+        }
+    }
+
+    [Command]
+    private void CmdSendTargets(NetworkIdentity[] targets, int[] indexes)
+    {
+        NetworkIdentity[][] targetsToSend = new NetworkIdentity[indexes.Length][];
+        int ind = 0;
+        for (int i = 0; i < indexes.Length; i++)
+        {
+            targetsToSend[i] = new NetworkIdentity[indexes[i]];
+            for (int j = 0; j < indexes[i]; j++, ind++)
+            {
+                targetsToSend[i][j] = targets[ind];
+            }
+        }
+
+        gameSession.ServerSendTargets(netIdentity, targetsToSend);
+        allSelectedTargets = null;
+        selectedTargets = null;
+        selectableTargetDescriptions = null;
     }
 
     public bool IsDead()
@@ -332,7 +670,88 @@ public class PlayerController : NetworkBehaviour
 
     public bool IsSelectingTargets()
     {
+        return gameSession.CanSelectTargets(this);
+    }
+
+    public void SetTargettingQuery(ITargettingDescription desc)
+    {
+        TargettingQuery query = new TargettingQuery(desc, this);
+        foreach (Targettable t in gameSession.GetPotentialTargets())
+        {
+            t.SetTargettingQuery(query);
+        }
+    }
+
+    public void RemoveTargettingQuery()
+    {
+        foreach (Targettable t in gameSession.GetPotentialTargets())
+        {
+            t.ResetTargettingQuery();
+        }
+    }
+
+    public bool HasValidSelectedTargets()
+    {
+        if (selectableTargetDescriptions != null && allSelectedTargets.Count < selectableTargetDescriptions.Count)
+        {
+            ITargettingDescription desc = selectableTargetDescriptions[allSelectedTargets.Count];
+            if (desc.targettingType == TargettingType.EXCEPT)
+            {
+                ExceptTargetDescription exceptDesc = (ExceptTargetDescription)desc;
+                desc = exceptDesc.targetDescription;
+            }
+
+            switch (desc.targettingType)
+            {
+                case TargettingType.TARGET:
+                    TargetXDescription targetDesc = (TargetXDescription)desc;
+                    return selectedTargets.Count == targetDesc.amount;
+                case TargettingType.UP_TO_TARGET:
+                    // 0 is valid for up to so selected targets is always valid
+                    return true;
+            }
+        }
         return false;
+    }
+
+    public bool CanSelectMoreTargets()
+    {
+        if (selectableTargetDescriptions != null)
+        {
+            ITargettingDescription desc = selectableTargetDescriptions[allSelectedTargets.Count];
+            if (desc.targettingType == TargettingType.EXCEPT)
+            {
+                ExceptTargetDescription exceptDesc = (ExceptTargetDescription)desc;
+                desc = exceptDesc.targetDescription;
+            }
+
+            switch (desc.targettingType)
+            {
+                case TargettingType.TARGET:
+                    TargetXDescription targetDesc = (TargetXDescription)desc;
+                    return selectedTargets.Count < targetDesc.amount;
+                case TargettingType.UP_TO_TARGET:
+                    UpToXTargetDescription upToTargetDesc = (UpToXTargetDescription)desc;
+                    return selectedTargets.Count < upToTargetDesc.amount;
+            }
+        }
+        return false;
+    }
+
+    public void AddTarget(Targettable target)
+    {
+        if (CanSelectMoreTargets())
+        {
+            selectedTargets.Add(target);
+        }
+    }
+
+    public void RemoveTarget(Targettable target)
+    {
+        if (selectedTargets != null)
+        {
+            selectedTargets.Remove(target);
+        }
     }
 
     public bool IsResolving()
@@ -343,5 +762,20 @@ public class PlayerController : NetworkBehaviour
     public bool IsInCombat()
     {
         return gameSession.CanChooseAttackers(this) || gameSession.CanChooseBlocks(this);
+    }
+
+    public bool IsActivePlayer()
+    {
+        return gameSession.IsActivePlayer(this);
+    }
+
+    public List<PlayerController> GetOpponents()
+    {
+        return gameSession.GetOpponents(this);
+    }
+
+    public bool IsAnOpponent(PlayerController c)
+    {
+        return GetOpponents().Contains(c);
     }
 }

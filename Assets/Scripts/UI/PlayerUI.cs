@@ -13,16 +13,29 @@ public class PlayerUI : Targettable
     {
         if (player)
         {
-            return player.CanPlayCards();
+            return player.IsTargettable();
         }
         return false;
+    }
+
+    public override bool IsTargettable(TargettingQuery targetQuery)
+    {
+        if (player)
+        {
+            return player.IsTargettable(targetQuery);
+        }
+        return false;
+    }
+
+    protected override Targettable GetTargettableEntity()
+    {
+        return player;
     }
 
     // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
-
     }
 
     // Update is called once per frame
@@ -33,7 +46,7 @@ public class PlayerUI : Targettable
         {
             if (player.health < GameConstants.MAX_PLAYER_HEALTH)
             {
-                healthDisplay.text = "<color=orange>" + player.health.ToString() + "</color>";
+                healthDisplay.text = "<color=yellow>" + player.health.ToString() + "</color>";
 
             }
             else

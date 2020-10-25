@@ -48,7 +48,7 @@ public class ProceduralCardGenerator : ICardGenerator
 
 
         // Decide on stats
-        card.attack = random.Next(1, card.manaCost);
+        card.attack = random.Next(0, card.manaCost + 1);
         card.health = card.manaCost - card.attack + 1;
 
         /*

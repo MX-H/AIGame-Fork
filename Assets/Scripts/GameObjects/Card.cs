@@ -44,9 +44,10 @@ public class Card : Targettable
         }
     }
 
-    void OnMouseDown()
+    protected override void OnMouseDown()
     {
-        if (isDraggable && isRevealed && context != null)
+        base.OnMouseDown();
+        if (isDraggable && isRevealed && context != null && !controller.IsSelectingTargets())
         {
             dragging = true;
             currMousePos = Camera.main.ScreenToWorldPoint(
@@ -187,19 +188,137 @@ public class Card : Targettable
 
     public override bool IsTargettable()
     {
-        if (owner)
+        if (controller)
         {
-            if (owner.CanPlayCards() && owner.isLocalPlayer)
+            if (controller.CanPlayCards() && controller.isLocalPlayer)
             {
                 if (cardData != null && cardData.GetManaCost() <= owner.currMana)
                 {
+                    switch (cardData.GetCardType())
+                    {
+                        case CardType.SPELL:
+                            return HasValidTargets(cardData.GetSelectableTargets(TriggerCondition.NONE));
+                        case CardType.CREATURE:
+                        case CardType.TRAP:
+                            return true;
+                    }
                     return true;
                 }
             }
-            else
-            {
-            }
         }
         return false;
+    }
+
+    public bool HasValidTargets(List<ITargettingDescription> targets)
+    {
+        List<Targettable> potentialTargets = FindObjectOfType<GameSession>().GetPotentialTargets();
+
+        foreach (ITargettingDescription desc in targets)
+        {
+            ITargettingDescription descToCheck = desc;
+
+            if (desc.targettingType == TargettingType.EXCEPT)
+            {
+                ExceptTargetDescription exceptDesc = (ExceptTargetDescription)desc;
+                descToCheck = exceptDesc.targetDescription;
+            }
+
+            int targetsNeeded = 0;
+
+            switch (descToCheck.targettingType)
+            {
+                case TargettingType.TARGET:
+                    {
+                        TargetXDescription targetDesc = (TargetXDescription)descToCheck;
+                        targetsNeeded = targetDesc.amount;
+                    }
+                    break;
+                case TargettingType.UP_TO_TARGET:
+                    // Up to is valid for 0 so we can skip uneccessary checks
+                    continue;
+            }
+
+            TargettingQuery query = new TargettingQuery(desc, controller);
+
+            foreach (Targettable t in potentialTargets)
+            {
+                if (t.IsTargettable(query))
+                {
+                    targetsNeeded -= 1;
+                    if (targetsNeeded <= 0)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (targetsNeeded > 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public override bool IsTargettable(TargettingQuery targetQuery)
+    {
+        bool valid = false;
+
+        ITargettingDescription desc = targetQuery.targettingDesc;
+        if (desc.targettingType == TargettingType.EXCEPT)
+        {
+            ExceptTargetDescription exceptDesc = (ExceptTargetDescription)desc;
+            desc = exceptDesc.targetDescription;
+        }
+        switch (desc.targetType)
+        {
+            case TargetType.CARDS:
+                valid = true;
+                break;
+            case TargetType.CREATURE_CARDS:
+                valid = cardData.GetCardType() == CardType.CREATURE;
+                break;
+            case TargetType.SPELL_CARDS:
+                valid = cardData.GetCardType() == CardType.SPELL;
+                break;
+            case TargetType.TRAP_CARDS:
+                valid = cardData.GetCardType() == CardType.TRAP;
+                break;
+        }
+
+        if (valid)
+        {
+            IQualifiableTargettingDescription qualifiableDesc = (IQualifiableTargettingDescription)desc;
+            if (qualifiableDesc != null)
+            {
+                IQualifierDescription qualifier = qualifiableDesc.qualifier;
+                if (qualifier != null)
+                {
+                    switch (qualifier.qualifierType)
+                    {
+                        case QualifierType.NONE:
+                            break;
+                        case QualifierType.CREATURE_TYPE:
+                            {
+                                CreatureTypeQualifierDescription creatureQualifier = (CreatureTypeQualifierDescription)qualifier;
+                                valid = creatureQualifier.creatureType == cardData.GetCreatureType();
+                            }
+                            break;
+                        case QualifierType.CARD_TYPE:
+                            {
+                                CardTypeQualifierDescription cardTypeQualifier = (CardTypeQualifierDescription)qualifier;
+                                valid = cardTypeQualifier.cardType == cardData.GetCardType();
+                            }
+                            break;
+                        default:
+                            valid = false;
+                            break;
+                    }
+                }
+            }
+        }
+
+        return valid;
     }
 }

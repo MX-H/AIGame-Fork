@@ -69,6 +69,50 @@ public class Trap : Targettable
 
     public override bool IsTargettable()
     {
-        return IsActive();
+        return false;
+    }
+
+    public override bool IsTargettable(TargettingQuery targetQuery)
+    {
+        bool valid = false;
+
+        if (IsActive())
+        {
+            ITargettingDescription desc = targetQuery.targettingDesc;
+            if (desc.targettingType == TargettingType.EXCEPT)
+            {
+                ExceptTargetDescription exceptDesc = (ExceptTargetDescription)desc;
+                desc = exceptDesc.targetDescription;
+            }
+
+            switch (desc.targetType)
+            {
+                case TargetType.PERMANENT:
+                case TargetType.SET_TRAPS:
+                    valid = true;
+                    break;
+            }
+
+            if (valid)
+            {
+                IQualifiableTargettingDescription qualifiableDesc = (IQualifiableTargettingDescription)desc;
+                if (qualifiableDesc != null)
+                {
+                    IQualifierDescription qualifier = qualifiableDesc.qualifier;
+                    if (qualifier != null)
+                    {
+                        switch (qualifier.qualifierType)
+                        {
+                            case QualifierType.NONE:
+                                break;
+                            default:
+                                valid = false;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        return valid;
     }
 }

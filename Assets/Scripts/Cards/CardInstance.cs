@@ -71,6 +71,11 @@ public class CardInstance
         return CreatureType.HUMAN;
     }
 
+    public List<ITargettingDescription> GetSelectableTargets(TriggerCondition trigger)
+    {
+        return baseCard.GetSelectableTargets(trigger);
+    }
+
     public SortedSet<KeywordAttribute> GetAttributes()
     {
         if (GetCardType() == CardType.CREATURE)

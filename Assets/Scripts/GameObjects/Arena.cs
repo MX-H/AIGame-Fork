@@ -337,4 +337,21 @@ public class Arena : MonoBehaviour
     {
         return inCombatCreatures.Count;
     }
+
+    public List<Targettable> GetTargettables()
+    {
+        List<Targettable> targets = new List<Targettable>();
+        foreach (Trap t in traps)
+        {
+            if (t.IsActive())
+            {
+                targets.Add(t);
+            }
+        }
+
+        targets.AddRange(creatures);
+        targets.AddRange(inCombatCreatures);
+
+        return targets;
+    }
 }

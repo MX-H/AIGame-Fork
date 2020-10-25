@@ -13,7 +13,7 @@ public abstract class ITargettingDescription : IDescription
         targetType = target;
         targettingType = targetting;
     }
-
+    public abstract bool RequiresSelection();
     public abstract bool RequiresPluralEffect();
 
     public abstract string CardText(bool plural = false);

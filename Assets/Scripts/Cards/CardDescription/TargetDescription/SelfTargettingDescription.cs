@@ -26,6 +26,11 @@ public class SelfTargettingDescription : ITargettingDescription
     {
         return false;
     }
+
+    public override bool RequiresSelection()
+    {
+        return false;
+    }
 }
 
 public class SelfTargettingProceduralGenerator : IProceduralTargettingGenerator

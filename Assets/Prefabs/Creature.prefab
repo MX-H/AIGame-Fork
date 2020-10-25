@@ -788,8 +788,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 724a29384123d0a40a90816307a25319, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   outline: {fileID: 0}
   isTargettable: 0
+  isSelected: 0
   card: {fileID: 0}
   dragging: 0
   hovering: 0
@@ -815,6 +818,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   renderers:
   - {fileID: 1185355083446392693}
+  targetColor: {r: 0, g: 0.7529412, b: 0.25, a: 0.78431374}
+  selectColor: {r: 0, g: 0.57254905, b: 0.9716981, a: 0.78431374}
 --- !u!114 &7485027606198577293
 MonoBehaviour:
   m_ObjectHideFlags: 0

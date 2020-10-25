@@ -281,7 +281,7 @@ static class CardEnums
         RemoveFlags(TriggerCondition.ON_SELF_DAMAGE_TAKEN, new TargettingType[] { TargettingType.TARGET, TargettingType.UP_TO_TARGET });
 
         RegisterFlags(QualifierType.NONE, (TargetType[])Enum.GetValues(typeof(TargetType)));
-        RegisterFlags(QualifierType.CREATURE_TYPE, new TargetType[] { TargetType.CREATURES });
+        RegisterFlags(QualifierType.CREATURE_TYPE, new TargetType[] { TargetType.CREATURES, TargetType.CREATURE_CARDS });
         RegisterFlags(QualifierType.CARD_TYPE, new TargetType[] { TargetType.CARDS });
     }
 

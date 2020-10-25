@@ -73,7 +73,6 @@ public class Hand : MonoBehaviour
                         cards[i].transform.rotation = Quaternion.LookRotation(cards[i].transform.position - Camera.main.transform.position, transform.up);
                         cards[i].transform.localPosition = new Vector3(0, 0, (center - i) * 0.03f);
                         cards[i].transform.Rotate(new Vector3(0, 0, (i - center) * -5.0f));
-
                     }
                     else
                     {
@@ -138,4 +137,8 @@ public class Hand : MonoBehaviour
         return cards.Contains(c);
     }
 
+    public List<Targettable> GetTargettables()
+    {
+        return cards.Cast<Targettable>().ToList();
+    }
 }

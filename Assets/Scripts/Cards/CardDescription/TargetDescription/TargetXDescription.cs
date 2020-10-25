@@ -27,6 +27,11 @@ public class TargetXDescription : IQualifiableTargettingDescription
     {
         return amount == 1;
     }
+
+    public override bool RequiresSelection()
+    {
+        return true;
+    }
 }
 
 public class TargetXProceduralGenerator : IProceduralTargettingGenerator

@@ -26,6 +26,11 @@ public class FoeTargettingDescription : ITargettingDescription
     {
         return true;
     }
+
+    public override bool RequiresSelection()
+    {
+        return false;
+    }
 }
 
 public class FoeTargettingProceduralGenerator : IProceduralTargettingGenerator

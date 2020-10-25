@@ -5,7 +5,6 @@ using TMPro;
 
 public class ConfirmButton : Targettable
 {
-    public GameSession gameSession;
     public PlayerController localPlayer;
     public TextMeshProUGUI confirmText;
     private enum State
@@ -26,6 +25,11 @@ public class ConfirmButton : Targettable
     public override bool IsTargettable()
     {
         return (state != State.INACTIVE) && (state != State.AWAITING_SELECTION);
+    }
+
+    public override bool IsTargettable(TargettingQuery targetQuery)
+    {
+        return false;
     }
 
     // Update is called once per frame
@@ -52,14 +56,21 @@ public class ConfirmButton : Targettable
         
     }
 
-    private void OnMouseDown()
+    protected override void OnMouseDown()
     {
         if (localPlayer)
         {
             switch (state)
             {
                 case State.AWAITING_CONFIRMATION:
-                    localPlayer.ClientRequestSendConfirmation();
+                    if (localPlayer.IsSelectingTargets())
+                    {
+                        localPlayer.ConfirmSelectedTargets();
+                    }
+                    else
+                    {
+                        localPlayer.ClientRequestSendConfirmation();
+                    }
                     break;
                 case State.END_TURN:
                     localPlayer.ClientRequestEndTurn();
@@ -70,6 +81,7 @@ public class ConfirmButton : Targettable
 
     private void DetermineState()
     {
+        GameSession gameSession = FindObjectOfType<GameSession>();
         if (gameSession && localPlayer)
         {
             if (!gameSession.IsWaitingOnPlayer(localPlayer))
@@ -78,7 +90,14 @@ public class ConfirmButton : Targettable
             }
             else if (localPlayer.IsSelectingTargets())
             {
-                state = State.AWAITING_SELECTION;
+                if (localPlayer.HasValidSelectedTargets())
+                {
+                    state = State.AWAITING_CONFIRMATION;
+                }
+                else
+                {
+                    state = State.AWAITING_SELECTION;
+                }
             }
             else if (!localPlayer.IsInCombat() && !localPlayer.IsResolving() && gameSession.IsActivePlayer(localPlayer))
             {

@@ -209,6 +209,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   outline: {fileID: 4084882757954268407}
   isTargettable: 0
+  isSelected: 0
   gameSession: {fileID: 0}
   localPlayer: {fileID: 0}
   confirmText: {fileID: 4444566820577637446}
@@ -226,6 +227,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   renderers:
   - {fileID: 5031787964206251212}
+  targetColor: {r: 0, g: 0.7529412, b: 0.2509804, a: 0.78431374}
+  selectColor: {r: 0, g: 0.57254905, b: 0.972549, a: 0.78431374}
 --- !u!1 &8965633737883914206
 GameObject:
   m_ObjectHideFlags: 0

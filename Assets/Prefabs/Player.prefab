@@ -65,10 +65,11 @@ MonoBehaviour:
   hand: {fileID: 0}
   deck: {fileID: 0}
   arena: {fileID: 0}
+  discard: {fileID: 0}
   health: 0
   currMana: 0
   totalMana: 0
-  model: {fileID: 11400000, guid: 9115dbd5ff9f6c64199ae445982ce44c, type: 2}
+  model: {fileID: 11400000, guid: bcbec90c9ba264943b094db842f9c18b, type: 2}
   imageGlossary: {fileID: 11400000, guid: 9730a333d1475fd488f7a8e43a6b6b5c, type: 2}
   cardPrefab: {fileID: 7826359536346464351, guid: a230248f1058d0d4d900b14ac753a656,
     type: 3}

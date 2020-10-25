@@ -6,7 +6,7 @@ public static class GameConstants
 {
     public static readonly int MAX_HAND_SIZE = 10;
     public static readonly int START_DECK_SIZE = 30;
-    public static readonly int MAX_PLAYER_HEALTH = 30;
+    public static readonly int MAX_PLAYER_HEALTH = 10;
     public static readonly int MAX_MANA = 10;
     public static readonly int MAX_CREATURES = 5;
     public static readonly int MAX_TRAPS = 5;

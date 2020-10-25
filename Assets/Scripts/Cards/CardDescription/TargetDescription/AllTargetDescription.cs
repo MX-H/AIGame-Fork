@@ -23,6 +23,11 @@ public class AllTargetDescription : IQualifiableTargettingDescription
     {
         return false;
     }
+
+    public override bool RequiresSelection()
+    {
+        return false;
+    }
 }
 
 public class AllTargetProceduralGenerator : IProceduralTargettingGenerator

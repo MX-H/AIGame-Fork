@@ -25,6 +25,11 @@ public class ExceptTargetDescription : IQualifiableTargettingDescription
     {
         return false;
     }
+
+    public override bool RequiresSelection()
+    {
+        return targetDescription.RequiresSelection();
+    }
 }
 
 public class ExceptTargetProceduralGenerator : IProceduralTargettingGenerator

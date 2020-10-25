@@ -35,4 +35,26 @@ public class CardDescription : IDescription
         }
         return power;
     }
+
+    public List<ITargettingDescription> GetSelectableTargets(TriggerCondition trigger)
+    {
+        List<ITargettingDescription> targetList = new List<ITargettingDescription>();
+
+        foreach (CardEffectDescription effect in cardEffects)
+        {
+            if (effect.targettingType != null && effect.targettingType.RequiresSelection())
+            {
+                // For creature cards they have effects that trigger at different times
+                // make sure the trigger condition matches with the effect
+
+                if (cardType == CardType.CREATURE && trigger != effect.triggerCondition)
+                {
+                    continue;
+                }
+
+                targetList.Add(effect.targettingType);
+            }
+        }
+        return targetList;
+    }
 }
