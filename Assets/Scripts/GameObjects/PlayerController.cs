@@ -193,6 +193,29 @@ public class PlayerController : Targettable
     [Server]
     public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId)
     {
+        Card card = cardId.gameObject.GetComponent<Card>();
+
+        if (isServerOnly)
+        {
+            Creature creature = creatureId.gameObject.GetComponent<Creature>();
+            creature.controller = this;
+            creature.owner = this;
+            creature.SetCard(card);
+            arena.AddCreature(creature);
+        }
+
+        // If creature has an ETB effect with no targets add the effect to the stack
+        if (card.cardData.HasEffectsOnTrigger(TriggerCondition.ON_SELF_ENTER) && card.cardData.GetSelectableTargets(TriggerCondition.ON_SELF_ENTER).Count == 0)
+        {
+            gameSession.ServerAddEffectToStack(cardId, TriggerCondition.ON_SELF_ENTER);
+        }
+
+        RpcPlayCreature(creatureId, cardId);
+    }
+
+    [Server]
+    public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId, NetworkIdentity[] targets, int[] indexes)
+    {
         if (isServerOnly)
         {
             Creature creature = creatureId.gameObject.GetComponent<Creature>();
@@ -202,6 +225,9 @@ public class PlayerController : Targettable
             creature.SetCard(card);
             arena.AddCreature(creature);
         }
+
+        gameSession.ServerAddEffectToStack(cardId, TriggerCondition.ON_SELF_ENTER, targets, indexes);
+
         RpcPlayCreature(creatureId, cardId);
     }
 
@@ -219,9 +245,14 @@ public class PlayerController : Targettable
     [Server]
     public void ServerPlaySpell(NetworkIdentity cardId)
     {
-        if (isServerOnly)
-        {
-        }
+        gameSession.ServerAddEffectToStack(cardId, TriggerCondition.NONE);
+        RpcPlaySpell(cardId);
+    }
+
+    [Server]
+    public void ServerPlaySpell(NetworkIdentity cardId, NetworkIdentity[] targets, int[] indexes)
+    {
+        gameSession.ServerAddEffectToStack(cardId, TriggerCondition.NONE, targets, indexes);
         RpcPlaySpell(cardId);
     }
 
@@ -596,7 +627,7 @@ public class PlayerController : Targettable
         if (isLocalPlayer && HasValidSelectedTargets())
         {
             allSelectedTargets.Add(selectedTargets);
-            foreach (Targettable t in selectedTargets)
+            foreach (Targettable t in gameSession.GetPotentialTargets())
             {
                 t.Deselect();
             }
@@ -637,18 +668,7 @@ public class PlayerController : Targettable
     [Command]
     private void CmdSendTargets(NetworkIdentity[] targets, int[] indexes)
     {
-        NetworkIdentity[][] targetsToSend = new NetworkIdentity[indexes.Length][];
-        int ind = 0;
-        for (int i = 0; i < indexes.Length; i++)
-        {
-            targetsToSend[i] = new NetworkIdentity[indexes[i]];
-            for (int j = 0; j < indexes[i]; j++, ind++)
-            {
-                targetsToSend[i][j] = targets[ind];
-            }
-        }
-
-        gameSession.ServerSendTargets(netIdentity, targetsToSend);
+        gameSession.ServerSendTargets(netIdentity, targets, indexes);
         allSelectedTargets = null;
         selectedTargets = null;
         selectableTargetDescriptions = null;
@@ -665,7 +685,7 @@ public class PlayerController : Targettable
     }
     public bool CanPlayCards()
     {
-        return gameSession.IsActivePlayer(this) && gameSession.IsWaitingOnPlayer(this) && !IsInCombat();
+        return gameSession.IsActivePlayer(this) && gameSession.IsWaitingOnPlayer(this) && !IsInCombat() && !IsSelectingTargets();
     }
 
     public bool IsSelectingTargets()

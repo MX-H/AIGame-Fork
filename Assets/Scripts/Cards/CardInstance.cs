@@ -23,6 +23,12 @@ public class CardInstance
         baseCard = card;
     }
 
+    public CardInstance Clone()
+    {
+        CardInstance cardInstance = new CardInstance(srcPlayer, cardSeed);
+        return cardInstance;
+    }
+
     public CardType GetCardType()
     {
         return baseCard.cardType;
@@ -71,6 +77,10 @@ public class CardInstance
         return CreatureType.HUMAN;
     }
 
+    public bool HasEffectsOnTrigger(TriggerCondition trigger)
+    {
+        return baseCard.HasEffectsOnTrigger(trigger);
+    }
     public List<ITargettingDescription> GetSelectableTargets(TriggerCondition trigger)
     {
         return baseCard.GetSelectableTargets(trigger);

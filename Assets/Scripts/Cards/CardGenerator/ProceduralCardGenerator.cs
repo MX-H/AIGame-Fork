@@ -51,7 +51,6 @@ public class ProceduralCardGenerator : ICardGenerator
         card.attack = random.Next(0, card.manaCost + 1);
         card.health = card.manaCost - card.attack + 1;
 
-        /*
         // Decide on keyword attributes
         int amount = random.Next(2);
         for (int i = 0; i < amount; i++)
@@ -61,7 +60,6 @@ public class ProceduralCardGenerator : ICardGenerator
 
         // Decide on effects
         GenerateCardEffects(random, model, card, powerBudget, powerMargin, powerLimit);
-        */
 
         card.image = ProceduralUtils.GetRandomTexture(random, images.GetCreatureImages(card.creatureType));
 

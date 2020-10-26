@@ -36,6 +36,18 @@ public class CardDescription : IDescription
         return power;
     }
 
+    public bool HasEffectsOnTrigger(TriggerCondition trigger)
+    {
+        foreach (CardEffectDescription effect in cardEffects)
+        {
+            if (effect.triggerCondition == trigger)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<ITargettingDescription> GetSelectableTargets(TriggerCondition trigger)
     {
         List<ITargettingDescription> targetList = new List<ITargettingDescription>();

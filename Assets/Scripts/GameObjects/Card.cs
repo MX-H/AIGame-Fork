@@ -190,7 +190,7 @@ public class Card : Targettable
     {
         if (controller)
         {
-            if (controller.CanPlayCards() && controller.isLocalPlayer)
+            if (controller.CanPlayCards() && controller.isLocalPlayer && context != null)
             {
                 if (cardData != null && cardData.GetManaCost() <= owner.currMana)
                 {

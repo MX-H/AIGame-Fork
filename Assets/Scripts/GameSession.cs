@@ -53,6 +53,7 @@ public class GameSession : NetworkBehaviour
     }
 
     public AssignableAreas[] playerAreas;
+    public Effect effectPrefab;
 
     public override void OnStartServer()
     {
@@ -64,7 +65,7 @@ public class GameSession : NetworkBehaviour
     void Start()
     {
         // Create 2 players
-
+        ClientScene.RegisterPrefab(effectPrefab.gameObject);
     }
 
     public bool IsGameReady()
@@ -173,6 +174,18 @@ public class GameSession : NetworkBehaviour
             c.SetCard(card);
             c.gameObject.GetComponent<CreatureState>().ServerInitialize();
             return c.GetComponent<NetworkIdentity>();
+        }
+        return null;
+    }
+
+    [Server]
+    private NetworkIdentity ServerCreateEffect()
+    {
+        if (IsGameReady())
+        {
+            Effect e = Instantiate(effectPrefab);
+            NetworkServer.Spawn(e.gameObject);
+            return e.netIdentity;
         }
         return null;
     }
@@ -310,7 +323,7 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public void ServerSendTargets(NetworkIdentity playerId, NetworkIdentity[][] targets)
+    public void ServerSendTargets(NetworkIdentity playerId, NetworkIdentity[] flattenedTargets, int[] indexes)
     {
         // Validate all targets
         Card card = pendingCard.GetComponent<Card>();
@@ -319,6 +332,17 @@ public class GameSession : NetworkBehaviour
         if (card != null && playerList[waitingIndex].netIdentity && currState == GameState.SELECTING_TARGETS)
         {
             PlayerController player = playerId.GetComponent<PlayerController>();
+
+            NetworkIdentity[][] targets = new NetworkIdentity[indexes.Length][];
+            int ind = 0;
+            for (int i = 0; i < indexes.Length; i++)
+            {
+                targets[i] = new NetworkIdentity[indexes[i]];
+                for (int j = 0; j < indexes[i]; j++, ind++)
+                {
+                    targets[i][j] = flattenedTargets[ind];
+                }
+            }
 
             List<ITargettingDescription> selectableTargetDescriptions = null;
             switch (card.cardData.GetCardType())
@@ -402,7 +426,7 @@ public class GameSession : NetworkBehaviour
 
             if (isValid)
             {
-                ServerPlayCardWithTargets(playerId, targets);
+                ServerPlayCardWithTargets(playerId, flattenedTargets, indexes);
             }
             else
             {
@@ -467,13 +491,15 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public void ServerPlayCardWithTargets(NetworkIdentity playerId, NetworkIdentity[][] targets)
+    public void ServerPlayCardWithTargets(NetworkIdentity playerId, NetworkIdentity[] targets, int[] indexes)
     {
         if (IsGameReady() && playerId == playerList[activeIndex].netIdentity && currState == GameState.SELECTING_TARGETS)
         {
             PlayerController player = playerList[activeIndex];
             Card card = pendingCard.GetComponent<Card>();
             player.ServerPayCost(card);
+
+            ChangeState(GameState.WAIT_ACTIVE);
 
             switch (card.cardData.GetCardType())
             {
@@ -489,7 +515,6 @@ public class GameSession : NetworkBehaviour
                     break;
             }
 
-            ChangeState(GameState.WAIT_ACTIVE);
             pendingCard = null;
         }
     }
@@ -536,6 +561,91 @@ public class GameSession : NetworkBehaviour
                     break;
             }
         }
+    }
+
+    [Server]
+    public void ServerAddEffectToStack(NetworkIdentity source, TriggerCondition trigger, NetworkIdentity[] flattenedTargets, int[] indexes)
+    {
+        NetworkIdentity effectId = ServerCreateEffect();
+        Effect effect = effectId.GetComponent<Effect>();
+
+        if (isServerOnly)
+        {
+            // Reconstruct jagged arrays
+            Targettable[][] targets = new Targettable[indexes.Length][];
+            int ind = 0;
+            for (int i = 0; i < indexes.Length; i++)
+            {
+                targets[i] = new Targettable[indexes[i]];
+                for (int j = 0; j < indexes[i]; j++, ind++)
+                {
+                    targets[i][j] = flattenedTargets[ind].GetComponent<Targettable>();
+                }
+            }
+
+            effect.SetData(source.GetComponent<Card>(), trigger, targets);
+
+            EffectStack stack = FindObjectOfType<EffectStack>();
+            effect.SetData(source.GetComponent<Card>(), trigger);
+            stack.PushEffect(effect);
+
+        }
+        RpcAddEffectToStackWithTargets(effectId, source, trigger, flattenedTargets, indexes);
+
+    }
+
+    [Server]
+    public void ServerAddEffectToStack(NetworkIdentity source, TriggerCondition trigger)
+    {
+        NetworkIdentity effectId = ServerCreateEffect();
+        Effect effect = effectId.GetComponent<Effect>();
+
+        if (isServerOnly)
+        {
+            effect.SetData(source.GetComponent<Card>(), trigger);
+
+            EffectStack stack = FindObjectOfType<EffectStack>();
+            effect.SetData(source.GetComponent<Card>(), trigger);
+            stack.PushEffect(effect);
+        }
+
+        RpcAddEffectToStack(effectId, source, trigger);
+    }
+
+    [ClientRpc]
+    public void RpcAddEffectToStackWithTargets(NetworkIdentity effectId, NetworkIdentity source, TriggerCondition trigger, NetworkIdentity[] flattenedTargets, int[] indexes)
+    {
+        Effect effect = effectId.GetComponent<Effect>();
+
+        // Reconstruct jagged arrays
+        Targettable[][] targets = new Targettable[indexes.Length][];
+        int ind = 0;
+        for (int i = 0; i < indexes.Length; i++)
+        {
+            targets[i] = new Targettable[indexes[i]];
+            for (int j = 0; j < indexes[i]; j++, ind++)
+            {
+                targets[i][j] = flattenedTargets[ind].GetComponent<Targettable>();
+            }
+        }
+
+        effect.SetData(source.GetComponent<Card>(), trigger, targets);
+
+        EffectStack stack = FindObjectOfType<EffectStack>();
+        effect.SetData(source.GetComponent<Card>(), trigger);
+        stack.PushEffect(effect);
+    }
+
+    [ClientRpc]
+    public void RpcAddEffectToStack(NetworkIdentity effectId, NetworkIdentity source, TriggerCondition trigger)
+    {
+        Effect effect = effectId.GetComponent<Effect>();
+
+        effect.SetData(source.GetComponent<Card>(), trigger);
+
+        EffectStack stack = FindObjectOfType<EffectStack>();
+        effect.SetData(source.GetComponent<Card>(), trigger);
+        stack.PushEffect(effect);
     }
 
     [Server]

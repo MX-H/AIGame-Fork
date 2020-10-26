@@ -40,7 +40,6 @@ public class Creature : Targettable
         if (dragging)
         {
             transform.position = currMousePos;
-            Debug.DrawRay(currMousePos, Camera.main.transform.forward * 100, Color.red);
         }
 
         if (card != null && card.cardData != null)

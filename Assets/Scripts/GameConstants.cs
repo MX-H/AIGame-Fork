@@ -11,6 +11,7 @@ public static class GameConstants
     public static readonly int MAX_CREATURES = 5;
     public static readonly int MAX_TRAPS = 5;
     public static readonly int STARTING_HAND_SIZE = 4;
+    public static readonly int MAX_STACK_SIZE = 5;
     public static class Z_LAYERS
     {
         public static readonly float HOVER_LAYER = -40;
