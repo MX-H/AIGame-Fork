@@ -12,6 +12,19 @@ public class DrawEffectDescription : IEffectDescription
         drawModifier = DrawModifier.SELF;
     }
 
+    public override void ApplyToTarget(Targettable target, PlayerController player)
+    {
+        PlayerController targetPlayer = target as PlayerController;
+        if (targetPlayer)
+        {
+            GameSession gameSession = GameUtils.GetGameSession();
+            for (int i = 0; i < amount; i++)
+            {
+                gameSession.ServerPlayerDrawCard(targetPlayer);
+            }
+        }
+    }
+
     public override string CardText(bool plural) 
     {
         return (plural ? "draws " : "draw ") + amount.ToString() + ((amount == 1) ? " card" : " cards");

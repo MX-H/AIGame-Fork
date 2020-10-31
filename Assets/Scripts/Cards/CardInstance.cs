@@ -77,6 +77,11 @@ public class CardInstance
         return CreatureType.HUMAN;
     }
 
+    public List<CardEffectDescription> GetEffectsOnTrigger(TriggerCondition trigger)
+    {
+        return baseCard.GetEffectsOnTrigger(trigger);
+    }
+
     public bool HasEffectsOnTrigger(TriggerCondition trigger)
     {
         return baseCard.HasEffectsOnTrigger(trigger);

@@ -31,6 +31,11 @@ public class FoeTargettingDescription : ITargettingDescription
     {
         return false;
     }
+
+    public override void ResolveEffectWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    {
+        effect.ApplyToTarget(player.GetOpponents()[0], player);
+    }
 }
 
 public class FoeTargettingProceduralGenerator : IProceduralTargettingGenerator

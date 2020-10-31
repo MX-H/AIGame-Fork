@@ -11,6 +11,9 @@ public class Effect : Targettable
 
     private bool hovering;
 
+    private Targettable[][] targetList;
+    private TriggerCondition triggerCondition;
+
     public override bool IsTargettable()
     {
         return false;
@@ -67,16 +70,42 @@ public class Effect : Targettable
             Sprite[] sprites = Resources.LoadAll<Sprite>(GameConstants.PATHS.CARD_IMAGES + c.cardData.GetImage().name);
             icon.sprite = sprites[1];
         }
+
+        triggerCondition = trigger;
+        targetList = targets;
     }
 
     public void SetData(Card c, TriggerCondition trigger)
     {
         source.cardData = c.cardData.Clone();
+        source.controller = c.controller;
 
         if (c.cardData.GetImage() && icon)
         {
             Sprite[] sprites = Resources.LoadAll<Sprite>(GameConstants.PATHS.CARD_IMAGES + c.cardData.GetImage().name);
             icon.sprite = sprites[1];
+        }
+
+        triggerCondition = trigger;
+    }
+
+    [Server]
+    public void ServerResolve()
+    {
+        List<CardEffectDescription> effectList = source.cardData.GetEffectsOnTrigger(triggerCondition);
+
+        int targetIndex = 0;
+        foreach (CardEffectDescription effect in effectList)
+        {
+            if (effect.targettingType != null && effect.targettingType.RequiresSelection())
+            {
+                effect.ResolveEffect(targetList[targetIndex], source.controller);
+                targetIndex++;
+            }
+            else
+            {
+                effect.ResolveEffect(null, source.controller);
+            }
         }
     }
 }

@@ -10,6 +10,19 @@ public class DamageEffectDescription : IEffectDescription
     {
     }
 
+    public override void ApplyToTarget(Targettable target, PlayerController player)
+    {
+        GameSession gameSession = GameUtils.GetGameSession();
+        if (effectType == EffectType.HEAL_DAMAGE)
+        {
+            gameSession.ServerHealDamage(target, amount);
+        }
+        else
+        {
+            gameSession.ServerApplyDamage(target, amount);
+        }
+    }
+
     public override string CardText(bool plural)
     {
         string text = "";

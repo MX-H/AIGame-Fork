@@ -30,6 +30,37 @@ public class ExceptTargetDescription : IQualifiableTargettingDescription
     {
         return targetDescription.RequiresSelection();
     }
+
+    public override void ResolveEffectWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    {
+        TargetXDescription targetDescription = new TargetXDescription(targetType);
+        targetDescription.amount = 1;
+        targetDescription.qualifier = qualifier;
+
+        TargettingQuery query = new TargettingQuery(targetDescription, player);
+        GameSession gameSession = GameUtils.GetGameSession();
+
+        List<Targettable> possibleTargets = gameSession.GetPotentialTargets();
+        foreach (Targettable t in possibleTargets)
+        {
+            if (t.IsTargettable(query))
+            {
+                bool valid = true;
+                foreach (Targettable t2 in targets)
+                {
+                    if (t == t2)
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (valid)
+                {
+                    effect.ApplyToTarget(t, player);
+                }
+            }
+        }
+    }
 }
 
 public class ExceptTargetProceduralGenerator : IProceduralTargettingGenerator

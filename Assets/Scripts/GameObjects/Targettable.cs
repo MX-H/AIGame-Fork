@@ -83,7 +83,6 @@ public abstract class Targettable : NetworkBehaviour
 
     public abstract bool IsTargettable();
     public abstract bool IsTargettable(TargettingQuery targetQuery);
-
     public void SetTargettingQuery(TargettingQuery targettingDesc)
     {
         targettingQuery = targettingDesc;

@@ -24,4 +24,9 @@ public class CardEffectDescription : IDescription
     {
         return PowerBudget.FLAT_EFFECT_COST + targettingType.PowerLevel() * effectType.PowerLevel();
     }
+
+    public void ResolveEffect(Targettable[] targets, PlayerController player)
+    {
+        targettingType.ResolveEffectWithTargets(effectType, targets, player);
+    }
 }

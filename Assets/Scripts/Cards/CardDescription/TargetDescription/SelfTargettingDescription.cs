@@ -31,6 +31,11 @@ public class SelfTargettingDescription : ITargettingDescription
     {
         return false;
     }
+
+    public override void ResolveEffectWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    {
+        effect.ApplyToTarget(player, player);
+    }
 }
 
 public class SelfTargettingProceduralGenerator : IProceduralTargettingGenerator

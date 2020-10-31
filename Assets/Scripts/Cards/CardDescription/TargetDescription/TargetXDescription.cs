@@ -32,6 +32,14 @@ public class TargetXDescription : IQualifiableTargettingDescription
     {
         return true;
     }
+
+    public override void ResolveEffectWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    {
+        foreach (Targettable target in targets)
+        {
+            effect.ApplyToTarget(target, player);
+        }
+    }
 }
 
 public class TargetXProceduralGenerator : IProceduralTargettingGenerator

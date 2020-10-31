@@ -15,10 +15,10 @@ public abstract class ITargettingDescription : IDescription
     }
     public abstract bool RequiresSelection();
     public abstract bool RequiresPluralEffect();
-
     public abstract string CardText(bool plural = false);
     public abstract Alignment GetAlignment();
     public abstract double PowerLevel();
+    public abstract void ResolveEffectWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player);
 }
 
 public abstract class IQualifiableTargettingDescription : ITargettingDescription

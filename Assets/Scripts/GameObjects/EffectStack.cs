@@ -34,8 +34,25 @@ public class EffectStack : MonoBehaviour
         effectStack.Add(effect);
         effect.transform.SetParent(transform);
     }
-    public void PopEffect()
+    public Effect PopEffect()
     {
+        Effect effect = effectStack[effectStack.Count - 1];
         effectStack.RemoveAt(effectStack.Count - 1);
+        return effect;
+    }
+
+    public void RemoveEffect(Effect effect)
+    {
+        effectStack.Remove(effect);
+    }
+
+    public bool IsFull()
+    {
+        return effectStack.Count >= GameConstants.MAX_STACK_SIZE;
+    }
+
+    public bool IsEmpty()
+    {
+        return effectStack.Count == 0;
     }
 }

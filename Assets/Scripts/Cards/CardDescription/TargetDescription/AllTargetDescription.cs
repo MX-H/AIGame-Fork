@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class AllTargetDescription : IQualifiableTargettingDescription
 {
     public AllTargetDescription(TargetType target) : base(target, TargettingType.ALL)
@@ -27,6 +26,25 @@ public class AllTargetDescription : IQualifiableTargettingDescription
     public override bool RequiresSelection()
     {
         return false;
+    }
+
+    public override void ResolveEffectWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    {
+        TargetXDescription targetDescription = new TargetXDescription(targetType);
+        targetDescription.amount = 1;
+        targetDescription.qualifier = qualifier;
+
+        TargettingQuery query = new TargettingQuery(targetDescription, player);
+        GameSession gameSession = GameUtils.GetGameSession();
+
+        List<Targettable> possibleTargets = gameSession.GetPotentialTargets();
+        foreach (Targettable t in possibleTargets)
+        {
+            if (t.IsTargettable(query))
+            {
+                effect.ApplyToTarget(t, player);
+            }
+        }
     }
 }
 

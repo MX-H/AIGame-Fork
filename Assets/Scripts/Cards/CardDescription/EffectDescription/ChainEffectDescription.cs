@@ -11,6 +11,11 @@ public class ChainEffectDescription : IEffectDescription
     {
     }
 
+    public override void ApplyToTarget(Targettable target, PlayerController player)
+    {
+        throw new System.NotImplementedException();
+    }
+
     public override string CardText(bool plural)
     {
         throw new System.NotImplementedException();

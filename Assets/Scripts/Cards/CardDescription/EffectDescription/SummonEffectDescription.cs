@@ -9,6 +9,12 @@ public class SummonEffectDescription : IEffectDescription
     public CreatureType tokenType;
     public SummonEffectDescription() : base(EffectType.SUMMON_TOKEN)
     { }
+
+    public override void ApplyToTarget(Targettable target, PlayerController player)
+    {
+        return;
+    }
+
     public override string CardText(bool plural)
     {
         return (plural ? "summons " : "summon ") + amount.ToString() + " " + CardParsing.Parse(tokenType) + ((amount == 1) ? " token" : " tokens");

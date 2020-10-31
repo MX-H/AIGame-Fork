@@ -16,6 +16,7 @@ public abstract class IEffectDescription : IDescription
     public abstract string CardText(bool plural);
     public abstract Alignment GetAlignment();
     public abstract double PowerLevel();
+    public abstract void ApplyToTarget(Targettable target, PlayerController player);
 }
 
 public abstract class IEffectGenerator

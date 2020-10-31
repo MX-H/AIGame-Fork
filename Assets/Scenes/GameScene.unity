@@ -1345,6 +1345,7 @@ MonoBehaviour:
     deck: {fileID: 1518905591}
     arena: {fileID: 235487816}
     discard: {fileID: 2015742338}
+  effectStack: {fileID: 1523821313}
   effectPrefab: {fileID: 1000785880795795753, guid: 25c2a0d30901f624fb9ca5d4caf65ef1,
     type: 3}
 --- !u!4 &1132223709

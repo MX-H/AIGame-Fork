@@ -776,7 +776,7 @@ public class PlayerController : Targettable
 
     public bool IsResolving()
     {
-        return false;
+        return !gameSession.effectStack.IsEmpty();
     }
 
     public bool IsInCombat()

@@ -7,6 +7,15 @@ public class NegateEffectDescription : IEffectDescription
     public NegateEffectDescription() : base(EffectType.NEGATE)
     { }
 
+    public override void ApplyToTarget(Targettable target, PlayerController player)
+    {
+        Effect effectTarget = target as Effect;
+        if (effectTarget)
+        {
+            GameUtils.GetGameSession().ServerRemoveEffect(effectTarget);
+        }
+    }
+
     public override string CardText(bool plural)
     {
         return (plural ? "is" : "are") + " negated";
@@ -21,6 +30,7 @@ public class NegateEffectDescription : IEffectDescription
     {
         return PowerBudget.UNIT_COST * 3;
     }
+
 }
 
 public class NegateEffectProceduralGenerator : IProceduralEffectGenerator

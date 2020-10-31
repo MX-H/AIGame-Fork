@@ -36,6 +36,21 @@ public class CardDescription : IDescription
         return power;
     }
 
+    public List<CardEffectDescription> GetEffectsOnTrigger(TriggerCondition trigger)
+    {
+        List<CardEffectDescription> effects = new List<CardEffectDescription>();
+        foreach (CardEffectDescription effect in cardEffects)
+        {
+            if (cardType == CardType.CREATURE && trigger != effect.triggerCondition)
+            {
+                continue;
+            }
+
+            effects.Add(effect);
+        }
+        return effects;
+    }
+
     public bool HasEffectsOnTrigger(TriggerCondition trigger)
     {
         foreach (CardEffectDescription effect in cardEffects)
