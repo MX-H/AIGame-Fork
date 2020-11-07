@@ -45,10 +45,11 @@ public class ExceptTargetDescription : IQualifiableTargettingDescription
         {
             if (t.IsTargettable(query))
             {
+                Targettable targetableEntity = t.GetTargettableEntity();
                 bool valid = true;
                 foreach (Targettable t2 in targets)
                 {
-                    if (t == t2)
+                    if (targetableEntity == t2)
                     {
                         valid = false;
                         break;
@@ -56,7 +57,7 @@ public class ExceptTargetDescription : IQualifiableTargettingDescription
                 }
                 if (valid)
                 {
-                    effect.ApplyToTarget(t, player);
+                    effect.ApplyToTarget(targetableEntity, player);
                 }
             }
         }

@@ -42,7 +42,7 @@ public class AllTargetDescription : IQualifiableTargettingDescription
         {
             if (t.IsTargettable(query))
             {
-                effect.ApplyToTarget(t, player);
+                effect.ApplyToTarget(t.GetTargettableEntity(), player);
             }
         }
     }
