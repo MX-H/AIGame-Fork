@@ -27,6 +27,10 @@ public class Arena : MonoBehaviour
     public void AssignPlayer(PlayerController p)
     {
         player = p;
+        foreach (Trap t in traps)
+        {
+            t.owner = p;
+        }
 
         p.arena = this;
     }
@@ -212,6 +216,43 @@ public class Arena : MonoBehaviour
             if (!t.IsActive())
             {
                 t.SetCard(c);
+                return;
+            }
+        }
+    }
+
+    public void AddTrap(Card c, int index)
+    {
+        if (!traps[index].IsActive())
+        {
+            traps[index].SetCard(c);
+        }
+    }
+
+    public int GetTrapIndex(Card c)
+    {
+        for (int i = 0; i < traps.Length; i++)
+        {
+            if (traps[i].IsActive() && traps[i].card == c)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public bool IsTrap(Card c)
+    {
+        return GetTrapIndex(c) >= 0;
+    }
+
+    public void RemoveTrap(Card c)
+    {
+        foreach (Trap t in traps)
+        {
+            if (t.IsActive() && t.card == c)
+            {
+                t.SetCard(null);
                 return;
             }
         }

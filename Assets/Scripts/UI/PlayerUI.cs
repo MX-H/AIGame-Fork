@@ -27,7 +27,7 @@ public class PlayerUI : Targettable
         return false;
     }
 
-    protected override Targettable GetTargettableEntity()
+    public override Targettable GetTargettableEntity()
     {
         return player;
     }

@@ -175,6 +175,24 @@ public class PlayerController : Targettable
         hand.AddCard(c);
     }
 
+    [Server]
+    public void ServerAddTrapBackToArena(NetworkIdentity cardId, int index)
+    {
+        if (isServerOnly)
+        {
+            Card c = cardId.GetComponent<Card>();
+            arena.AddTrap(c, index);
+        }
+        RpcAddTrapBackToArena(cardId, index);
+    }
+
+    [ClientRpc]
+    public void RpcAddTrapBackToArena(NetworkIdentity cardId, int index)
+    {
+        Card c = cardId.GetComponent<Card>();
+        arena.AddTrap(c, index);
+    }
+
     [ClientRpc]
     public void RpcAddCardToHand(NetworkIdentity playerId, int seed, NetworkIdentity id)
     {
@@ -193,6 +211,12 @@ public class PlayerController : Targettable
     [Server]
     public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId)
     {
+        ServerPlayCreature(creatureId, cardId, null, null);
+    }
+
+    [Server]
+    public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId, NetworkIdentity[] targets, int[] indexes)
+    {
         Card card = cardId.gameObject.GetComponent<Card>();
 
         if (isServerOnly)
@@ -204,29 +228,15 @@ public class PlayerController : Targettable
             arena.AddCreature(creature);
         }
 
+        if (targets != null && indexes != null)
+        {
+            gameSession.ServerAddEffectToStack(cardId, TriggerCondition.ON_SELF_ENTER, targets, indexes);
+        }
         // If creature has an ETB effect with no targets add the effect to the stack
-        if (card.cardData.HasEffectsOnTrigger(TriggerCondition.ON_SELF_ENTER) && card.cardData.GetSelectableTargets(TriggerCondition.ON_SELF_ENTER).Count == 0)
+        else if (card.cardData.HasEffectsOnTrigger(TriggerCondition.ON_SELF_ENTER) && card.cardData.GetSelectableTargets(TriggerCondition.ON_SELF_ENTER).Count == 0)
         {
             gameSession.ServerAddEffectToStack(cardId, TriggerCondition.ON_SELF_ENTER);
         }
-
-        RpcPlayCreature(creatureId, cardId);
-    }
-
-    [Server]
-    public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId, NetworkIdentity[] targets, int[] indexes)
-    {
-        if (isServerOnly)
-        {
-            Creature creature = creatureId.gameObject.GetComponent<Creature>();
-            Card card = cardId.gameObject.GetComponent<Card>();
-            creature.controller = this;
-            creature.owner = this;
-            creature.SetCard(card);
-            arena.AddCreature(creature);
-        }
-
-        gameSession.ServerAddEffectToStack(cardId, TriggerCondition.ON_SELF_ENTER, targets, indexes);
 
         RpcPlayCreature(creatureId, cardId);
     }
@@ -245,14 +255,20 @@ public class PlayerController : Targettable
     [Server]
     public void ServerPlaySpell(NetworkIdentity cardId)
     {
-        gameSession.ServerAddEffectToStack(cardId, TriggerCondition.NONE);
-        RpcPlaySpell(cardId);
+        ServerPlaySpell(cardId, null, null);
     }
 
     [Server]
     public void ServerPlaySpell(NetworkIdentity cardId, NetworkIdentity[] targets, int[] indexes)
     {
-        gameSession.ServerAddEffectToStack(cardId, TriggerCondition.NONE, targets, indexes);
+        if (targets != null && indexes != null)
+        {
+            gameSession.ServerAddEffectToStack(cardId, TriggerCondition.NONE, targets, indexes);
+        }
+        else
+        {
+            gameSession.ServerAddEffectToStack(cardId, TriggerCondition.NONE);
+        }
         RpcPlaySpell(cardId);
     }
 
@@ -281,23 +297,56 @@ public class PlayerController : Targettable
     }
 
     [Server]
+    public void ServerActivateTrap(NetworkIdentity cardId)
+    {
+        // Activating a trap should be the same as playing a spell
+        ServerPlaySpell(cardId);
+    }
+
+    [Server]
+    public void ServerActivateTrap(NetworkIdentity cardId, NetworkIdentity[] targets, int[] indexes)
+    {
+        ServerPlaySpell(cardId, targets, indexes);
+    }
+
+    [Server]
     public void ServerRemoveCardFromHand(NetworkIdentity cardId)
     {
-        if (isServerOnly)
-        {
-            Card card = cardId.gameObject.GetComponent<Card>();
-            hand.RemoveCard(card);
-            card.gameObject.SetActive(false);
-        }
+        Card card = cardId.gameObject.GetComponent<Card>();
+        hand.RemoveCard(card);
+        card.gameObject.SetActive(false);
         RpcRemoveCardFromHand(cardId);
     }
 
     [ClientRpc]
     public void RpcRemoveCardFromHand(NetworkIdentity cardId)
     {
-        Card card = cardId.gameObject.GetComponent<Card>();
-        hand.RemoveCard(card);
+        if (!isServer)
+        {
+            Card card = cardId.gameObject.GetComponent<Card>();
+            hand.RemoveCard(card);
+            card.gameObject.SetActive(false);
+        }
+    }
+
+    [Server]
+    public void ServerRemoveTrapFromArena(NetworkIdentity cardId)
+    {
+        Card card = cardId.GetComponent<Card>();
+        arena.RemoveTrap(card);
         card.gameObject.SetActive(false);
+        RpcRemoveTrapFromArena(cardId);
+    }
+
+    [ClientRpc]
+    public void RpcRemoveTrapFromArena(NetworkIdentity cardId)
+    {
+        if (!isServer)
+        {
+            Card card = cardId.GetComponent<Card>();
+            arena.RemoveTrap(card);
+            card.gameObject.SetActive(false);
+        }
     }
 
     [Server]
@@ -380,6 +429,15 @@ public class PlayerController : Targettable
         if (isLocalPlayer)
         {
             CmdPlayCard(card);
+        }
+    }
+
+    [Client]
+    public void ClientRequestActivateTrap(NetworkIdentity cardId)
+    {
+        if (isLocalPlayer)
+        {
+            CmdActivateTrap(cardId);
         }
     }
 
@@ -574,6 +632,28 @@ public class PlayerController : Targettable
     }
 
     [Command]
+    private void CmdActivateTrap(NetworkIdentity cardId)
+    {
+        Card card = cardId.GetComponent<Card>();
+        if (arena.IsTrap(card) && CanActivateTraps())
+        {
+            List<ITargettingDescription> targets = card.cardData.GetSelectableTargets(TriggerCondition.NONE);
+
+            if (targets.Count > 0)
+            {
+                if (card.HasValidTargets(targets))
+                {
+                    gameSession.ServerActivateTrapAndSelectTargets(netIdentity, cardId);
+                }
+            }
+            else
+            {
+                gameSession.ServerActivateTrap(netIdentity, cardId);
+            }
+        }
+    }
+
+    [Command]
     private void CmdCancelPlayCard()
     {
         gameSession.ServerCancelPlayCard(netIdentity);
@@ -685,7 +765,12 @@ public class PlayerController : Targettable
     }
     public bool CanPlayCards()
     {
-        return gameSession.IsActivePlayer(this) && gameSession.IsWaitingOnPlayer(this) && !IsInCombat() && !IsSelectingTargets();
+        return gameSession.IsActivePlayer(this) && gameSession.IsWaitingOnPlayer(this) && gameSession.IsStackEmpty() && !IsInCombat() && !IsSelectingTargets();
+    }
+
+    public bool CanActivateTraps()
+    {
+        return gameSession.IsWaitingOnPlayer(this) && !gameSession.IsStackFull() && !IsInCombat() && !IsSelectingTargets();
     }
 
     public bool IsSelectingTargets()

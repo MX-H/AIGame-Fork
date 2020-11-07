@@ -109,7 +109,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ecc6689e4b3cc974eac964bce3e0de1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outline: {fileID: 0}
+  syncMode: 0
+  syncInterval: 0.1
+  outline: {fileID: 8026875940533087263}
   isTargettable: 0
   isSelected: 0
   trapVisual: {fileID: 5336630532726948099}

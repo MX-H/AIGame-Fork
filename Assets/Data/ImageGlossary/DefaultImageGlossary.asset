@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00a31babd6759344a9f76ae49049b5a9, type: 3}
   m_Name: DefaultImageGlossary
   m_EditorClassIdentifier: 
-  spellImageBank: {fileID: 11400000, guid: b7cf53697c89ddd47810ebb4dfd149a9, type: 2}
+  spellImageBank: {fileID: 11400000, guid: 79861939a7012b948aee497ea13d590b, type: 2}
   trapImageBank: {fileID: 11400000, guid: b7cf53697c89ddd47810ebb4dfd149a9, type: 2}
   creatureImageBanks:
   - type: 0

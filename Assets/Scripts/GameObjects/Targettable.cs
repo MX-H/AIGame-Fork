@@ -98,7 +98,7 @@ public abstract class Targettable : NetworkBehaviour
         return targettingQuery;
     }
 
-    protected virtual Targettable GetTargettableEntity()
+    public virtual Targettable GetTargettableEntity()
     {
         return this;
     }

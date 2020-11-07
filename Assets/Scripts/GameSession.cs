@@ -44,6 +44,9 @@ public class GameSession : NetworkBehaviour
     [SyncVar]
     NetworkIdentity pendingCard;
 
+    [SyncVar]
+    int pendingTrapIndex;
+
     [Serializable]
     public struct AssignableAreas
     {
@@ -564,7 +567,14 @@ public class GameSession : NetworkBehaviour
 
             if (isValid)
             {
-                ServerPlayCardWithTargets(playerId, flattenedTargets, indexes);
+                if (pendingTrapIndex < 0)
+                {
+                    ServerPlayCardWithTargets(playerId, flattenedTargets, indexes);
+                }
+                else
+                {
+                    ServerActivateTrapWithTargets(playerId, flattenedTargets, indexes);
+                }
             }
             else
             {
@@ -613,84 +623,6 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public void ServerPlayCardAndSelectTargets(NetworkIdentity playerId, NetworkIdentity card)
-    {
-        if (IsGameReady() && playerId == playerList[activeIndex].netIdentity && currState == GameState.WAIT_ACTIVE)
-        {
-            // Remove the card from the players hand
-            PlayerController p = playerList[activeIndex];
-            Card c = card.gameObject.GetComponent<Card>();
-            p.ServerRemoveCardFromHand(card);
-
-            // Go into target selection state and wait for response
-            pendingCard = card;
-            ChangeState(GameState.SELECTING_TARGETS);
-        }
-    }
-
-    [Server]
-    public void ServerPlayCardWithTargets(NetworkIdentity playerId, NetworkIdentity[] targets, int[] indexes)
-    {
-        if (IsGameReady() && playerId == playerList[activeIndex].netIdentity && currState == GameState.SELECTING_TARGETS)
-        {
-            PlayerController player = playerList[activeIndex];
-            Card card = pendingCard.GetComponent<Card>();
-            player.ServerPayCost(card);
-
-            switch (card.cardData.GetCardType())
-            {
-                case CardType.CREATURE:
-                    NetworkIdentity creature = ServerCreateCreature(player, card);
-                    player.ServerPlayCreature(creature, pendingCard, targets, indexes);
-                    break;
-                case CardType.SPELL:
-                    player.ServerPlaySpell(pendingCard, targets, indexes);
-                    break;
-                case CardType.TRAP:
-                    player.ServerPlayTrap(pendingCard);
-                    break;
-            }
-            pendingCard = null;
-            playerPasses = 0;
-
-            // If effect is added to stack start passing priority/resolving
-            if (!effectStack.IsEmpty())
-            {
-                if (waitingIndex == activeIndex)
-                {
-                    ChangeState(GameState.WAIT_NON_ACTIVE);
-                }
-                else
-                {
-                    ChangeState(GameState.WAIT_ACTIVE);
-                }
-            }
-            else
-            {
-                ChangeState(GameState.WAIT_ACTIVE);
-            }
-        }
-    }
-
-    [Server]
-    public void ServerCancelPlayCard(NetworkIdentity playerId)
-    {
-        if(IsGameReady() && playerId == playerList[waitingIndex].netIdentity && currState == GameState.SELECTING_TARGETS)
-        {
-            Card card = pendingCard.GetComponent<Card>();
-            PlayerController player = playerList[waitingIndex];
-            player.ServerAddExistingCardToHand(pendingCard);
-        }
-    }
-
-    [Server]
-    public void ServerRemoveCardFromHand(NetworkIdentity playerId, NetworkIdentity card)
-    {
-        PlayerController p = playerId.GetComponent<PlayerController>();
-        p.ServerRemoveCardFromHand(card);
-    }
-
-    [Server]
     public void ServerPlayCard(NetworkIdentity playerId, NetworkIdentity card)
     {
         if (IsGameReady() && playerId == playerList[activeIndex].netIdentity && currState == GameState.WAIT_ACTIVE)
@@ -732,6 +664,157 @@ public class GameSession : NetworkBehaviour
                 ChangeState(GameState.WAIT_ACTIVE);
             }
         }
+    }
+
+    [Server]
+    public void ServerActivateTrap(NetworkIdentity playerId, NetworkIdentity cardId)
+    {
+        PlayerController player = playerId.GetComponent<PlayerController>();
+        if (IsGameReady() && IsWaitingOnPlayer(player) && (currState == GameState.WAIT_ACTIVE || currState == GameState.WAIT_NON_ACTIVE) && !effectStack.IsFull())
+        {
+            Card card = cardId.GetComponent<Card>();
+            if (player.arena.IsTrap(card))
+            {
+                player.ServerRemoveTrapFromArena(cardId);
+                player.ServerActivateTrap(cardId);
+
+                playerPasses = 0;
+
+                if (waitingIndex == activeIndex)
+                {
+                    ChangeState(GameState.WAIT_NON_ACTIVE);
+                }
+                else
+                {
+                    ChangeState(GameState.WAIT_ACTIVE);
+                }
+            }
+        }
+    }
+
+    [Server]
+    public void ServerPlayCardAndSelectTargets(NetworkIdentity playerId, NetworkIdentity card)
+    {
+        if (IsGameReady() && playerId == playerList[activeIndex].netIdentity && currState == GameState.WAIT_ACTIVE)
+        {
+            // Remove the card from the players hand
+            PlayerController p = playerList[activeIndex];
+            Card c = card.gameObject.GetComponent<Card>();
+            p.ServerRemoveCardFromHand(card);
+
+            // Go into target selection state and wait for response
+            SetPendingCard(c, p);
+        }
+    }
+
+    [Server]
+    public void ServerActivateTrapAndSelectTargets(NetworkIdentity playerId, NetworkIdentity cardId)
+    {
+        PlayerController player = playerId.GetComponent<PlayerController>();
+        if (IsGameReady() && IsWaitingOnPlayer(player) && (currState == GameState.WAIT_ACTIVE || currState == GameState.WAIT_NON_ACTIVE) && !effectStack.IsFull())
+        {
+            Card card = cardId.GetComponent<Card>();
+            if (player.arena.IsTrap(card))
+            {
+                SetPendingCard(card, player);
+                player.ServerRemoveTrapFromArena(cardId);
+            }
+        }
+    }
+
+    [Server]
+    private void ServerPlayCardWithTargets(NetworkIdentity playerId, NetworkIdentity[] targets, int[] indexes)
+    {
+        if (IsGameReady() && playerId == playerList[activeIndex].netIdentity && currState == GameState.SELECTING_TARGETS)
+        {
+            PlayerController player = playerList[activeIndex];
+            Card card = pendingCard.GetComponent<Card>();
+            player.ServerPayCost(card);
+
+            switch (card.cardData.GetCardType())
+            {
+                case CardType.CREATURE:
+                    NetworkIdentity creature = ServerCreateCreature(player, card);
+                    player.ServerPlayCreature(creature, pendingCard, targets, indexes);
+                    break;
+                case CardType.SPELL:
+                    player.ServerPlaySpell(pendingCard, targets, indexes);
+                    break;
+                case CardType.TRAP:
+                    // This shouldn't happen, since playing traps just results in them being set onto the arena
+                    // Only activating the trap should have targets
+                    player.ServerPlayTrap(pendingCard);
+                    break;
+            }
+            SetPendingCard(null, player);
+            playerPasses = 0;
+
+            // If effect is added to stack start passing priority/resolving
+            if (!effectStack.IsEmpty())
+            {
+                if (waitingIndex == activeIndex)
+                {
+                    ChangeState(GameState.WAIT_NON_ACTIVE);
+                }
+                else
+                {
+                    ChangeState(GameState.WAIT_ACTIVE);
+                }
+            }
+            else
+            {
+                ChangeState(GameState.WAIT_ACTIVE);
+            }
+        }
+    }
+
+    [Server]
+    private void ServerActivateTrapWithTargets(NetworkIdentity playerId, NetworkIdentity[] targets, int[] indexes)
+    {
+        PlayerController player = playerId.GetComponent<PlayerController>();
+        if (IsGameReady() && IsWaitingOnPlayer(player) && currState == GameState.SELECTING_TARGETS)
+        {
+            Card card = pendingCard.GetComponent<Card>();
+            player.ServerActivateTrap(pendingCard, targets, indexes);
+
+            SetPendingCard(null, player);
+
+            playerPasses = 0;
+
+            if (waitingIndex == activeIndex)
+            {
+                ChangeState(GameState.WAIT_NON_ACTIVE);
+            }
+            else
+            {
+                ChangeState(GameState.WAIT_ACTIVE);
+            }
+        }
+    }
+
+    [Server]
+    public void ServerCancelPlayCard(NetworkIdentity playerId)
+    {
+        if(IsGameReady() && playerId == playerList[waitingIndex].netIdentity && currState == GameState.SELECTING_TARGETS)
+        {
+            Card card = pendingCard.GetComponent<Card>();
+            PlayerController player = playerList[waitingIndex];
+            if (pendingTrapIndex < 0)
+            {
+                player.ServerAddExistingCardToHand(pendingCard);
+            }
+            else
+            {
+                player.ServerAddTrapBackToArena(pendingCard, pendingTrapIndex);
+            }
+        }
+    }
+
+    [Server]
+    public void ServerRemoveCardFromHand(NetworkIdentity playerId, NetworkIdentity card)
+    {
+        PlayerController p = playerId.GetComponent<PlayerController>();
+        p.ServerRemoveCardFromHand(card);
     }
 
     [Server]
@@ -931,6 +1014,24 @@ public class GameSession : NetworkBehaviour
         return false;
     }
 
+    public bool IsStackEmpty()
+    {
+        if (effectStack)
+        {
+            return effectStack.IsEmpty();
+        }
+        return false;
+    }
+
+    public bool IsStackFull()
+    {
+        if (effectStack)
+        {
+            return effectStack.IsFull();
+        }
+        return true;
+    }
+
     public PlayerController[] GetPlayerList()
     {
         return (PlayerController[]) playerList.Clone();
@@ -973,4 +1074,18 @@ public class GameSession : NetworkBehaviour
         return targets;
     }
 
+    private void SetPendingCard(Card card, PlayerController controller)
+    {
+        if (card != null)
+        {
+            pendingCard = card.netIdentity;
+            pendingTrapIndex = controller.arena.GetTrapIndex(card);
+            ChangeState(GameState.SELECTING_TARGETS);
+        }
+        else
+        {
+            pendingCard = null;
+            pendingTrapIndex = -1;
+        }
+    }
 }

@@ -110,6 +110,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34d4462d029d5314aa3204a45bf8ff86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   outline: {fileID: 0}
   isTargettable: 0
   isSelected: 0
@@ -343,7 +345,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
+  m_BlockingObjects: 2
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -354,6 +356,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3715010004442471740}
     m_Modifications:
+    - target: {fileID: 731089725262465425, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_UseSpriteMesh
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1673071212794425727, guid: 2faf7aeefa6dc28478cba9205d86306d,
         type: 3}
       propertyPath: m_Name
