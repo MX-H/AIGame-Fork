@@ -30,6 +30,10 @@ public class PlayerController : Targettable
     List<Targettable> selectedTargets; // Targets for current condition
     List<List<Targettable>> allSelectedTargets;
     List<ITargettingDescription> selectableTargetDescriptions;
+    List<CardEffectDescription> selectableEffectDescriptions;
+
+
+    private TextPrompt selectingTextPrompt;
 
     public override void OnStartServer()
     {
@@ -49,7 +53,11 @@ public class PlayerController : Targettable
         base.Start();
         ClientScene.RegisterPrefab(cardPrefab.gameObject);
         ClientScene.RegisterPrefab(creaturePrefab.gameObject);
-
+        if (isLocalPlayer)
+        {
+            selectingTextPrompt = GameObject.Find("Player Selection Prompt").GetComponent<TextPrompt>();
+            selectingTextPrompt.gameObject.SetActive(false);
+        }
         cardGenerator = new ProceduralCardGenerator(model, imageGlossary);
         if (isLocalPlayer)
         {
@@ -73,11 +81,13 @@ public class PlayerController : Targettable
                     switch (card.cardData.GetCardType())
                     {
                         case CardType.CREATURE:
-                            selectableTargetDescriptions = card.cardData.GetSelectableTargets(TriggerCondition.ON_CREATURE_ENTER);
+                            selectableTargetDescriptions = card.cardData.GetSelectableTargets(gameSession.GetPendingTriggerCondition());
+                            selectableEffectDescriptions = card.cardData.GetSelectableEffectsOnTrigger(gameSession.GetPendingTriggerCondition());
                             break;
                         case CardType.SPELL:
                         case CardType.TRAP:
                             selectableTargetDescriptions = card.cardData.GetSelectableTargets(TriggerCondition.NONE);
+                            selectableEffectDescriptions = card.cardData.GetSelectableEffectsOnTrigger(TriggerCondition.NONE);
                             break;
                     }
 
@@ -85,9 +95,42 @@ public class PlayerController : Targettable
                     allSelectedTargets = new List<List<Targettable>>();
 
                     SetTargettingQuery(selectableTargetDescriptions[0]);
+                    SetSelectionPrompt(selectableEffectDescriptions[0]);
                 }
 
             }
+        }
+    }
+
+    public void SetSelectionPrompt(CardEffectDescription effectDescription)
+    {
+        if (selectingTextPrompt != null)
+        {
+            if (effectDescription != null)
+            {
+                string selectMessage = "Select ";
+                if (effectDescription.targettingType.targettingType != TargettingType.EXCEPT)
+                {
+                    selectMessage += effectDescription.targettingType.CardText() + " that ";
+                }
+                else
+                {
+                    ExceptTargetDescription exceptDesc = effectDescription.targettingType as ExceptTargetDescription;
+                    ITargettingDescription targetDesc = exceptDesc.targetDescription;
+                    selectMessage += exceptDesc.targetDescription.CardText() + " that " + (targetDesc.RequiresPluralEffect() ? "do not " : "does not "); 
+                }
+                selectMessage += effectDescription.effectType.CardText(effectDescription.targettingType.RequiresPluralEffect());
+                selectingTextPrompt.SetText(selectMessage);
+                selectingTextPrompt.gameObject.SetActive(true);
+            }
+        }
+    }
+
+    public void HideSelectionPrompt()
+    {
+        if (selectingTextPrompt != null)
+        {
+            selectingTextPrompt.gameObject.SetActive(false);
         }
     }
 
@@ -218,15 +261,12 @@ public class PlayerController : Targettable
     public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId, NetworkIdentity[] targets, int[] indexes)
     {
         Card card = cardId.gameObject.GetComponent<Card>();
+        Creature creature = creatureId.gameObject.GetComponent<Creature>();
 
-        if (isServerOnly)
-        {
-            Creature creature = creatureId.gameObject.GetComponent<Creature>();
-            creature.controller = this;
-            creature.owner = this;
-            creature.SetCard(card);
-            arena.AddCreature(creature);
-        }
+        creature.controller = this;
+        creature.owner = this;
+        creature.SetCard(card);
+        arena.AddCreature(creature);
 
         if (targets != null && indexes != null)
         {
@@ -237,6 +277,7 @@ public class PlayerController : Targettable
         {
             gameSession.ServerAddEffectToStack(cardId, TriggerCondition.ON_SELF_ENTER);
         }
+        gameSession.ServerTriggerEffects(creature, TriggerCondition.ON_CREATURE_ENTER);
 
         RpcPlayCreature(creatureId, cardId);
     }
@@ -244,12 +285,15 @@ public class PlayerController : Targettable
     [ClientRpc]
     public void RpcPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId)
     {
-        Creature creature = creatureId.gameObject.GetComponent<Creature>();
-        Card card = cardId.gameObject.GetComponent<Card>();
-        creature.controller = this;
-        creature.owner = this;
-        creature.SetCard(card);
-        arena.AddCreature(creature);
+        if (!isServer)
+        {
+            Creature creature = creatureId.gameObject.GetComponent<Creature>();
+            Card card = cardId.gameObject.GetComponent<Card>();
+            creature.controller = this;
+            creature.owner = this;
+            creature.SetCard(card);
+            arena.AddCreature(creature);
+        }
     }
 
     [Server]
@@ -716,6 +760,7 @@ public class PlayerController : Targettable
             {
                 // Send all selected targets to the server
                 RemoveTargettingQuery();
+                HideSelectionPrompt();
 
                 int[] indexes = new int[allSelectedTargets.Count];
                 int totalSize = 0;
@@ -741,6 +786,7 @@ public class PlayerController : Targettable
             {
                 selectedTargets = new List<Targettable>();
                 SetTargettingQuery(selectableTargetDescriptions[allSelectedTargets.Count]);
+                SetSelectionPrompt(selectableEffectDescriptions[allSelectedTargets.Count]);
             }
         }
     }

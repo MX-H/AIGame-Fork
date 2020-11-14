@@ -13,19 +13,31 @@ public class GameSession : NetworkBehaviour
         GAME_START,
         DECLARE_ATTACKS,
         DECLARE_BLOCKS,
+        RESOLVING_COMBAT,
         TURN_START,
         WAIT_ACTIVE,
         WAIT_NON_ACTIVE,
         SELECTING_TARGETS,
         RESOLVING_EFFECTS,
+        TRIGGERING_EFFECTS,
         GAME_OVER
+    }
+
+    private enum PendingType
+    {
+        PLAY_CARD,
+        USE_TRAP,
+        TRIGGER_EFFECT
     }
 
     [SyncVar]
     GameState currState;
 
     [SyncVar]
-    GameState prevState;
+    GameState prevState;    // useful for debugging which state we came from
+
+    [SyncVar]
+    GameState savedState;   // Used for resuming some state that was interrupted (such as trigger effects in combat)
 
     [SyncVar]
     int activeIndex = 0;
@@ -45,7 +57,25 @@ public class GameSession : NetworkBehaviour
     NetworkIdentity pendingCard;
 
     [SyncVar]
+    PendingType pendingAction;
+
+    [SyncVar]
+    TriggerCondition pendingTriggerCondition;
+
+    [SyncVar]
     int pendingTrapIndex;
+
+    Queue<(Creature, Creature, TriggerCondition)> pendingTriggers;
+
+    // Used to queue up triggers, triggers should be added on a game state update
+    Queue<(Creature, TriggerCondition)> delayedTriggers;
+
+
+    // Used for resolving combat
+    List<Creature> attackers;
+    Creature[] defenders;
+    int attackerIndex = 0;
+
 
     [Serializable]
     public struct AssignableAreas
@@ -65,6 +95,8 @@ public class GameSession : NetworkBehaviour
     {
         base.OnStartServer();
         currState = GameState.INITIALIZE;
+        pendingTriggers = new Queue<(Creature, Creature, TriggerCondition)>();
+        delayedTriggers = new Queue<(Creature, TriggerCondition)>();
     }
 
     // Start is called before the first frame update
@@ -81,8 +113,12 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    private void ChangeState(GameState state)
+    private void ChangeState(GameState state, bool shouldSave = false)
     {
+        if (shouldSave)
+        {
+            SaveState();
+        }
         prevState = currState;
         currState = state;
 
@@ -95,6 +131,12 @@ public class GameSession : NetworkBehaviour
                 waitingIndex = (activeIndex + 1) % playerList.Length;
                 break;
         }
+    }
+
+    [Server]
+    private void SaveState()
+    {
+        savedState = currState;
     }
 
     // Update is called once per frame
@@ -156,6 +198,78 @@ public class GameSession : NetworkBehaviour
                         playerPasses = 0;
 
                         ChangeState(GameState.WAIT_ACTIVE);
+                        SaveState();
+                    }
+                    break;
+                case GameState.TRIGGERING_EFFECTS:
+                    {
+                        if (effectStack.IsFull())
+                        {
+                            // TODO: Burn through the remaining effects, show some visual indication
+                            // for now we'll just empty the remaining effects
+                            pendingTriggers.Clear();
+                        }
+                        else if (pendingTriggers.Count > 0)
+                        {
+                            (Creature creature, Creature source, TriggerCondition trigger) = pendingTriggers.Dequeue();
+                            if (creature.card.cardData.GetSelectableTargets(trigger).Count > 0)
+                            {
+                                SetPendingCard(creature.card, creature.controller, trigger);
+                            }
+                            else
+                            {
+                                ServerAddEffectToStack(creature.card.netIdentity, trigger);
+                            }
+                        }
+
+                        if (pendingTriggers.Count == 0 && currState != GameState.SELECTING_TARGETS)
+                        {
+                            playerPasses = 0;
+                            ChangeState(GameState.WAIT_ACTIVE);
+                        }
+                    }
+                    break;
+                case GameState.RESOLVING_COMBAT:
+                    {
+                        SaveState();
+                        if (attackerIndex < attackers.Count)
+                        {
+                            CreatureState attackerState = attackers[attackerIndex].gameObject.GetComponent<CreatureState>();
+
+                            if (defenders[attackerIndex] != null)
+                            {
+                                CreatureState defenderState = defenders[attackerIndex].gameObject.GetComponent<CreatureState>();
+
+                                ServerCreatureDoDamage(attackers[attackerIndex], attackerState.GetAttack(), defenders[attackerIndex]);
+                                ServerCreatureDoDamage(defenders[attackerIndex], defenderState.GetAttack(), attackers[attackerIndex]);
+                            }
+                            else
+                            {
+                                ServerCreatureDoDamage(attackers[attackerIndex], attackerState.GetAttack(), playerList[waitingIndex]);
+                            }
+                            attackerIndex++;
+                        }
+                        else
+                        {
+                            foreach (PlayerController p in playerList)
+                            {
+                                p.ServerLeaveCombat();
+                            }
+
+                            ChangeState(GameState.WAIT_ACTIVE);
+                        }
+                        ServerUpdateGameState();
+                    }
+                    break;
+                case GameState.RESOLVING_EFFECTS:
+                    {
+                        ServerResolveStack();
+
+                        if (effectStack.IsEmpty())
+                        {
+                            ChangeState(savedState);
+                        }
+                        ServerUpdateGameState();
                     }
                     break;
                 default:
@@ -168,6 +282,16 @@ public class GameSession : NetworkBehaviour
     public void ServerReceiveAcknowledge()
     {
         playerAcknowledgements++;
+    }
+
+    [Server]
+    public void ServerCreatureDoDamage(Creature source, int amount, Targettable target)
+    {
+        if (amount > 0)
+        {
+            ServerApplyDamage(target, amount);
+            delayedTriggers.Enqueue((source, TriggerCondition.ON_SELF_DAMAGE_DEALT));
+        }
     }
 
     [Server]
@@ -317,44 +441,11 @@ public class GameSession : NetworkBehaviour
                     break;
                 case GameState.DECLARE_BLOCKS:
                     {
-                        List<Creature> attackers = playerList[activeIndex].arena.GetCombatCreatures();
-                        Creature[] defenders = playerList[waitingIndex].arena.GetDefenders();
+                        attackers = playerList[activeIndex].arena.GetCombatCreatures();
+                        defenders = playerList[waitingIndex].arena.GetDefenders();
+                        attackerIndex = 0;
 
-                        for (int i = 0; i < attackers.Count; i++)
-                        {
-                            CreatureState attackerState = attackers[i].gameObject.GetComponent<CreatureState>();
-
-                            if (defenders[i] != null)
-                            {
-                                CreatureState defenderState = defenders[i].gameObject.GetComponent<CreatureState>();
-
-                                attackerState.ServerDoDamage(defenderState.GetAttack());
-                                defenderState.ServerDoDamage(attackerState.GetAttack());
-
-                                if (attackerState.IsDead())
-                                {
-                                    playerList[activeIndex].ServerDestroyCreature(attackerState.netIdentity);
-                                }
-
-                                if (defenderState.IsDead())
-                                {
-                                    playerList[waitingIndex].ServerDestroyCreature(defenderState.netIdentity);
-                                }
-                            }
-                            else
-                            {
-                                playerList[waitingIndex].ServerDoDamage(attackerState.GetAttack());
-                            }
-                        }
-
-                        waitingIndex = activeIndex;
-
-                        foreach (PlayerController p in playerList)
-                        {
-                            p.ServerLeaveCombat();
-                        }
-
-                        ChangeState(GameState.WAIT_ACTIVE);
+                        ChangeState(GameState.RESOLVING_COMBAT);
                     }
                     break;
                 case GameState.WAIT_ACTIVE:
@@ -363,14 +454,14 @@ public class GameSession : NetworkBehaviour
                         playerPasses++;
                         if (effectStack.IsFull())
                         {
-                            ServerResolveStack();
+                            ChangeState(GameState.RESOLVING_EFFECTS);
                         }
                         else
                         {
                             ChangeState(GameState.WAIT_NON_ACTIVE);
                             if (playerPasses >= playerList.Length)
                             {
-                                ServerResolveStack();
+                                ChangeState(GameState.RESOLVING_EFFECTS);
                             }
                         }
                     }
@@ -381,14 +472,14 @@ public class GameSession : NetworkBehaviour
                         playerPasses++;
                         if (effectStack.IsFull())
                         {
-                            ServerResolveStack();
+                            ChangeState(GameState.RESOLVING_EFFECTS);
                         }
                         else
                         {
                             ChangeState(GameState.WAIT_ACTIVE);
                             if (playerPasses >= playerList.Length)
                             {
-                                ServerResolveStack();
+                                ChangeState(GameState.RESOLVING_EFFECTS);
                             }
                         }
                     }
@@ -402,19 +493,19 @@ public class GameSession : NetworkBehaviour
     [Server]
     public void ServerApplyDamage(Targettable target, int amount)
     {
-        PlayerController player = target as PlayerController;
-        if (player)
+        if (amount > 0)
         {
-            player.ServerDoDamage(amount);
-        }
-
-        Creature creature = target as Creature;
-        if (creature)
-        {
-            creature.creatureState.ServerDoDamage(amount);
-            if (creature.creatureState.IsDead())
+            PlayerController player = target as PlayerController;
+            if (player)
             {
-                creature.controller.ServerDestroyCreature(creature.netIdentity);
+                player.ServerDoDamage(amount);
+            }
+
+            Creature creature = target as Creature;
+            if (creature)
+            {
+                creature.creatureState.ServerDoDamage(amount);
+                delayedTriggers.Enqueue((creature, TriggerCondition.ON_SELF_DAMAGE_TAKEN));
             }
         }
     }
@@ -489,7 +580,7 @@ public class GameSession : NetworkBehaviour
             switch (card.cardData.GetCardType())
             {
                 case CardType.CREATURE:
-                    selectableTargetDescriptions = card.cardData.GetSelectableTargets(TriggerCondition.ON_CREATURE_ENTER);
+                    selectableTargetDescriptions = card.cardData.GetSelectableTargets(pendingTriggerCondition);
                     break;
                 case CardType.SPELL:
                 case CardType.TRAP:
@@ -567,18 +658,63 @@ public class GameSession : NetworkBehaviour
 
             if (isValid)
             {
-                if (pendingTrapIndex < 0)
+                switch (pendingAction)
                 {
-                    ServerPlayCardWithTargets(playerId, flattenedTargets, indexes);
-                }
-                else
-                {
-                    ServerActivateTrapWithTargets(playerId, flattenedTargets, indexes);
+                    case PendingType.PLAY_CARD:
+                        ServerPlayCardWithTargets(playerId, flattenedTargets, indexes);
+                        break;
+                    case PendingType.TRIGGER_EFFECT:
+                        ServerAddEffectToStack(pendingCard, pendingTriggerCondition, flattenedTargets, indexes);
+                        ChangeState(GameState.TRIGGERING_EFFECTS);
+                        break;
+                    case PendingType.USE_TRAP:
+                        ServerActivateTrapWithTargets(playerId, flattenedTargets, indexes);
+                        break;
                 }
             }
             else
             {
                 ServerCancelPlayCard(playerId);
+            }
+        }
+    }
+
+    [Server]
+    private void ServerUpdateGameState()
+    {
+        List<Creature> creaturesToUpdate = new List<Creature>();
+        List<Creature> creaturesToTrigger = new List<Creature>();
+
+        // Process active players creatures first
+        for (int i = 0; i < playerList.Length; i++)
+        {
+            PlayerController player = playerList[(activeIndex + i) % playerList.Length];
+            creaturesToUpdate.AddRange(player.arena.GetAllCreatures());
+        }
+
+        foreach (Creature creature in creaturesToUpdate)
+        {
+            if (creature.creatureState.IsDead())
+            {
+                // Remove the creature
+                creature.controller.ServerDestroyCreature(creature.netIdentity);
+                creaturesToTrigger.Add(creature);
+            }
+        }
+
+        foreach (Creature creature in creaturesToTrigger)
+        {
+            delayedTriggers.Enqueue((creature, TriggerCondition.ON_SELF_DIES));
+        }
+
+        ServerCheckGameState();
+
+        if (currState != GameState.GAME_OVER)
+        {
+            while (delayedTriggers.Count > 0)
+            {
+                (Creature source, TriggerCondition trigger) = delayedTriggers.Dequeue();
+                ServerTriggerEffects(source, trigger);
             }
         }
     }
@@ -647,21 +783,24 @@ public class GameSession : NetworkBehaviour
             }
             playerPasses = 0;
 
-            // If effect is added to stack start passing priority/resolving
-            if (!effectStack.IsEmpty())
+            if (currState != GameState.TRIGGERING_EFFECTS)
             {
-                if (waitingIndex == activeIndex)
+                // If effect is added to stack start passing priority/resolving
+                if (!effectStack.IsEmpty())
                 {
-                    ChangeState(GameState.WAIT_NON_ACTIVE);
+                    if (waitingIndex == activeIndex)
+                    {
+                        ChangeState(GameState.WAIT_NON_ACTIVE);
+                    }
+                    else
+                    {
+                        ChangeState(GameState.WAIT_ACTIVE);
+                    }
                 }
                 else
                 {
                     ChangeState(GameState.WAIT_ACTIVE);
                 }
-            }
-            else
-            {
-                ChangeState(GameState.WAIT_ACTIVE);
             }
         }
     }
@@ -693,6 +832,70 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
+    public void ServerTriggerEffects(Creature source, TriggerCondition trigger)
+    {
+        // Creature effects trigger, so poll available creatures
+
+        List<Creature> creaturesToTrigger = new List<Creature>();
+
+        // Active triggers first
+        for (int i = 0; i < playerList.Length; i++)
+        {
+            PlayerController player = playerList[(activeIndex + i) % playerList.Length];
+            creaturesToTrigger.AddRange(player.arena.GetAllCreatures());
+        }
+
+        switch (trigger)
+        {
+            case TriggerCondition.ON_CREATURE_ENTER:
+                // Look at all creatures other than the source
+                foreach (Creature creature in creaturesToTrigger)
+                {
+                    if (creature != source)
+                    {
+                        if (creature.card.cardData.HasEffectsOnTrigger(trigger) && creature.card.HasValidTargets(creature.card.cardData.GetSelectableTargets(trigger)))
+                        {
+                            pendingTriggers.Enqueue((creature, source, trigger));
+                        }
+                    }
+                }
+                break;
+            case TriggerCondition.ON_SELF_DIES:
+                // Add self trigger first
+                if (source.card.cardData.HasEffectsOnTrigger(trigger) && source.card.HasValidTargets(source.card.cardData.GetSelectableTargets(trigger)))
+                {
+                    pendingTriggers.Enqueue((source, source, trigger));
+                }
+
+                // Then add triggers from others
+                foreach (Creature creature in creaturesToTrigger)
+                {
+                    if (creature.card != source)
+                    {
+                        if (creature.card.cardData.HasEffectsOnTrigger(TriggerCondition.ON_CREATURE_DIES) && 
+                            creature.card.HasValidTargets(creature.card.cardData.GetSelectableTargets(TriggerCondition.ON_CREATURE_DIES)))
+                        {
+                            pendingTriggers.Enqueue((creature, source, TriggerCondition.ON_CREATURE_DIES));
+                        }
+                    }
+                }
+                break;
+            case TriggerCondition.ON_SELF_DAMAGE_DEALT:
+            case TriggerCondition.ON_SELF_DAMAGE_TAKEN:
+                if (source.card.cardData.HasEffectsOnTrigger(trigger) && source.card.HasValidTargets(source.card.cardData.GetSelectableTargets(trigger)))
+                {
+                    pendingTriggers.Enqueue((source, source, trigger));
+                }
+                break;
+        }
+
+        if (pendingTriggers.Count > 0)
+        {
+            ChangeState(GameState.TRIGGERING_EFFECTS);
+        }
+    }
+
+    [Server]
     public void ServerPlayCardAndSelectTargets(NetworkIdentity playerId, NetworkIdentity card)
     {
         if (IsGameReady() && playerId == playerList[activeIndex].netIdentity && currState == GameState.WAIT_ACTIVE)
@@ -703,7 +906,7 @@ public class GameSession : NetworkBehaviour
             p.ServerRemoveCardFromHand(card);
 
             // Go into target selection state and wait for response
-            SetPendingCard(c, p);
+            SetPendingCard(c, p, (c.cardData.GetCardType() == CardType.CREATURE) ? TriggerCondition.ON_SELF_ENTER : TriggerCondition.NONE);
         }
     }
 
@@ -716,7 +919,7 @@ public class GameSession : NetworkBehaviour
             Card card = cardId.GetComponent<Card>();
             if (player.arena.IsTrap(card))
             {
-                SetPendingCard(card, player);
+                SetPendingCard(card, player, TriggerCondition.NONE);
                 player.ServerRemoveTrapFromArena(cardId);
             }
         }
@@ -746,24 +949,27 @@ public class GameSession : NetworkBehaviour
                     player.ServerPlayTrap(pendingCard);
                     break;
             }
-            SetPendingCard(null, player);
+            SetPendingCard(null, player, TriggerCondition.NONE);
             playerPasses = 0;
 
-            // If effect is added to stack start passing priority/resolving
-            if (!effectStack.IsEmpty())
+            if (currState != GameState.TRIGGERING_EFFECTS)
             {
-                if (waitingIndex == activeIndex)
+                // If effect is added to stack start passing priority/resolving
+                if (!effectStack.IsEmpty())
                 {
-                    ChangeState(GameState.WAIT_NON_ACTIVE);
+                    if (waitingIndex == activeIndex)
+                    {
+                        ChangeState(GameState.WAIT_NON_ACTIVE);
+                    }
+                    else
+                    {
+                        ChangeState(GameState.WAIT_ACTIVE);
+                    }
                 }
                 else
                 {
                     ChangeState(GameState.WAIT_ACTIVE);
                 }
-            }
-            else
-            {
-                ChangeState(GameState.WAIT_ACTIVE);
             }
         }
     }
@@ -777,7 +983,7 @@ public class GameSession : NetworkBehaviour
             Card card = pendingCard.GetComponent<Card>();
             player.ServerActivateTrap(pendingCard, targets, indexes);
 
-            SetPendingCard(null, player);
+            SetPendingCard(null, player, TriggerCondition.NONE);
 
             playerPasses = 0;
 
@@ -961,6 +1167,11 @@ public class GameSession : NetworkBehaviour
         return null;
     }
 
+    public TriggerCondition GetPendingTriggerCondition()
+    {
+        return pendingTriggerCondition;
+    }
+
     public bool CanSelectTargets(PlayerController c)
     {
         if (IsGameReady())
@@ -1074,18 +1285,41 @@ public class GameSession : NetworkBehaviour
         return targets;
     }
 
-    private void SetPendingCard(Card card, PlayerController controller)
+    private void SetPendingCard(Card card, PlayerController controller, TriggerCondition trigger)
     {
         if (card != null)
         {
             pendingCard = card.netIdentity;
             pendingTrapIndex = controller.arena.GetTrapIndex(card);
+            pendingTriggerCondition = trigger;
+
+            if (pendingTrapIndex >= 0)
+            {
+                pendingAction = PendingType.USE_TRAP;
+            }
+            else if (trigger == TriggerCondition.ON_SELF_ENTER || trigger == TriggerCondition.NONE)
+            {
+                pendingAction = PendingType.PLAY_CARD;
+            }
+            else
+            {
+                pendingAction = PendingType.TRIGGER_EFFECT;
+            }
+
+            for (int i = 0; i < playerList.Length; i++)
+            {
+                if (playerList[i] == controller)
+                {
+                    waitingIndex = i;
+                }
+            }
             ChangeState(GameState.SELECTING_TARGETS);
         }
         else
         {
             pendingCard = null;
             pendingTrapIndex = -1;
+            pendingTriggerCondition = TriggerCondition.NONE;
         }
     }
 }

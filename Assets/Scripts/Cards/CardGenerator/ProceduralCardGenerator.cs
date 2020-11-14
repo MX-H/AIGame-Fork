@@ -46,10 +46,12 @@ public class ProceduralCardGenerator : ICardGenerator
         card.name = "A creature card";
         //card.name += "(" + powerBudget.ToString() + ")";
 
+        // Stat budget is 2 stats per (mana spent + 1), but 1 is always health
+        int maxStats = 2 * (card.manaCost + 1) - 1;
 
         // Decide on stats
-        card.attack = random.Next(0, card.manaCost + 1);
-        card.health = card.manaCost - card.attack + 1;
+        card.attack = random.Next(0, maxStats);
+        card.health = maxStats - card.attack + 1;
 
         // Decide on keyword attributes
         int amount = random.Next(2);
@@ -351,6 +353,7 @@ public class ProceduralCardGenerator : ICardGenerator
             }
 
             allowableTargetting.IntersectWith(CardEnums.GetValidFlags<TargettingType>(targetType));
+            allowableTargetting.IntersectWith(CardEnums.GetValidFlags<TargettingType>(effectDesc.triggerCondition));
 
             // Special case
             // Up to can never be a downside because you can choose 0 targets
