@@ -343,6 +343,14 @@ public class Arena : MonoBehaviour
         return creatures;
     }
 
+    public List<Creature> GetAllCreatures()
+    {
+        List<Creature> creatureList = new List<Creature>();
+        creatureList.AddRange(inCombatCreatures);
+        creatureList.AddRange(creatures);
+        return creatureList;
+    }
+
     public Creature[] GetDefenders()
     {
         return defenders;

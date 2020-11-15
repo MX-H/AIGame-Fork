@@ -36,6 +36,7 @@ public class FoeTargettingDescription : ITargettingDescription
     {
         effect.ApplyToTarget(player.GetOpponents()[0], player);
     }
+
 }
 
 public class FoeTargettingProceduralGenerator : IProceduralTargettingGenerator

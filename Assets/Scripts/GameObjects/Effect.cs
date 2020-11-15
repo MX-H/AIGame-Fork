@@ -8,6 +8,7 @@ public class Effect : Targettable
 {
     public Card source;
     public SpriteRenderer icon;
+    public TextPrompt textPrompt;
 
     private bool hovering;
 
@@ -33,6 +34,7 @@ public class Effect : Targettable
         source.transform.localPosition = new Vector3(-2.5f, 0.0f, 0.0f);
         source.gameObject.SetActive(false);
         source.enabled = false;
+        textPrompt.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -48,6 +50,7 @@ public class Effect : Targettable
             source.HoverZoomToCam();
             hovering = true;
             source.gameObject.SetActive(true);
+            textPrompt.gameObject.SetActive(true);
         }
     }
 
@@ -59,9 +62,10 @@ public class Effect : Targettable
             hovering = false;
             source.transform.localPosition = new Vector3(-2.5f, 0.0f, 0.0f);
             source.gameObject.SetActive(false);
+            textPrompt.gameObject.SetActive(false);
         }
     }
-    public void SetData(Card c, TriggerCondition trigger, Targettable[][] targets)
+    public void SetData(Card c, TriggerCondition trigger, Targettable[][] targets = null)
     {
         source.cardData = c.cardData.Clone();
 
@@ -69,24 +73,20 @@ public class Effect : Targettable
         {
             Sprite[] sprites = Resources.LoadAll<Sprite>(GameConstants.PATHS.CARD_IMAGES + c.cardData.GetImage().name);
             icon.sprite = sprites[1];
+        }
+
+        if (textPrompt != null)
+        {
+            string effectMessage = "";
+            foreach (CardEffectDescription desc in source.cardData.GetEffectsOnTrigger(trigger))
+            {
+                effectMessage += desc.CardText() + '\n';
+            }
+            textPrompt.SetText(effectMessage);
         }
 
         triggerCondition = trigger;
         targetList = targets;
-    }
-
-    public void SetData(Card c, TriggerCondition trigger)
-    {
-        source.cardData = c.cardData.Clone();
-        source.controller = c.controller;
-
-        if (c.cardData.GetImage() && icon)
-        {
-            Sprite[] sprites = Resources.LoadAll<Sprite>(GameConstants.PATHS.CARD_IMAGES + c.cardData.GetImage().name);
-            icon.sprite = sprites[1];
-        }
-
-        triggerCondition = trigger;
     }
 
     [Server]

@@ -82,6 +82,11 @@ public class CardInstance
         return baseCard.GetEffectsOnTrigger(trigger);
     }
 
+    public List<CardEffectDescription> GetSelectableEffectsOnTrigger(TriggerCondition trigger)
+    {
+        return baseCard.GetSelectableEffectsOnTrigger(trigger);
+    }
+
     public bool HasEffectsOnTrigger(TriggerCondition trigger)
     {
         return baseCard.HasEffectsOnTrigger(trigger);

@@ -51,6 +51,28 @@ public class CardDescription : IDescription
         return effects;
     }
 
+    public List<CardEffectDescription> GetSelectableEffectsOnTrigger(TriggerCondition trigger)
+    {
+        List<CardEffectDescription> effectList = new List<CardEffectDescription>();
+
+        foreach (CardEffectDescription effect in cardEffects)
+        {
+            if (effect.targettingType != null && effect.targettingType.RequiresSelection())
+            {
+                // For creature cards they have effects that trigger at different times
+                // make sure the trigger condition matches with the effect
+
+                if (cardType == CardType.CREATURE && trigger != effect.triggerCondition)
+                {
+                    continue;
+                }
+
+                effectList.Add(effect);
+            }
+        }
+        return effectList;
+    }
+
     public bool HasEffectsOnTrigger(TriggerCondition trigger)
     {
         foreach (CardEffectDescription effect in cardEffects)
