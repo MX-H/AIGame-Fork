@@ -730,6 +730,24 @@ public class GameSession : NetworkBehaviour
                 loser = p;
             }
         }
+        checkGameOver(loser);
+    }
+
+    [Server]
+    public void ServerSurrender(NetworkIdentity id)
+    {
+        PlayerController loser = null;
+        foreach (PlayerController p in playerList)
+        {
+            if (p.netIdentity == id)
+            {
+                loser = p;
+            }
+        }
+        checkGameOver(loser);
+    }
+
+    private void checkGameOver(PlayerController loser) {
         if (loser != null)
         {
             foreach (PlayerController p in playerList)
@@ -1321,5 +1339,10 @@ public class GameSession : NetworkBehaviour
             pendingTrapIndex = -1;
             pendingTriggerCondition = TriggerCondition.NONE;
         }
+    }
+
+    public bool isGameOverState()
+    {
+        return currState == GameState.GAME_OVER;
     }
 }
