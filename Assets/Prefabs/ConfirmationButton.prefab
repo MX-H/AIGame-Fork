@@ -113,6 +113,7 @@ GameObject:
   - component: {fileID: 2569735496357701484}
   - component: {fileID: 6992153854128488453}
   - component: {fileID: 4084882757954268407}
+  - component: {fileID: -2938563797042006779}
   m_Layer: 0
   m_Name: ConfirmationButton
   m_TagString: Untagged
@@ -230,6 +231,22 @@ MonoBehaviour:
   - {fileID: 5031787964206251212}
   targetColor: {r: 0, g: 0.7529412, b: 0.2509804, a: 0.78431374}
   selectColor: {r: 0, g: 0.57254905, b: 0.972549, a: 0.78431374}
+--- !u!114 &-2938563797042006779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5655833806949240361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &8965633737883914206
 GameObject:
   m_ObjectHideFlags: 0

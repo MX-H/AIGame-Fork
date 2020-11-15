@@ -36,6 +36,7 @@ public class PlayerController : Targettable
         base.OnStartServer();
         gameSession = FindObjectOfType<GameSession>();
     }
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -55,6 +56,10 @@ public class PlayerController : Targettable
         {
             ConfirmButton confirmButton = FindObjectOfType<ConfirmButton>();
             confirmButton.localPlayer = this;
+            GameOverButton gameOverButton = FindObjectOfType<GameOverButton>();
+            gameOverButton.localPlayer = this;
+            SurrenderButton surrenderButton = FindObjectOfType<SurrenderButton>();
+            surrenderButton.localPlayer = this;
         }
     }
 
@@ -518,7 +523,7 @@ public class PlayerController : Targettable
     [Client]
     public void ClientRequestMoveToCombat(NetworkIdentity creature, int ind)
     {
-        if (isLocalPlayer &&  CanMoveCreatures())
+        if (isLocalPlayer && CanMoveCreatures())
         {
             CmdMoveToCombat(creature, ind);
         }
@@ -583,6 +588,18 @@ public class PlayerController : Targettable
     private void CmdEndTurn()
     {
         gameSession.ServerEndTurn(netIdentity);
+    }
+
+    [Client]
+    public void ClientRequestSurrender() 
+    {
+        CmdSurrender();
+    }
+
+    [Command]
+    private void CmdSurrender()
+    {
+        gameSession.ServerSurrender(netIdentity);
     }
 
     [Command]
@@ -699,7 +716,7 @@ public class PlayerController : Targettable
     public void TargetEndGame(NetworkConnection target, bool winner)
     {
         TextMeshProUGUI endGameText = GameObject.Find("GameOverText").GetComponent<TextMeshProUGUI>();
-        endGameText.text = winner ? "VICTORY" : "DEFEAT";
+        endGameText.text = winner ? "VICTORY" : "DEFEAT";   
     }
 
     public void ConfirmSelectedTargets()
