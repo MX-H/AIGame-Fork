@@ -1341,7 +1341,7 @@ public class GameSession : NetworkBehaviour
         }
     }
 
-    public bool displayGameOverButton()
+    public bool isGameOverState()
     {
         return currState == GameState.GAME_OVER;
     }
