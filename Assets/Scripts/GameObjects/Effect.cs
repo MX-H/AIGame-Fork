@@ -51,6 +51,17 @@ public class Effect : Targettable
             hovering = true;
             source.gameObject.SetActive(true);
             textPrompt.gameObject.SetActive(true);
+
+            if (targetList != null)
+            {
+                for (int i = 0; i < targetList.Length; i++)
+                {
+                    foreach(Targettable targetable in targetList[i])
+                    {
+                        targetable.GetTargettableUI().AddText("<sprite=" + i + ">");
+                    }
+                }
+            }
         }
     }
 
@@ -63,6 +74,16 @@ public class Effect : Targettable
             source.transform.localPosition = new Vector3(-2.5f, 0.0f, 0.0f);
             source.gameObject.SetActive(false);
             textPrompt.gameObject.SetActive(false);
+            if (targetList != null)
+            {
+                foreach (Targettable[] targettables in targetList)
+                {
+                    foreach (Targettable targetable in targettables)
+                    {
+                        targetable.GetTargettableUI().ClearText();
+                    }
+                }
+            }
         }
     }
     public void SetData(Card c, TriggerCondition trigger, Targettable[][] targets = null)
@@ -78,8 +99,14 @@ public class Effect : Targettable
         if (textPrompt != null)
         {
             string effectMessage = "";
+            int targetsIndex = 0;
             foreach (CardEffectDescription desc in source.cardData.GetEffectsOnTrigger(trigger))
             {
+                if (desc.targettingType.RequiresSelection())
+                {
+                    effectMessage += "<sprite=" + targetsIndex + "> ";
+                    targetsIndex++;
+                }
                 effectMessage += desc.CardText() + '\n';
             }
             textPrompt.SetText(effectMessage);

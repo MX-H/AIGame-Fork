@@ -364,7 +364,7 @@ public class GameSession : NetworkBehaviour
             for (int i = 0; i < players.Length; i++)
             {
                 PlayerController p = playerList[i];
-                playerAreas[i].playerUI.player = p;
+                playerAreas[i].playerUI.AssignPlayer(p);
                 playerAreas[i].hand.AssignPlayer(p);
                 playerAreas[i].deck.AssignPlayer(p);
                 playerAreas[i].arena.AssignPlayer(p);
@@ -399,7 +399,7 @@ public class GameSession : NetworkBehaviour
         for (int i = 0; i < players.Length; i++)
         {
             PlayerController p = playerList[(startInd + i) % players.Length];
-            playerAreas[i].playerUI.player = p;
+            playerAreas[i].playerUI.AssignPlayer(p);
             playerAreas[i].hand.AssignPlayer(p);
             playerAreas[i].deck.AssignPlayer(p);
             playerAreas[i].arena.AssignPlayer(p);

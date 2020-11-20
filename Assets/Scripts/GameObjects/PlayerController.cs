@@ -10,6 +10,7 @@ public class PlayerController : Targettable
     public Deck deck;
     public Arena arena;
     public DiscardPile discard;
+    public PlayerUI playerUI;
 
     [SyncVar]
     public int health;
@@ -31,7 +32,6 @@ public class PlayerController : Targettable
     List<List<Targettable>> allSelectedTargets;
     List<ITargettingDescription> selectableTargetDescriptions;
     List<CardEffectDescription> selectableEffectDescriptions;
-
 
     private TextPrompt selectingTextPrompt;
 
@@ -100,20 +100,20 @@ public class PlayerController : Targettable
                     allSelectedTargets = new List<List<Targettable>>();
 
                     SetTargettingQuery(selectableTargetDescriptions[0]);
-                    SetSelectionPrompt(selectableEffectDescriptions[0]);
+                    SetSelectionPrompt(selectableEffectDescriptions[0], 0);
                 }
 
             }
         }
     }
 
-    public void SetSelectionPrompt(CardEffectDescription effectDescription)
+    public void SetSelectionPrompt(CardEffectDescription effectDescription, int index = -1)
     {
         if (selectingTextPrompt != null)
         {
             if (effectDescription != null)
             {
-                string selectMessage = "Select ";
+                string selectMessage = ((index < 0) ? "" : "<sprite=" + index + "> ") + "Select ";
                 if (effectDescription.targettingType.targettingType != TargettingType.EXCEPT)
                 {
                     selectMessage += effectDescription.targettingType.CardText() + " that ";
@@ -803,7 +803,7 @@ public class PlayerController : Targettable
             {
                 selectedTargets = new List<Targettable>();
                 SetTargettingQuery(selectableTargetDescriptions[allSelectedTargets.Count]);
-                SetSelectionPrompt(selectableEffectDescriptions[allSelectedTargets.Count]);
+                SetSelectionPrompt(selectableEffectDescriptions[allSelectedTargets.Count], allSelectedTargets.Count);
             }
         }
     }
@@ -945,5 +945,10 @@ public class PlayerController : Targettable
     public bool IsAnOpponent(PlayerController c)
     {
         return GetOpponents().Contains(c);
+    }
+
+    public override Targettable GetTargettableUI()
+    {
+        return playerUI;
     }
 }

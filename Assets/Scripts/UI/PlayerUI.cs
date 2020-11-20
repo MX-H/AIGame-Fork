@@ -32,6 +32,12 @@ public class PlayerUI : Targettable
         return player;
     }
 
+    public void AssignPlayer(PlayerController p)
+    {
+        player = p;
+        p.playerUI = this;
+    }
+
     // Start is called before the first frame update
     protected override void Start()
     {

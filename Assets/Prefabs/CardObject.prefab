@@ -112,9 +112,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  outline: {fileID: 0}
   isTargettable: 0
   isSelected: 0
+  text: {fileID: 1886781022126436182}
   selected: 0
   dragging: 0
   hovering: 0
@@ -455,7 +455,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 3
+  m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -627,6 +627,16 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9193199758522649406, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_fontSize
+      value: 72
+      objectReference: {fileID: 0}
+    - target: {fileID: 9193199758522649406, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_fontSizeBase
+      value: 50
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2faf7aeefa6dc28478cba9205d86306d, type: 3}
 --- !u!224 &7380622844168367819 stripped
@@ -635,3 +645,15 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 468743032146886147}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1886781022126436182 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2066727929995759957, guid: 2faf7aeefa6dc28478cba9205d86306d,
+    type: 3}
+  m_PrefabInstance: {fileID: 468743032146886147}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
