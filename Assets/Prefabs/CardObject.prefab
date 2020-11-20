@@ -481,6 +481,61 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardUI
       objectReference: {fileID: 0}
+    - target: {fileID: 2066727929995759957, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_text
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2066727929995759957, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_textInfo.characterCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2066727929995759957, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_textInfo.wordCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2066727929995759957, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_textInfo.lineCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2066727929995759957, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_textInfo.pageCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2066727929995759957, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_fontSize
+      value: 400
+      objectReference: {fileID: 0}
+    - target: {fileID: 2066727929995759957, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_textInfo.materialCount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2066727929995759957, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_fontSizeMax
+      value: 800
+      objectReference: {fileID: 0}
+    - target: {fileID: 4759564079546317536, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 4759564079546317536, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 4759564079546317536, guid: 2faf7aeefa6dc28478cba9205d86306d,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1400
+      objectReference: {fileID: 0}
     - target: {fileID: 6984082546384014701, guid: 2faf7aeefa6dc28478cba9205d86306d,
         type: 3}
       propertyPath: m_LocalPosition.z

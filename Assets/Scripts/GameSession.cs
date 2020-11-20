@@ -535,11 +535,6 @@ public class GameSession : NetworkBehaviour
         effect.ServerResolve();
         effect.gameObject.SetActive(false);
 
-        if (effectStack.IsEmpty())
-        {
-            ChangeState(GameState.WAIT_ACTIVE);
-        }
-
         playerPasses = 0;
         RpcResolveStack();
     }

@@ -122,7 +122,7 @@ public class PlayerController : Targettable
                 {
                     ExceptTargetDescription exceptDesc = effectDescription.targettingType as ExceptTargetDescription;
                     ITargettingDescription targetDesc = exceptDesc.targetDescription;
-                    selectMessage += exceptDesc.targetDescription.CardText() + " that " + (targetDesc.RequiresPluralEffect() ? "do not " : "does not "); 
+                    selectMessage += exceptDesc.targetDescription.CardText() + " that " + (targetDesc.RequiresPluralEffect() ? "does not " : "do not "); 
                 }
                 selectMessage += effectDescription.effectType.CardText(effectDescription.targettingType.RequiresPluralEffect());
                 selectingTextPrompt.SetText(selectMessage);
@@ -798,6 +798,10 @@ public class PlayerController : Targettable
                 }
 
                 CmdSendTargets(targets, indexes);
+
+                allSelectedTargets = null;
+                selectedTargets = null;
+                selectableTargetDescriptions = null;
             }
             else
             {
@@ -812,9 +816,6 @@ public class PlayerController : Targettable
     private void CmdSendTargets(NetworkIdentity[] targets, int[] indexes)
     {
         gameSession.ServerSendTargets(netIdentity, targets, indexes);
-        allSelectedTargets = null;
-        selectedTargets = null;
-        selectableTargetDescriptions = null;
     }
 
     public bool IsDead()

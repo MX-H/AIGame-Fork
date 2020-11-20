@@ -89,6 +89,7 @@ public class Effect : Targettable
     public void SetData(Card c, TriggerCondition trigger, Targettable[][] targets = null)
     {
         source.cardData = c.cardData.Clone();
+        source.controller = c.controller;
 
         if (c.cardData.GetImage() && icon)
         {
