@@ -104,6 +104,33 @@ public class PlayerController : Targettable
                 }
 
             }
+
+            // Cancel actions when right click detected (undo target select, then playing card)
+            if (Input.GetMouseButtonDown(1))
+            {
+                // Back out of target select to the previous selection
+                if (allSelectedTargets.Count > 0)
+                {
+                    int lastInd = allSelectedTargets.Count - 1;
+                    allSelectedTargets.RemoveAt(lastInd);
+
+                    foreach (Targettable t in gameSession.GetPotentialTargets())
+                    {
+                        t.Deselect();
+                    }
+
+                    selectedTargets = new List<Targettable>();
+
+                    SetTargettingQuery(selectableTargetDescriptions[lastInd]);
+                    SetSelectionPrompt(selectableEffectDescriptions[lastInd]);
+
+                }
+                // Send a request to cancel playing card, note: triggered effects cannot be cancelled so this request will do nothing
+                else
+                {
+                    ClientRequestCancelPlayCard();
+                }
+            }
         }
     }
 
@@ -497,6 +524,22 @@ public class PlayerController : Targettable
         {
             CmdCancelPlayCard();
         }
+    }
+
+    [TargetRpc]
+    public void TargetCancelPlayCard(NetworkConnection target)
+    {
+        foreach (Targettable t in gameSession.GetPotentialTargets())
+        {
+            t.Deselect();
+        }
+
+        RemoveTargettingQuery();
+        HideSelectionPrompt();
+
+        allSelectedTargets = null;
+        selectedTargets = null;
+        selectableTargetDescriptions = null;
     }
 
     [Client]

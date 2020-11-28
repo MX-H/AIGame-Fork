@@ -1018,13 +1018,26 @@ public class GameSession : NetworkBehaviour
         {
             Card card = pendingCard.GetComponent<Card>();
             PlayerController player = playerList[waitingIndex];
-            if (pendingTrapIndex < 0)
+            switch (pendingAction)
             {
-                player.ServerAddExistingCardToHand(pendingCard);
-            }
-            else
-            {
-                player.ServerAddTrapBackToArena(pendingCard, pendingTrapIndex);
+                case PendingType.PLAY_CARD:
+                    player.ServerAddExistingCardToHand(pendingCard);
+                    player.TargetCancelPlayCard(playerId.connectionToClient);
+
+                    // Only active player should be able to play cards
+                    ChangeState(GameState.WAIT_ACTIVE);
+
+                    break;
+                case PendingType.USE_TRAP:
+                    player.ServerAddTrapBackToArena(pendingCard, pendingTrapIndex);
+                    player.TargetCancelPlayCard(playerId.connectionToClient);
+
+                    ChangeState((waitingIndex == activeIndex) ? GameState.WAIT_ACTIVE : GameState.WAIT_NON_ACTIVE);
+
+                    break;
+                default:
+                    // We can't do anything about triggered effects, these are mandatory so do nothing
+                    break;
             }
         }
     }
