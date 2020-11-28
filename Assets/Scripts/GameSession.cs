@@ -90,6 +90,7 @@ public class GameSession : NetworkBehaviour
     public AssignableAreas[] playerAreas;
     public EffectStack effectStack;
     public Effect effectPrefab;
+    public CreatureModelIndex creatureModelIndex;
 
     public override void OnStartServer()
     {
@@ -105,6 +106,7 @@ public class GameSession : NetworkBehaviour
         // Create 2 players
         ClientScene.RegisterPrefab(effectPrefab.gameObject);
         GameUtils.SetGameSession(this);
+        GameUtils.SetCreatureModelIndex(creatureModelIndex);
     }
 
     public bool IsGameReady()
@@ -341,6 +343,19 @@ public class GameSession : NetworkBehaviour
             return c.GetComponent<NetworkIdentity>();
         }
         return null;
+    }
+
+    [Server]
+    public void ServerCreateToken(PlayerController player, CreatureType creatureType)
+    {
+        if (IsGameReady())
+        {
+            NetworkIdentity cardId = ServerCreateCard(player);
+            Card card = cardId.gameObject.GetComponent<Card>();
+            card.cardData = new CardInstance(GameUtils.GetCreatureModelIndex().GetToken(creatureType));
+            NetworkIdentity creatureId = ServerCreateCreature(player, card);
+            player.ServerPlayToken(cardId, creatureId, creatureType);
+        }
     }
 
     [Server]

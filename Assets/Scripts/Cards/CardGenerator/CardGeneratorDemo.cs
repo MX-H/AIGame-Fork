@@ -9,6 +9,7 @@ public class CardGeneratorDemo : MonoBehaviour
     public CardUI display;
     public CardHistogram model;
     public ImageGlossary images;
+    public CardDescription desc;
 
     private ICardGenerator cardGenerator;
     void Start()
@@ -20,9 +21,15 @@ public class CardGeneratorDemo : MonoBehaviour
     {
         if (Input.GetKeyDown("space"))
         {
-            model.Update();
-            ICardGenerator cardGenerator = new ProceduralCardGenerator(model, images);
-            display.SetCard(new CardInstance(cardGenerator.GenerateCard(Random.Range(0, 10000))));
+            if (desc == null)
+            {
+                ICardGenerator cardGenerator = new ProceduralCardGenerator(model, images);
+                display.SetCard(new CardInstance(cardGenerator.GenerateCard(Random.Range(0, 10000))));
+            }
+            else
+            {
+                display.SetCard(new CardInstance(desc));
+            }
         }
     }
 }

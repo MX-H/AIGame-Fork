@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CardDescription : IDescription
+[CreateAssetMenu(fileName = "New CardDescription", menuName = "CardDescription", order = 52)]
+public class CardDescription : ScriptableObject, IDescription
 {
     public string name;
     public int manaCost;

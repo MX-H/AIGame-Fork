@@ -2242,6 +2242,7 @@ MonoBehaviour:
   display: {fileID: 0}
   model: {fileID: 0}
   images: {fileID: 0}
+  desc: {fileID: 0}
 --- !u!4 &837170618
 Transform:
   m_ObjectHideFlags: 0
@@ -2369,6 +2370,7 @@ MonoBehaviour:
   display: {fileID: 0}
   model: {fileID: 0}
   images: {fileID: 0}
+  desc: {fileID: 0}
 --- !u!4 &1072768594
 Transform:
   m_ObjectHideFlags: 0
@@ -2415,6 +2417,7 @@ MonoBehaviour:
   display: {fileID: 0}
   model: {fileID: 0}
   images: {fileID: 0}
+  desc: {fileID: 0}
 --- !u!4 &1109978558
 Transform:
   m_ObjectHideFlags: 0
@@ -2475,6 +2478,7 @@ MonoBehaviour:
   effectStack: {fileID: 1523821313}
   effectPrefab: {fileID: 1000785880795795753, guid: 25c2a0d30901f624fb9ca5d4caf65ef1,
     type: 3}
+  creatureModelIndex: {fileID: 11400000, guid: 95b57733f798b4446b2677d832506b04, type: 2}
 --- !u!4 &1132223709
 Transform:
   m_ObjectHideFlags: 0

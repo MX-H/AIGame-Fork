@@ -284,13 +284,48 @@ public class PlayerController : Targettable
     }
 
     [Server]
-    public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId)
+    public void ServerPlayToken(NetworkIdentity cardId, NetworkIdentity creatureId, CreatureType tokenType)
     {
-        ServerPlayCreature(creatureId, cardId, null, null);
+        Card card = cardId.gameObject.GetComponent<Card>();
+        card.cardData = new CardInstance(GameUtils.GetCreatureModelIndex().GetToken(tokenType));
+        card.owner = this;
+        card.controller = this;
+        card.isRevealed = isLocalPlayer;
+        card.isDraggable = isLocalPlayer;
+
+        ServerPlayCreature(creatureId, cardId, false);
+
+        RpcPlayToken(cardId, creatureId, tokenType);
+    }
+
+    [ClientRpc]
+    public void RpcPlayToken(NetworkIdentity cardId, NetworkIdentity creatureId, CreatureType tokenType)
+    {
+        if (!isServer)
+        {
+            Card card = cardId.gameObject.GetComponent<Card>();
+            card.cardData = new CardInstance(GameUtils.GetCreatureModelIndex().GetToken(tokenType));
+            card.owner = this;
+            card.controller = this;
+            card.isRevealed = isLocalPlayer;
+            card.isDraggable = isLocalPlayer;
+
+            Creature creature = creatureId.gameObject.GetComponent<Creature>();
+            creature.controller = this;
+            creature.owner = this;
+            creature.SetCard(card);
+            arena.AddCreature(creature);
+        }
     }
 
     [Server]
-    public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId, NetworkIdentity[] targets, int[] indexes)
+    public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId, bool rpc = true)
+    {
+        ServerPlayCreature(creatureId, cardId, null, null, rpc);
+    }
+
+    [Server]
+    public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId, NetworkIdentity[] targets, int[] indexes, bool rpc = true)
     {
         Card card = cardId.gameObject.GetComponent<Card>();
         Creature creature = creatureId.gameObject.GetComponent<Creature>();
@@ -311,7 +346,10 @@ public class PlayerController : Targettable
         }
         gameSession.ServerTriggerEffects(creature, TriggerCondition.ON_CREATURE_ENTER);
 
-        RpcPlayCreature(creatureId, cardId);
+        if (rpc)
+        {
+            RpcPlayCreature(creatureId, cardId);
+        }
     }
 
     [ClientRpc]

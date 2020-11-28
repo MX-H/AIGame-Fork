@@ -12,7 +12,15 @@ public class SummonEffectDescription : IEffectDescription
 
     public override void ApplyToTarget(Targettable target, PlayerController player)
     {
-        return;
+        PlayerController targetPlayer = target as PlayerController;
+        if (targetPlayer)
+        {
+            GameSession gameSession = GameUtils.GetGameSession();
+            for (int i = 0; i < amount; i++)
+            {
+                gameSession.ServerCreateToken(targetPlayer, tokenType);
+            }
+        }
     }
 
     public override string CardText(bool plural)
