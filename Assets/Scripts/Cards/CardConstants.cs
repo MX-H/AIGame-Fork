@@ -24,6 +24,37 @@ public static class PowerBudget
         return (int)Math.Round((mana + 0.5) * 2.0, MidpointRounding.AwayFromZero);
     }
 
+    public static int PowerLevelToMana(double powerLevel)
+    {
+        // quadratic formula
+        double a = -1.0 / 90.0;
+        double b = 91.0 / 90.0;
+        double c = 1.5 - powerLevel;
+
+        double discriminant = b * b - 4 * a * c;
+        if (discriminant < 0)
+        {
+            // This means that you have a power level higher than the mana function could have produced
+            // This should not be an issue, because the max is at around 45 mana
+            return 10;
+        }
+
+        double x1 = (-b + Math.Sqrt(discriminant)) / (2 * a);
+        double x2 = (-b + Math.Sqrt(discriminant)) / (2 * a);
+        double x = Math.Min(x1, x2);
+
+        if (x < 0)
+        {
+            x = 0;
+        }
+        else if (x > 10)
+        {
+            x = 10;
+        }
+
+        return (int)Math.Round(x, MidpointRounding.AwayFromZero);
+    }
+
     public static double StatsToPowerBudget(int statTotal)
     {
         double manaCost = (statTotal / 2.0) - 0.5;

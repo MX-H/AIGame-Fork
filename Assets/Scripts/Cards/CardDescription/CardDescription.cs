@@ -28,10 +28,11 @@ public class CardDescription : ScriptableObject, IDescription
         {
             if (effect.GetAlignment() != Alignment.NEGATIVE)
             {
-                power += effect.PowerLevel();
+                power += effect.PowerLevel() * PowerBudget.GetTriggerModifier(effect.triggerCondition, this);
             }
-            else {
-                power -= effect.PowerLevel() * PowerBudget.DOWNSIDE_WEIGHT;
+            else
+            {
+                power -= effect.PowerLevel() * PowerBudget.DOWNSIDE_WEIGHT * PowerBudget.GetTriggerModifier(effect.triggerCondition, this);
             }
         }
         return power;
