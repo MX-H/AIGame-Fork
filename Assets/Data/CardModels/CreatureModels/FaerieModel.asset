@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 72eebb8ee9da02843ab77bb77bd7623b, type: 3}
-  m_Name: DefaultModel
+  m_Name: FaerieModel
   m_EditorClassIdentifier: 
   histograms:
   - id: CardType
@@ -131,17 +131,17 @@ MonoBehaviour:
       value: 1
       enumType: CreatureType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 3
+      total: 11
     - enumVal: 1
-      value: 1
+      value: 0
       enumType: CreatureType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 3
+      total: 11
     - enumVal: 2
-      value: 1
+      value: 10
       enumType: CreatureType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 3
+      total: 11
   - id: QualifierType
     values:
     - enumVal: 0
@@ -190,47 +190,47 @@ MonoBehaviour:
     - enumVal: 0
       value: 1
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 11
+      total: 48
     - enumVal: 1
-      value: 1
+      value: 5
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 11
+      total: 48
     - enumVal: 2
-      value: 1
+      value: 10
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 11
+      total: 48
     - enumVal: 3
-      value: 1
+      value: 10
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 11
+      total: 48
     - enumVal: 4
-      value: 1
+      value: 10
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 11
+      total: 48
     - enumVal: 5
-      value: 1
+      value: 5
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 11
+      total: 48
     - enumVal: 6
-      value: 1
+      value: 3
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 11
+      total: 48
     - enumVal: 7
       value: 1
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 11
+      total: 48
     - enumVal: 8
       value: 1
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 11
+      total: 48
     - enumVal: 9
       value: 1
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 11
+      total: 48
     - enumVal: 10
       value: 1
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 11
+      total: 48
   - id: DrawModifier
     values:
     - enumVal: 0
@@ -256,30 +256,30 @@ MonoBehaviour:
   - id: KeywordAttribute
     values:
     - enumVal: 0
-      value: 1
+      value: 10
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 5
+      total: 48
     - enumVal: 1
-      value: 1
+      value: 30
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 5
+      total: 48
     - enumVal: 2
-      value: 1
+      value: 5
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 5
+      total: 48
     - enumVal: 3
-      value: 1
+      value: 3
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 5
+      total: 48
     - enumVal: 4
-      value: 1
+      value: 0
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 5
+      total: 48
   - id: TriggerCondition
     values:
     - enumVal: 0

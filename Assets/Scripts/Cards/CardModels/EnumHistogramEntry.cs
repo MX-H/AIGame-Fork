@@ -14,7 +14,10 @@ public class EnumHistogramEntry
 
     public int enumVal;
 
+    [Range(0, 30)]
     public int value;
 
     public string enumType;
+
+    public int total;
 }

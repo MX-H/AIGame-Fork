@@ -18,14 +18,14 @@ static public class CardParsing
     {
         switch (a)
         {
+            case KeywordAttribute.NONE:
+                return "<NONE>";
             case KeywordAttribute.EVASION:
                 return "Evasion";
             case KeywordAttribute.FAST_STRIKE:
                 return "Swift Strike";
             case KeywordAttribute.PIERCING:
                 return "Excessive";
-            case KeywordAttribute.SURPRISE:
-                return "Surprise";
             case KeywordAttribute.UNTOUCHABLE:
                 return "Untouchable";
         }
@@ -40,14 +40,14 @@ static public class CardParsing
                 return "Arrival";
             case TriggerCondition.ON_CREATURE_ENTER:
                 return "Creature Arrives";
-            case TriggerCondition.ON_SELF_DAMAGE_DEALT:
-                return "Upon dealing damage";
+            case TriggerCondition.ON_SELF_DAMAGE_DEALT_TO_PLAYER:
+                return "Strike Foe";
             case TriggerCondition.ON_SELF_DAMAGE_TAKEN:
-                return "Upon taking damage";
+                return "Struck";
             case TriggerCondition.ON_SELF_DIES:
                 return "Departure";
             case TriggerCondition.ON_CREATURE_DIES:
-                return "Creatures Departs";
+                return "Creature Departs";
             case TriggerCondition.ON_STACK_UPDATED:
                 return "Response";
             case TriggerCondition.IS_ALIVE:

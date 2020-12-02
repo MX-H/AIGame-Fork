@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: bbe2c7293af197640a2b40018e79b9a6, type: 2}
+  - {fileID: 2100000, guid: eea2ee63e29c7fb47b752b62fb1f7be2, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -338,7 +338,7 @@ PrefabInstance:
     - target: {fileID: 4872621158941925137, guid: 294f7832050b61c44917f1b55c0b30cb,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 11
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 4872621158941925137, guid: 294f7832050b61c44917f1b55c0b30cb,
         type: 3}
@@ -595,7 +595,7 @@ PrefabInstance:
     - target: {fileID: 4872621158941925137, guid: 294f7832050b61c44917f1b55c0b30cb,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 11
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 4872621158941925137, guid: 294f7832050b61c44917f1b55c0b30cb,
         type: 3}
@@ -852,7 +852,7 @@ PrefabInstance:
     - target: {fileID: 4872621158941925137, guid: 294f7832050b61c44917f1b55c0b30cb,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 11
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 4872621158941925137, guid: 294f7832050b61c44917f1b55c0b30cb,
         type: 3}
@@ -1109,7 +1109,7 @@ PrefabInstance:
     - target: {fileID: 4872621158941925137, guid: 294f7832050b61c44917f1b55c0b30cb,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 11
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 4872621158941925137, guid: 294f7832050b61c44917f1b55c0b30cb,
         type: 3}
@@ -1366,7 +1366,7 @@ PrefabInstance:
     - target: {fileID: 4872621158941925137, guid: 294f7832050b61c44917f1b55c0b30cb,
         type: 3}
       propertyPath: m_textInfo.characterCount
-      value: 11
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 4872621158941925137, guid: 294f7832050b61c44917f1b55c0b30cb,
         type: 3}

@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New CardDescription", menuName = "CardDescription", order = 52)]
 public class CardDescription : ScriptableObject, IDescription
 {
-    public string name;
+    public string cardName;
     public int manaCost;
     public CardType cardType;
     public List<CardEffectDescription> cardEffects = new List<CardEffectDescription>();
@@ -21,7 +21,7 @@ public class CardDescription : ScriptableObject, IDescription
         return Alignment.NEUTRAL;
     }
 
-    public double PowerLevel()
+    public virtual double PowerLevel()
     {
         double power = 0;
         foreach (CardEffectDescription effect in cardEffects)
@@ -106,5 +106,10 @@ public class CardDescription : ScriptableObject, IDescription
             }
         }
         return targetList;
+    }
+
+    public virtual bool HasKeywordAttribute(KeywordAttribute keyword)
+    {
+        return false;
     }
 }

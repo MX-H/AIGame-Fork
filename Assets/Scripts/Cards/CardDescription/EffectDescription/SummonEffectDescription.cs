@@ -7,6 +7,7 @@ public class SummonEffectDescription : IEffectDescription
 {
     public int amount;
     public CreatureType tokenType;
+    public int manaCost;
     public SummonEffectDescription() : base(EffectType.SUMMON_TOKEN)
     { }
 
@@ -35,7 +36,8 @@ public class SummonEffectDescription : IEffectDescription
 
     public override double PowerLevel()
     {
-        return 3 * (amount - 0.5) * PowerBudget.UNIT_COST;
+        // Tokens tend to suck
+        return (amount - 0.5) * (manaCost) * PowerBudget.UNIT_COST;
     }
 }
 
@@ -48,6 +50,7 @@ public class SummonEffectProceduralGenerator : IProceduralEffectGenerator
     {
         SummonEffectDescription desc = new SummonEffectDescription();
         desc.tokenType = ProceduralUtils.GetRandomValue<CreatureType>(random, model);
+        desc.manaCost = creatureModelIndex.GetToken(desc.tokenType).manaCost;
 
         // Find the bounds of card amounts
         int max = ProceduralUtils.GetUpperBound(desc, ref desc.amount, MIN_SUMMONS, MAX_SUMMONS, maxAllocatedBudget);
@@ -66,8 +69,12 @@ public class SummonEffectProceduralGenerator : IProceduralEffectGenerator
 
     public override double GetMinCost()
     {
+        // We are assuming that on average a token is 1 mana of value
+        // This is a bit flawed because the token type is randomly chosen with a probability model
+        // so the cost of the token is not determined by the budget
         SummonEffectDescription desc = new SummonEffectDescription();
         desc.amount = 1;
+        desc.manaCost = 1;
         return desc.PowerLevel();
     }
 }

@@ -104,6 +104,22 @@ public static class ProceduralUtils
         return null;
     }
 
+    // Keywords have varying evaluations depending on the budget
+    static public SortedSet<KeywordAttribute> GetKeywordsWithinBudget(double maxBudget, int atk, int hp)
+    {
+        SortedSet<KeywordAttribute> ret = new SortedSet<KeywordAttribute>();
+
+        foreach (KeywordAttribute keyword in Enum.GetValues(typeof(KeywordAttribute)))
+        {
+            if (PowerBudget.GetKeywordCost(keyword, atk, hp) <= maxBudget)
+            {
+                ret.Add(keyword);
+            }
+        }
+
+        return ret;
+    }
+
     static public SortedSet<EffectType> GetEffectsWithinBudget(double maxBudget)
     {
         SortedSet<EffectType> ret = new SortedSet<EffectType>();
@@ -226,6 +242,12 @@ public static class ProceduralUtils
         // Should never get here
         Debug.Log("Wasn't able to generate a random value for " + typeof(T).ToString() + ", returning first value");
         return (T)Enum.GetValues(typeof(T)).GetValue(0);
+    }
+
+    static public bool FlagsExist<T>(IEnumerable<T> blacklist, IEnumerable<T> whitelist)
+    {
+        IEnumerable<T> result = whitelist.Except(blacklist);
+        return result.Count() > 0;
     }
 
     static public T GetRandomValueExcluding<T>(System.Random random, IHistogram model, IEnumerable<T> blacklist) where T : Enum

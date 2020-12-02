@@ -127,6 +127,18 @@ public class Arena : MonoBehaviour
         return arenaState;
     }
 
+    public bool IsValidBlock(Creature c, int ind)
+    {
+        if (incomingAttackers != null && ind < incomingAttackers.Count)
+        {
+            if (!incomingAttackers[ind].HasKeyword(KeywordAttribute.EVASION) || c.HasKeyword(KeywordAttribute.EVASION))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void AddCreature(Creature c)
     {
         if (creatures.Count < GameConstants.MAX_CREATURES)

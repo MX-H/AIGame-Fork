@@ -22,4 +22,20 @@ public class CreatureCardDescription : CardDescription
             attributes.Add(attribute);
         }
     }
+
+    public override bool HasKeywordAttribute(KeywordAttribute keyword)
+    {
+        return attributes.Exists(x => x == keyword);
+    }
+
+    public override double PowerLevel()
+    {
+        double powerLevel = base.PowerLevel();
+        foreach (KeywordAttribute keyword in attributes)
+        {
+            powerLevel += PowerBudget.GetKeywordCost(keyword, attack, health);
+        }
+        powerLevel += PowerBudget.StatsToPowerBudget(attack + health);
+        return powerLevel;
+    }
 }

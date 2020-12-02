@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomPropertyDrawer(typeof(EnumHistogramEntry))]
-public class EnumHistogramEntryDrawer : PropertyDrawer
+[CustomPropertyDrawer(typeof(CreatureModelIndex.StatModelEntry))]
+public class StatModelEntryDrawer : PropertyDrawer
 {
     // Draw the property inside the given rect
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -23,27 +23,22 @@ public class EnumHistogramEntryDrawer : PropertyDrawer
             EditorGUI.indentLevel = 0;
 
             // Calculate rects
-            var rect1 = new Rect(position.x, position.y, 150, position.height);
-            var rect2 = new Rect(position.x + 155, position.y, 30, position.height);
-            var rect3 = new Rect(position.x + 190, position.y, 200, position.height);
-            var rect4 = new Rect(position.x + 395, position.y, 50, position.height);
-            var rect5 = new Rect(position.x + 450, position.y, position.width - 450, position.height);
+            var rect1 = new Rect(position.x, position.y, 50, position.height);
+            var rect2 = new Rect(position.x + 55, position.y, 50, position.height);
+            var rect3 = new Rect(position.x + 110, position.y, 200, position.height);
+            var rect4 = new Rect(position.x + 315, position.y, 50, position.height);
+            var rect5 = new Rect(position.x + 370, position.y, position.width - 370, position.height);
 
 
-
-            SerializedProperty enumVal = property.FindPropertyRelative("enumVal");
+            SerializedProperty health = property.FindPropertyRelative("health");
+            SerializedProperty mana = property.FindPropertyRelative("mana");
             SerializedProperty value = property.FindPropertyRelative("value");
-            SerializedProperty enumType = property.FindPropertyRelative("enumType");
             SerializedProperty total = property.FindPropertyRelative("total");
 
-
-            string typeName = enumType.stringValue;
-            System.Type type = System.Type.GetType(typeName);
-            string typeText = System.Enum.ToObject(type, enumVal.intValue).ToString();
-            EditorGUI.LabelField(rect1, typeText);
-
             // Draw fields - pass GUIContent.none to each so they are drawn without labels
-            EditorGUI.PropertyField(rect2, enumVal, GUIContent.none);
+            EditorGUI.LabelField(rect1, "Atk: " + (PowerBudget.StatBudget(mana.intValue) - health.intValue).ToString());
+            EditorGUI.LabelField(rect2, "Hp: " + health.intValue.ToString());
+
             EditorGUI.PropertyField(rect3, value, GUIContent.none, true);
 
             float percent = 0;

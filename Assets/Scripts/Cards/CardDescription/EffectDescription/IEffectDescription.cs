@@ -30,11 +30,13 @@ public abstract class IProceduralEffectGenerator : IEffectGenerator
     protected IHistogram model;
     protected double minAllocatedBudget;
     protected double maxAllocatedBudget;
+    protected CreatureModelIndex creatureModelIndex;
 
-    public void SetupParameters(System.Random r, IHistogram m, double minBudget, double maxBudget)
+    public void SetupParameters(System.Random r, IHistogram m, CreatureModelIndex creatureModels, double minBudget, double maxBudget)
     {
         random = r;
         model = m;
+        creatureModelIndex = creatureModels;
         Assert.IsTrue(maxBudget >= minBudget);
         minAllocatedBudget = minBudget;
         maxAllocatedBudget = maxBudget;

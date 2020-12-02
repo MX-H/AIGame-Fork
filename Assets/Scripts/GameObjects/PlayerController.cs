@@ -59,7 +59,7 @@ public class PlayerController : Targettable
             selectingTextPrompt = GameObject.Find("Player Selection Prompt").GetComponent<TextPrompt>();
             selectingTextPrompt.gameObject.SetActive(false);
         }
-        cardGenerator = new ProceduralCardGenerator(model, imageGlossary);
+        cardGenerator = new ProceduralCardGenerator(model, imageGlossary, gameSession.creatureModelIndex);
         if (isLocalPlayer)
         {
             ConfirmButton confirmButton = FindObjectOfType<ConfirmButton>();
@@ -650,7 +650,19 @@ public class PlayerController : Targettable
     {
         if (isLocalPlayer && CanMoveCreatures())
         {
-            CmdMoveToCombat(creature, ind);
+            bool validPos = true;
+            if (arena.GetState() == Arena.State.BLOCKING)
+            {
+                if (arena.IsValidBlock(creature.gameObject.GetComponent<Creature>(), ind))
+                {
+                    validPos = false;
+                }
+            }
+
+            if (validPos)
+            {
+                CmdMoveToCombat(creature, ind);
+            }
         }
     }
 

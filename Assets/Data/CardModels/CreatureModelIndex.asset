@@ -14,11 +14,1535 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   creatureModels:
   - type: 0
-    model: {fileID: 11400000, guid: bcbec90c9ba264943b094db842f9c18b, type: 2}
+    model: {fileID: 11400000, guid: def14218dbd403942b2d81d56050bdea, type: 2}
     tokenDesc: {fileID: 11400000, guid: d11a948a73865ed449486e94cba27128, type: 2}
+    bodyLambda: 5
+    statProbabilities:
+    - mana: 0
+      statModels:
+      - mana: 0
+        health: 1
+        value: 1
+        total: 1
+    - mana: 1
+      statModels:
+      - mana: 1
+        health: 1
+        value: 10
+        total: 21
+      - mana: 1
+        health: 2
+        value: 10
+        total: 21
+      - mana: 1
+        health: 3
+        value: 1
+        total: 21
+    - mana: 2
+      statModels:
+      - mana: 2
+        health: 1
+        value: 10
+        total: 51
+      - mana: 2
+        health: 2
+        value: 15
+        total: 51
+      - mana: 2
+        health: 3
+        value: 15
+        total: 51
+      - mana: 2
+        health: 4
+        value: 10
+        total: 51
+      - mana: 2
+        health: 5
+        value: 1
+        total: 51
+    - mana: 3
+      statModels:
+      - mana: 3
+        health: 1
+        value: 1
+        total: 46
+      - mana: 3
+        health: 2
+        value: 10
+        total: 46
+      - mana: 3
+        health: 3
+        value: 12
+        total: 46
+      - mana: 3
+        health: 4
+        value: 12
+        total: 46
+      - mana: 3
+        health: 5
+        value: 10
+        total: 46
+      - mana: 3
+        health: 6
+        value: 1
+        total: 46
+      - mana: 3
+        health: 7
+        value: 0
+        total: 46
+    - mana: 4
+      statModels:
+      - mana: 4
+        health: 1
+        value: 1
+        total: 56
+      - mana: 4
+        health: 2
+        value: 5
+        total: 56
+      - mana: 4
+        health: 3
+        value: 10
+        total: 56
+      - mana: 4
+        health: 4
+        value: 12
+        total: 56
+      - mana: 4
+        health: 5
+        value: 12
+        total: 56
+      - mana: 4
+        health: 6
+        value: 10
+        total: 56
+      - mana: 4
+        health: 7
+        value: 5
+        total: 56
+      - mana: 4
+        health: 8
+        value: 1
+        total: 56
+      - mana: 4
+        health: 9
+        value: 0
+        total: 56
+    - mana: 5
+      statModels:
+      - mana: 5
+        health: 1
+        value: 0
+        total: 32
+      - mana: 5
+        health: 2
+        value: 0
+        total: 32
+      - mana: 5
+        health: 3
+        value: 1
+        total: 32
+      - mana: 5
+        health: 4
+        value: 5
+        total: 32
+      - mana: 5
+        health: 5
+        value: 10
+        total: 32
+      - mana: 5
+        health: 6
+        value: 10
+        total: 32
+      - mana: 5
+        health: 7
+        value: 5
+        total: 32
+      - mana: 5
+        health: 8
+        value: 1
+        total: 32
+      - mana: 5
+        health: 9
+        value: 0
+        total: 32
+      - mana: 5
+        health: 10
+        value: 0
+        total: 32
+      - mana: 5
+        health: 11
+        value: 0
+        total: 32
+    - mana: 6
+      statModels:
+      - mana: 6
+        health: 1
+        value: 0
+        total: 32
+      - mana: 6
+        health: 2
+        value: 0
+        total: 32
+      - mana: 6
+        health: 3
+        value: 0
+        total: 32
+      - mana: 6
+        health: 4
+        value: 1
+        total: 32
+      - mana: 6
+        health: 5
+        value: 5
+        total: 32
+      - mana: 6
+        health: 6
+        value: 10
+        total: 32
+      - mana: 6
+        health: 7
+        value: 10
+        total: 32
+      - mana: 6
+        health: 8
+        value: 5
+        total: 32
+      - mana: 6
+        health: 9
+        value: 1
+        total: 32
+      - mana: 6
+        health: 10
+        value: 0
+        total: 32
+      - mana: 6
+        health: 11
+        value: 0
+        total: 32
+      - mana: 6
+        health: 12
+        value: 0
+        total: 32
+      - mana: 6
+        health: 13
+        value: 0
+        total: 32
+    - mana: 7
+      statModels:
+      - mana: 7
+        health: 1
+        value: 0
+        total: 32
+      - mana: 7
+        health: 2
+        value: 0
+        total: 32
+      - mana: 7
+        health: 3
+        value: 0
+        total: 32
+      - mana: 7
+        health: 4
+        value: 0
+        total: 32
+      - mana: 7
+        health: 5
+        value: 1
+        total: 32
+      - mana: 7
+        health: 6
+        value: 5
+        total: 32
+      - mana: 7
+        health: 7
+        value: 10
+        total: 32
+      - mana: 7
+        health: 8
+        value: 10
+        total: 32
+      - mana: 7
+        health: 9
+        value: 5
+        total: 32
+      - mana: 7
+        health: 10
+        value: 1
+        total: 32
+      - mana: 7
+        health: 11
+        value: 0
+        total: 32
+      - mana: 7
+        health: 12
+        value: 0
+        total: 32
+      - mana: 7
+        health: 13
+        value: 0
+        total: 32
+      - mana: 7
+        health: 14
+        value: 0
+        total: 32
+      - mana: 7
+        health: 15
+        value: 0
+        total: 32
+    - mana: 8
+      statModels:
+      - mana: 8
+        health: 1
+        value: 0
+        total: 12
+      - mana: 8
+        health: 2
+        value: 0
+        total: 12
+      - mana: 8
+        health: 3
+        value: 0
+        total: 12
+      - mana: 8
+        health: 4
+        value: 0
+        total: 12
+      - mana: 8
+        health: 5
+        value: 0
+        total: 12
+      - mana: 8
+        health: 6
+        value: 1
+        total: 12
+      - mana: 8
+        health: 7
+        value: 2
+        total: 12
+      - mana: 8
+        health: 8
+        value: 3
+        total: 12
+      - mana: 8
+        health: 9
+        value: 3
+        total: 12
+      - mana: 8
+        health: 10
+        value: 2
+        total: 12
+      - mana: 8
+        health: 11
+        value: 1
+        total: 12
+      - mana: 8
+        health: 12
+        value: 0
+        total: 12
+      - mana: 8
+        health: 13
+        value: 0
+        total: 12
+      - mana: 8
+        health: 14
+        value: 0
+        total: 12
+      - mana: 8
+        health: 15
+        value: 0
+        total: 12
+      - mana: 8
+        health: 16
+        value: 0
+        total: 12
+      - mana: 8
+        health: 17
+        value: 0
+        total: 12
+    - mana: 9
+      statModels:
+      - mana: 9
+        health: 1
+        value: 0
+        total: 12
+      - mana: 9
+        health: 2
+        value: 0
+        total: 12
+      - mana: 9
+        health: 3
+        value: 0
+        total: 12
+      - mana: 9
+        health: 4
+        value: 0
+        total: 12
+      - mana: 9
+        health: 5
+        value: 0
+        total: 12
+      - mana: 9
+        health: 6
+        value: 0
+        total: 12
+      - mana: 9
+        health: 7
+        value: 1
+        total: 12
+      - mana: 9
+        health: 8
+        value: 2
+        total: 12
+      - mana: 9
+        health: 9
+        value: 3
+        total: 12
+      - mana: 9
+        health: 10
+        value: 3
+        total: 12
+      - mana: 9
+        health: 11
+        value: 2
+        total: 12
+      - mana: 9
+        health: 12
+        value: 1
+        total: 12
+      - mana: 9
+        health: 13
+        value: 0
+        total: 12
+      - mana: 9
+        health: 14
+        value: 0
+        total: 12
+      - mana: 9
+        health: 15
+        value: 0
+        total: 12
+      - mana: 9
+        health: 16
+        value: 0
+        total: 12
+      - mana: 9
+        health: 17
+        value: 0
+        total: 12
+      - mana: 9
+        health: 18
+        value: 0
+        total: 12
+      - mana: 9
+        health: 19
+        value: 0
+        total: 12
+    - mana: 10
+      statModels:
+      - mana: 10
+        health: 1
+        value: 0
+        total: 12
+      - mana: 10
+        health: 2
+        value: 0
+        total: 12
+      - mana: 10
+        health: 3
+        value: 0
+        total: 12
+      - mana: 10
+        health: 4
+        value: 0
+        total: 12
+      - mana: 10
+        health: 5
+        value: 0
+        total: 12
+      - mana: 10
+        health: 6
+        value: 0
+        total: 12
+      - mana: 10
+        health: 7
+        value: 0
+        total: 12
+      - mana: 10
+        health: 8
+        value: 1
+        total: 12
+      - mana: 10
+        health: 9
+        value: 2
+        total: 12
+      - mana: 10
+        health: 10
+        value: 3
+        total: 12
+      - mana: 10
+        health: 11
+        value: 3
+        total: 12
+      - mana: 10
+        health: 12
+        value: 2
+        total: 12
+      - mana: 10
+        health: 13
+        value: 1
+        total: 12
+      - mana: 10
+        health: 14
+        value: 0
+        total: 12
+      - mana: 10
+        health: 15
+        value: 0
+        total: 12
+      - mana: 10
+        health: 16
+        value: 0
+        total: 12
+      - mana: 10
+        health: 17
+        value: 0
+        total: 12
+      - mana: 10
+        health: 18
+        value: 0
+        total: 12
+      - mana: 10
+        health: 19
+        value: 0
+        total: 12
+      - mana: 10
+        health: 20
+        value: 0
+        total: 12
+      - mana: 10
+        health: 21
+        value: 0
+        total: 12
   - type: 1
-    model: {fileID: 11400000, guid: bcbec90c9ba264943b094db842f9c18b, type: 2}
+    model: {fileID: 11400000, guid: 9f88ebefb86d5824a93f652c29c44ce7, type: 2}
     tokenDesc: {fileID: 11400000, guid: 67a4a72847ab0dd4b8d8fc50cc1dd557, type: 2}
+    bodyLambda: 3.5
+    statProbabilities:
+    - mana: 0
+      statModels:
+      - mana: 0
+        health: 1
+        value: 1
+        total: 1
+    - mana: 1
+      statModels:
+      - mana: 1
+        health: 1
+        value: 4
+        total: 5
+      - mana: 1
+        health: 2
+        value: 1
+        total: 5
+      - mana: 1
+        health: 3
+        value: 0
+        total: 5
+    - mana: 2
+      statModels:
+      - mana: 2
+        health: 1
+        value: 7
+        total: 23
+      - mana: 2
+        health: 2
+        value: 10
+        total: 23
+      - mana: 2
+        health: 3
+        value: 5
+        total: 23
+      - mana: 2
+        health: 4
+        value: 1
+        total: 23
+      - mana: 2
+        health: 5
+        value: 0
+        total: 23
+    - mana: 3
+      statModels:
+      - mana: 3
+        health: 1
+        value: 5
+        total: 26
+      - mana: 3
+        health: 2
+        value: 10
+        total: 26
+      - mana: 3
+        health: 3
+        value: 8
+        total: 26
+      - mana: 3
+        health: 4
+        value: 3
+        total: 26
+      - mana: 3
+        health: 5
+        value: 0
+        total: 26
+      - mana: 3
+        health: 6
+        value: 0
+        total: 26
+      - mana: 3
+        health: 7
+        value: 0
+        total: 26
+    - mana: 4
+      statModels:
+      - mana: 4
+        health: 1
+        value: 3
+        total: 27
+      - mana: 4
+        health: 2
+        value: 8
+        total: 27
+      - mana: 4
+        health: 3
+        value: 10
+        total: 27
+      - mana: 4
+        health: 4
+        value: 5
+        total: 27
+      - mana: 4
+        health: 5
+        value: 1
+        total: 27
+      - mana: 4
+        health: 6
+        value: 0
+        total: 27
+      - mana: 4
+        health: 7
+        value: 0
+        total: 27
+      - mana: 4
+        health: 8
+        value: 0
+        total: 27
+      - mana: 4
+        health: 9
+        value: 0
+        total: 27
+    - mana: 5
+      statModels:
+      - mana: 5
+        health: 1
+        value: 1
+        total: 40
+      - mana: 5
+        health: 2
+        value: 3
+        total: 40
+      - mana: 5
+        health: 3
+        value: 10
+        total: 40
+      - mana: 5
+        health: 4
+        value: 12
+        total: 40
+      - mana: 5
+        health: 5
+        value: 10
+        total: 40
+      - mana: 5
+        health: 6
+        value: 3
+        total: 40
+      - mana: 5
+        health: 7
+        value: 1
+        total: 40
+      - mana: 5
+        health: 8
+        value: 0
+        total: 40
+      - mana: 5
+        health: 9
+        value: 0
+        total: 40
+      - mana: 5
+        health: 10
+        value: 0
+        total: 40
+      - mana: 5
+        health: 11
+        value: 0
+        total: 40
+    - mana: 6
+      statModels:
+      - mana: 6
+        health: 1
+        value: 1
+        total: 58
+      - mana: 6
+        health: 2
+        value: 3
+        total: 58
+      - mana: 6
+        health: 3
+        value: 8
+        total: 58
+      - mana: 6
+        health: 4
+        value: 15
+        total: 58
+      - mana: 6
+        health: 5
+        value: 15
+        total: 58
+      - mana: 6
+        health: 6
+        value: 10
+        total: 58
+      - mana: 6
+        health: 7
+        value: 5
+        total: 58
+      - mana: 6
+        health: 8
+        value: 1
+        total: 58
+      - mana: 6
+        health: 9
+        value: 0
+        total: 58
+      - mana: 6
+        health: 10
+        value: 0
+        total: 58
+      - mana: 6
+        health: 11
+        value: 0
+        total: 58
+      - mana: 6
+        health: 12
+        value: 0
+        total: 58
+      - mana: 6
+        health: 13
+        value: 0
+        total: 58
+    - mana: 7
+      statModels:
+      - mana: 7
+        health: 1
+        value: 0
+        total: 53
+      - mana: 7
+        health: 2
+        value: 1
+        total: 53
+      - mana: 7
+        health: 3
+        value: 3
+        total: 53
+      - mana: 7
+        health: 4
+        value: 6
+        total: 53
+      - mana: 7
+        health: 5
+        value: 15
+        total: 53
+      - mana: 7
+        health: 6
+        value: 15
+        total: 53
+      - mana: 7
+        health: 7
+        value: 10
+        total: 53
+      - mana: 7
+        health: 8
+        value: 2
+        total: 53
+      - mana: 7
+        health: 9
+        value: 1
+        total: 53
+      - mana: 7
+        health: 10
+        value: 0
+        total: 53
+      - mana: 7
+        health: 11
+        value: 0
+        total: 53
+      - mana: 7
+        health: 12
+        value: 0
+        total: 53
+      - mana: 7
+        health: 13
+        value: 0
+        total: 53
+      - mana: 7
+        health: 14
+        value: 0
+        total: 53
+      - mana: 7
+        health: 15
+        value: 0
+        total: 53
+    - mana: 8
+      statModels:
+      - mana: 8
+        health: 1
+        value: 0
+        total: 36
+      - mana: 8
+        health: 2
+        value: 0
+        total: 36
+      - mana: 8
+        health: 3
+        value: 0
+        total: 36
+      - mana: 8
+        health: 4
+        value: 1
+        total: 36
+      - mana: 8
+        health: 5
+        value: 3
+        total: 36
+      - mana: 8
+        health: 6
+        value: 5
+        total: 36
+      - mana: 8
+        health: 7
+        value: 13
+        total: 36
+      - mana: 8
+        health: 8
+        value: 10
+        total: 36
+      - mana: 8
+        health: 9
+        value: 3
+        total: 36
+      - mana: 8
+        health: 10
+        value: 1
+        total: 36
+      - mana: 8
+        health: 11
+        value: 0
+        total: 36
+      - mana: 8
+        health: 12
+        value: 0
+        total: 36
+      - mana: 8
+        health: 13
+        value: 0
+        total: 36
+      - mana: 8
+        health: 14
+        value: 0
+        total: 36
+      - mana: 8
+        health: 15
+        value: 0
+        total: 36
+      - mana: 8
+        health: 16
+        value: 0
+        total: 36
+      - mana: 8
+        health: 17
+        value: 0
+        total: 36
+    - mana: 9
+      statModels:
+      - mana: 9
+        health: 1
+        value: 0
+        total: 34
+      - mana: 9
+        health: 2
+        value: 0
+        total: 34
+      - mana: 9
+        health: 3
+        value: 0
+        total: 34
+      - mana: 9
+        health: 4
+        value: 0
+        total: 34
+      - mana: 9
+        health: 5
+        value: 0
+        total: 34
+      - mana: 9
+        health: 6
+        value: 1
+        total: 34
+      - mana: 9
+        health: 7
+        value: 7
+        total: 34
+      - mana: 9
+        health: 8
+        value: 10
+        total: 34
+      - mana: 9
+        health: 9
+        value: 7
+        total: 34
+      - mana: 9
+        health: 10
+        value: 5
+        total: 34
+      - mana: 9
+        health: 11
+        value: 3
+        total: 34
+      - mana: 9
+        health: 12
+        value: 1
+        total: 34
+      - mana: 9
+        health: 13
+        value: 0
+        total: 34
+      - mana: 9
+        health: 14
+        value: 0
+        total: 34
+      - mana: 9
+        health: 15
+        value: 0
+        total: 34
+      - mana: 9
+        health: 16
+        value: 0
+        total: 34
+      - mana: 9
+        health: 17
+        value: 0
+        total: 34
+      - mana: 9
+        health: 18
+        value: 0
+        total: 34
+      - mana: 9
+        health: 19
+        value: 0
+        total: 34
+    - mana: 10
+      statModels:
+      - mana: 10
+        health: 1
+        value: 0
+        total: 33
+      - mana: 10
+        health: 2
+        value: 0
+        total: 33
+      - mana: 10
+        health: 3
+        value: 0
+        total: 33
+      - mana: 10
+        health: 4
+        value: 0
+        total: 33
+      - mana: 10
+        health: 5
+        value: 0
+        total: 33
+      - mana: 10
+        health: 6
+        value: 0
+        total: 33
+      - mana: 10
+        health: 7
+        value: 1
+        total: 33
+      - mana: 10
+        health: 8
+        value: 5
+        total: 33
+      - mana: 10
+        health: 9
+        value: 15
+        total: 33
+      - mana: 10
+        health: 10
+        value: 10
+        total: 33
+      - mana: 10
+        health: 11
+        value: 1
+        total: 33
+      - mana: 10
+        health: 12
+        value: 1
+        total: 33
+      - mana: 10
+        health: 13
+        value: 0
+        total: 33
+      - mana: 10
+        health: 14
+        value: 0
+        total: 33
+      - mana: 10
+        health: 15
+        value: 0
+        total: 33
+      - mana: 10
+        health: 16
+        value: 0
+        total: 33
+      - mana: 10
+        health: 17
+        value: 0
+        total: 33
+      - mana: 10
+        health: 18
+        value: 0
+        total: 33
+      - mana: 10
+        health: 19
+        value: 0
+        total: 33
+      - mana: 10
+        health: 20
+        value: 0
+        total: 33
+      - mana: 10
+        health: 21
+        value: 0
+        total: 33
   - type: 2
-    model: {fileID: 11400000, guid: bcbec90c9ba264943b094db842f9c18b, type: 2}
+    model: {fileID: 11400000, guid: c4a0fe01988a6594ab86cce2199cd733, type: 2}
     tokenDesc: {fileID: 11400000, guid: 4f9f228582479724a8e338327a026fe6, type: 2}
+    bodyLambda: 2.5
+    statProbabilities:
+    - mana: 0
+      statModels:
+      - mana: 0
+        health: 1
+        value: 1
+        total: 1
+    - mana: 1
+      statModels:
+      - mana: 1
+        health: 1
+        value: 5
+        total: 6
+      - mana: 1
+        health: 2
+        value: 1
+        total: 6
+      - mana: 1
+        health: 3
+        value: 0
+        total: 6
+    - mana: 2
+      statModels:
+      - mana: 2
+        health: 1
+        value: 5
+        total: 11
+      - mana: 2
+        health: 2
+        value: 5
+        total: 11
+      - mana: 2
+        health: 3
+        value: 1
+        total: 11
+      - mana: 2
+        health: 4
+        value: 0
+        total: 11
+      - mana: 2
+        health: 5
+        value: 0
+        total: 11
+    - mana: 3
+      statModels:
+      - mana: 3
+        health: 1
+        value: 5
+        total: 18
+      - mana: 3
+        health: 2
+        value: 5
+        total: 18
+      - mana: 3
+        health: 3
+        value: 5
+        total: 18
+      - mana: 3
+        health: 4
+        value: 2
+        total: 18
+      - mana: 3
+        health: 5
+        value: 1
+        total: 18
+      - mana: 3
+        health: 6
+        value: 0
+        total: 18
+      - mana: 3
+        health: 7
+        value: 0
+        total: 18
+    - mana: 4
+      statModels:
+      - mana: 4
+        health: 1
+        value: 5
+        total: 16
+      - mana: 4
+        health: 2
+        value: 5
+        total: 16
+      - mana: 4
+        health: 3
+        value: 5
+        total: 16
+      - mana: 4
+        health: 4
+        value: 1
+        total: 16
+      - mana: 4
+        health: 5
+        value: 0
+        total: 16
+      - mana: 4
+        health: 6
+        value: 0
+        total: 16
+      - mana: 4
+        health: 7
+        value: 0
+        total: 16
+      - mana: 4
+        health: 8
+        value: 0
+        total: 16
+      - mana: 4
+        health: 9
+        value: 0
+        total: 16
+    - mana: 5
+      statModels:
+      - mana: 5
+        health: 1
+        value: 5
+        total: 19
+      - mana: 5
+        health: 2
+        value: 5
+        total: 19
+      - mana: 5
+        health: 3
+        value: 5
+        total: 19
+      - mana: 5
+        health: 4
+        value: 3
+        total: 19
+      - mana: 5
+        health: 5
+        value: 1
+        total: 19
+      - mana: 5
+        health: 6
+        value: 0
+        total: 19
+      - mana: 5
+        health: 7
+        value: 0
+        total: 19
+      - mana: 5
+        health: 8
+        value: 0
+        total: 19
+      - mana: 5
+        health: 9
+        value: 0
+        total: 19
+      - mana: 5
+        health: 10
+        value: 0
+        total: 19
+      - mana: 5
+        health: 11
+        value: 0
+        total: 19
+    - mana: 6
+      statModels:
+      - mana: 6
+        health: 1
+        value: 0
+        total: 19
+      - mana: 6
+        health: 2
+        value: 5
+        total: 19
+      - mana: 6
+        health: 3
+        value: 5
+        total: 19
+      - mana: 6
+        health: 4
+        value: 5
+        total: 19
+      - mana: 6
+        health: 5
+        value: 3
+        total: 19
+      - mana: 6
+        health: 6
+        value: 1
+        total: 19
+      - mana: 6
+        health: 7
+        value: 0
+        total: 19
+      - mana: 6
+        health: 8
+        value: 0
+        total: 19
+      - mana: 6
+        health: 9
+        value: 0
+        total: 19
+      - mana: 6
+        health: 10
+        value: 0
+        total: 19
+      - mana: 6
+        health: 11
+        value: 0
+        total: 19
+      - mana: 6
+        health: 12
+        value: 0
+        total: 19
+      - mana: 6
+        health: 13
+        value: 0
+        total: 19
+    - mana: 7
+      statModels:
+      - mana: 7
+        health: 1
+        value: 0
+        total: 24
+      - mana: 7
+        health: 2
+        value: 5
+        total: 24
+      - mana: 7
+        health: 3
+        value: 5
+        total: 24
+      - mana: 7
+        health: 4
+        value: 5
+        total: 24
+      - mana: 7
+        health: 5
+        value: 5
+        total: 24
+      - mana: 7
+        health: 6
+        value: 3
+        total: 24
+      - mana: 7
+        health: 7
+        value: 1
+        total: 24
+      - mana: 7
+        health: 8
+        value: 0
+        total: 24
+      - mana: 7
+        health: 9
+        value: 0
+        total: 24
+      - mana: 7
+        health: 10
+        value: 0
+        total: 24
+      - mana: 7
+        health: 11
+        value: 0
+        total: 24
+      - mana: 7
+        health: 12
+        value: 0
+        total: 24
+      - mana: 7
+        health: 13
+        value: 0
+        total: 24
+      - mana: 7
+        health: 14
+        value: 0
+        total: 24
+      - mana: 7
+        health: 15
+        value: 0
+        total: 24
+    - mana: 8
+      statModels:
+      - mana: 8
+        health: 1
+        value: 0
+        total: 29
+      - mana: 8
+        health: 2
+        value: 5
+        total: 29
+      - mana: 8
+        health: 3
+        value: 5
+        total: 29
+      - mana: 8
+        health: 4
+        value: 5
+        total: 29
+      - mana: 8
+        health: 5
+        value: 5
+        total: 29
+      - mana: 8
+        health: 6
+        value: 5
+        total: 29
+      - mana: 8
+        health: 7
+        value: 3
+        total: 29
+      - mana: 8
+        health: 8
+        value: 1
+        total: 29
+      - mana: 8
+        health: 9
+        value: 0
+        total: 29
+      - mana: 8
+        health: 10
+        value: 0
+        total: 29
+      - mana: 8
+        health: 11
+        value: 0
+        total: 29
+      - mana: 8
+        health: 12
+        value: 0
+        total: 29
+      - mana: 8
+        health: 13
+        value: 0
+        total: 29
+      - mana: 8
+        health: 14
+        value: 0
+        total: 29
+      - mana: 8
+        health: 15
+        value: 0
+        total: 29
+      - mana: 8
+        health: 16
+        value: 0
+        total: 29
+      - mana: 8
+        health: 17
+        value: 0
+        total: 29
+    - mana: 9
+      statModels:
+      - mana: 9
+        health: 1
+        value: 0
+        total: 24
+      - mana: 9
+        health: 2
+        value: 0
+        total: 24
+      - mana: 9
+        health: 3
+        value: 0
+        total: 24
+      - mana: 9
+        health: 4
+        value: 5
+        total: 24
+      - mana: 9
+        health: 5
+        value: 5
+        total: 24
+      - mana: 9
+        health: 6
+        value: 5
+        total: 24
+      - mana: 9
+        health: 7
+        value: 5
+        total: 24
+      - mana: 9
+        health: 8
+        value: 3
+        total: 24
+      - mana: 9
+        health: 9
+        value: 1
+        total: 24
+      - mana: 9
+        health: 10
+        value: 0
+        total: 24
+      - mana: 9
+        health: 11
+        value: 0
+        total: 24
+      - mana: 9
+        health: 12
+        value: 0
+        total: 24
+      - mana: 9
+        health: 13
+        value: 0
+        total: 24
+      - mana: 9
+        health: 14
+        value: 0
+        total: 24
+      - mana: 9
+        health: 15
+        value: 0
+        total: 24
+      - mana: 9
+        health: 16
+        value: 0
+        total: 24
+      - mana: 9
+        health: 17
+        value: 0
+        total: 24
+      - mana: 9
+        health: 18
+        value: 0
+        total: 24
+      - mana: 9
+        health: 19
+        value: 0
+        total: 24
+    - mana: 10
+      statModels:
+      - mana: 10
+        health: 1
+        value: 1
+        total: 21
+      - mana: 10
+        health: 2
+        value: 1
+        total: 21
+      - mana: 10
+        health: 3
+        value: 1
+        total: 21
+      - mana: 10
+        health: 4
+        value: 1
+        total: 21
+      - mana: 10
+        health: 5
+        value: 1
+        total: 21
+      - mana: 10
+        health: 6
+        value: 1
+        total: 21
+      - mana: 10
+        health: 7
+        value: 1
+        total: 21
+      - mana: 10
+        health: 8
+        value: 1
+        total: 21
+      - mana: 10
+        health: 9
+        value: 1
+        total: 21
+      - mana: 10
+        health: 10
+        value: 1
+        total: 21
+      - mana: 10
+        health: 11
+        value: 1
+        total: 21
+      - mana: 10
+        health: 12
+        value: 1
+        total: 21
+      - mana: 10
+        health: 13
+        value: 1
+        total: 21
+      - mana: 10
+        health: 14
+        value: 1
+        total: 21
+      - mana: 10
+        health: 15
+        value: 1
+        total: 21
+      - mana: 10
+        health: 16
+        value: 1
+        total: 21
+      - mana: 10
+        health: 17
+        value: 1
+        total: 21
+      - mana: 10
+        health: 18
+        value: 1
+        total: 21
+      - mana: 10
+        health: 19
+        value: 1
+        total: 21
+      - mana: 10
+        health: 20
+        value: 1
+        total: 21
+      - mana: 10
+        health: 21
+        value: 1
+        total: 21

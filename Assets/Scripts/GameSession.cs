@@ -243,7 +243,12 @@ public class GameSession : NetworkBehaviour
                                 CreatureState defenderState = defenders[attackerIndex].gameObject.GetComponent<CreatureState>();
 
                                 ServerCreatureDoDamage(attackers[attackerIndex], attackerState.GetAttack(), defenders[attackerIndex]);
-                                ServerCreatureDoDamage(defenders[attackerIndex], defenderState.GetAttack(), attackers[attackerIndex]);
+
+                                // Fast strike hits first, if it kills defender they can't do damage back
+                                if (!attackers[attackerIndex].HasKeyword(KeywordAttribute.FAST_STRIKE) || !defenders[attackerIndex].creatureState.IsDead())
+                                {
+                                    ServerCreatureDoDamage(defenders[attackerIndex], defenderState.GetAttack(), attackers[attackerIndex]);
+                                }
                             }
                             else
                             {
@@ -292,7 +297,21 @@ public class GameSession : NetworkBehaviour
         if (amount > 0)
         {
             ServerApplyDamage(target, amount);
-            delayedTriggers.Enqueue((source, TriggerCondition.ON_SELF_DAMAGE_DEALT));
+
+            Creature targetCreature = target as Creature;
+            if (targetCreature && source.HasKeyword(KeywordAttribute.PIERCING))
+            {
+                int excess = -targetCreature.creatureState.GetHealth();
+                if (excess > 0)
+                {
+                    ServerCreatureDoDamage(source, excess, targetCreature.controller);
+                }
+            }
+
+            if (target is PlayerController)
+            {
+                delayedTriggers.Enqueue((source, TriggerCondition.ON_SELF_DAMAGE_DEALT_TO_PLAYER));
+            }
         }
     }
 
@@ -375,7 +394,6 @@ public class GameSession : NetworkBehaviour
     {
         if (isServerOnly)
         {
-            PlayerController local = null;
             for (int i = 0; i < players.Length; i++)
             {
                 PlayerController p = playerList[i];
@@ -908,7 +926,7 @@ public class GameSession : NetworkBehaviour
                     }
                 }
                 break;
-            case TriggerCondition.ON_SELF_DAMAGE_DEALT:
+            case TriggerCondition.ON_SELF_DAMAGE_DEALT_TO_PLAYER:
             case TriggerCondition.ON_SELF_DAMAGE_TAKEN:
                 if (source.card.cardData.HasEffectsOnTrigger(trigger) && source.card.HasValidTargets(source.card.cardData.GetSelectableTargets(trigger)))
                 {

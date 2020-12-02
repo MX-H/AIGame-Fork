@@ -34,7 +34,7 @@ public class AllTargetDescription : IQualifiableTargettingDescription
         targetDescription.amount = 1;
         targetDescription.qualifier = qualifier;
 
-        TargettingQuery query = new TargettingQuery(targetDescription, player);
+        TargettingQuery query = new TargettingQuery(targetDescription, player, false);
         GameSession gameSession = GameUtils.GetGameSession();
 
         List<Targettable> possibleTargets = gameSession.GetPotentialTargets();

@@ -8,10 +8,12 @@ public class ProceduralCardGenerator : ICardGenerator
 {
     private IHistogram model;
     private ImageGlossary images;
-    public ProceduralCardGenerator(IHistogram m, ImageGlossary i)
+    private CreatureModelIndex creatureModelIndex;
+    public ProceduralCardGenerator(IHistogram m, ImageGlossary i, CreatureModelIndex creatureModels)
     {
         model = m;
         images = i;
+        creatureModelIndex = creatureModels;
     }
 
     public override CardDescription GenerateCard(int seed)
@@ -23,88 +25,159 @@ public class ProceduralCardGenerator : ICardGenerator
         switch (t)
         {
             case CardType.CREATURE:
-                return GenerateCreatureCard(random, model, images);
+                return GenerateCreatureCard(random, model, images, creatureModelIndex);
             case CardType.SPELL:
-                return GenerateSpellCard(random, model, images);
+                return GenerateSpellCard(random, model, images, creatureModelIndex);
             case CardType.TRAP:
-                return GenerateTrapCard(random, model, images);
+                return GenerateTrapCard(random, model, images, creatureModelIndex);
         }
 
         return new CardDescription();
     }
 
-    static private CardDescription GenerateCreatureCard(System.Random random, IHistogram model, ImageGlossary images)
+    static private int GeneratePoisson(double lambda, System.Random random)
     {
-        CreatureCardDescription card = new CreatureCardDescription();
+        // Algorithm due to Donald Knuth, 1969.
+        double p = 1.0, L = Math.Exp(-lambda);
+        int k = 0;
+        do
+        {
+            k++;
+            p *= random.NextDouble();
+        }
+        while (p > L);
+        return k - 1;
+    }
+
+    // Generate what mana cost should be allocated to stats
+    static private double GetCreatureBodyBudget(double lambda, int seed, int max)
+    {
+        System.Random rand = new System.Random(seed);
+        // We want to generate the body at mana costs of 0.5, poisson only returns ints so sample at double lambda
+
+        int k = GeneratePoisson(lambda * 2, rand);
+        while (k > (max * 2))
+        {
+            k = GeneratePoisson(lambda * 2, rand);
+        }
+
+        return k / 2.0;
+
+    }
+
+    static private int GetHealth(System.Random random, CreatureModelIndex.StatProbability probability, int stats)
+    {
+        int ret = 1;
+        int totalCount = 0;
+        for (int i = 0; i < stats; i++)
+        {
+            totalCount += probability.statModels[i].value;
+        }
+
+        if (totalCount > 0)
+        {
+            int result = random.Next(totalCount);
+            foreach (CreatureModelIndex.StatModelEntry entry in probability.statModels)
+            {
+                result -= entry.value;
+                if (result < 0)
+                {
+                    ret = entry.health;
+                    break;
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    static private CardDescription GenerateCreatureCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels)
+    {
+        CreatureCardDescription card = ScriptableObject.CreateInstance(typeof(CreatureCardDescription)) as CreatureCardDescription;
         card.creatureType = ProceduralUtils.GetRandomValue<CreatureType>(random, model);
+
+        MultiCardHistogram combinedModel = ScriptableObject.CreateInstance(typeof(MultiCardHistogram)) as MultiCardHistogram;
+        combinedModel.Init(new IHistogram[] { model, creatureModels.GetModel(card.creatureType) });
+
         card.manaCost = (int)ProceduralUtils.GetRandomValue<ManaCost>(random, model);
+
+        // Potentially generate a stronger body, but with a drawback
+        double bodyManaCost = GetCreatureBodyBudget(creatureModels.GetBodyLambda(card.creatureType), random.Next(), card.manaCost + 1);
+        int maxStats = PowerBudget.StatBudget(bodyManaCost);
+
+        // Decide on stats
+        card.health = GetHealth(random, creatureModels.GetStatProbability(card.creatureType, (int)Math.Round(bodyManaCost, MidpointRounding.AwayFromZero)), maxStats);
+        card.attack = maxStats - card.health;
 
         // Decide on power budget
         double powerBudget = PowerBudget.ManaPowerBudgets[card.manaCost];
         double powerMargin = PowerBudget.ManaPowerMargin[card.manaCost];
         double powerLimit = PowerBudget.ManaPowerLimit[card.manaCost];
-        card.name = "A creature card";
+        card.cardName = "A creature card";
         //card.name += "(" + powerBudget.ToString() + ")";
 
-        // Stat budget is 2 stats per (mana spent + 1), but 1 is always health
-        int maxStats = 2 * (card.manaCost + 1) - 1;
-
-        // Decide on stats
-        card.attack = random.Next(0, maxStats);
-        card.health = maxStats - card.attack + 1;
-
         // Decide on keyword attributes
-        int amount = random.Next(2);
-        for (int i = 0; i < amount; i++)
+        double keywordPowerLimit = powerLimit - card.PowerLevel();
+        if (keywordPowerLimit < 0)
         {
-            card.attributes.Add(ProceduralUtils.GetRandomValue<KeywordAttribute>(random, model));
+            keywordPowerLimit = 0;
+        }
+        int maxKeywords = 3;
+        for (int i = 0; i < maxKeywords; i++)
+        {
+            KeywordAttribute keyword = ProceduralUtils.GetRandomValue(random, combinedModel, ProceduralUtils.GetKeywordsWithinBudget(keywordPowerLimit, card.attack, card.health));
+            if (keyword == KeywordAttribute.NONE)
+            {
+                break;
+            }
+            card.attributes.Add(keyword);
         }
 
         // Decide on effects
-        GenerateCardEffects(random, model, card, powerBudget, powerMargin, powerLimit);
+        GenerateCardEffects(random, combinedModel, creatureModels, card, powerBudget, powerMargin, powerLimit);
 
         card.image = ProceduralUtils.GetRandomTexture(random, images.GetCreatureImages(card.creatureType));
 
         return card;
     }
 
-    static private CardDescription GenerateSpellCard(System.Random random, IHistogram model, ImageGlossary images)
+    static private CardDescription GenerateSpellCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels)
     {
-        CardDescription card = new CardDescription();
+        CardDescription card = ScriptableObject.CreateInstance(typeof(CardDescription)) as CardDescription;
         card.cardType = CardType.SPELL;
         card.manaCost = (int)ProceduralUtils.GetRandomValue<ManaCost>(random, model);
 
         double powerBudget = PowerBudget.ManaPowerBudgets[card.manaCost];
         double powerMargin = PowerBudget.ManaPowerMargin[card.manaCost];
         double powerLimit = PowerBudget.ManaPowerLimit[card.manaCost];
-        card.name = "A spell card"; 
+        card.cardName = "A spell card"; 
         //card.name += "(" + powerBudget.ToString() + ")";
 
-        GenerateCardEffects(random, model, card, powerBudget, powerMargin, powerLimit);
+        GenerateCardEffects(random, model, creatureModels, card, powerBudget, powerMargin, powerLimit);
         card.image = ProceduralUtils.GetRandomTexture(random, images.GetSpellImages());
 
         return card;
     }
 
-    static private CardDescription GenerateTrapCard(System.Random random, IHistogram model, ImageGlossary images)
+    static private CardDescription GenerateTrapCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels)
     {
-        CardDescription card = new CardDescription();
+        CardDescription card = ScriptableObject.CreateInstance(typeof(CardDescription)) as CardDescription;
         card.cardType = CardType.TRAP;
         card.manaCost = (int)ProceduralUtils.GetRandomValue<ManaCost>(random, model);
 
         double powerBudget = PowerBudget.ManaPowerBudgets[card.manaCost];
         double powerMargin = PowerBudget.ManaPowerMargin[card.manaCost];
         double powerLimit = PowerBudget.ManaPowerLimit[card.manaCost];
-        card.name = "A trap card";
+        card.cardName = "A trap card";
         //card.name += "(" + powerBudget.ToString() + ")";
 
-        GenerateCardEffects(random, model, card, powerBudget, powerMargin, powerLimit);
+        GenerateCardEffects(random, model, creatureModels, card, powerBudget, powerMargin, powerLimit);
         card.image = ProceduralUtils.GetRandomTexture(random, images.GetTrapImages());
 
         return card;
     }
 
-    static private void GenerateCardEffects(System.Random random, IHistogram model, CardDescription cardDesc, double powerBudget, double powerMargin, double powerLimit)
+    static private void GenerateCardEffects(System.Random random, IHistogram model, CreatureModelIndex creatureModels, CardDescription cardDesc, double powerBudget, double powerMargin, double powerLimit)
     {
         // A trap card only has one trigger condition
         if (cardDesc.cardType == CardType.TRAP)
@@ -125,21 +198,47 @@ public class ProceduralCardGenerator : ICardGenerator
             double maxAllowableBudget = powerLimit - cardDesc.PowerLevel() - PowerBudget.FLAT_EFFECT_COST;
             double minAllowableBudget = (powerBudget - cardDesc.PowerLevel() - PowerBudget.FLAT_EFFECT_COST) / (EffectConstants.MAX_CARD_EFFECTS - effectCount);
 
-            SortedSet<EffectType> candidatesWithinBudget = ProceduralUtils.GetEffectsWithinBudget(maxAllowableBudget);
-            if (candidatesWithinBudget.Count == 0)
-            {
-                Debug.Log("No effects are valid for budget " + maxAllowableBudget);
-                break;
-            }
-
             if (cardDesc.cardType == CardType.SPELL || (cardDesc.cardType == CardType.TRAP && effectCount > 0))
             {
                 // After the first condition of a trap or after casting a spell all further effects of
                 // the card should just resolve so trigger cond is NONE
                 cardEffect.triggerCondition = TriggerCondition.NONE;
+
+                // If NONE has been blacklisted that means that there are no candidates for the remaining budget
+                if (triggerBlacklist.Contains(TriggerCondition.NONE))
+                {
+                    Debug.Log("No effects are valid for budget " + maxAllowableBudget);
+
+                    break;
+                }
             }
-            else {
-                cardEffect.triggerCondition = ProceduralUtils.GetRandomValueExcluding(random, model, triggerBlacklist, CardEnums.GetValidFlags<TriggerCondition>(cardDesc.cardType));
+            else
+            {
+                if (ProceduralUtils.FlagsExist(triggerBlacklist, CardEnums.GetValidFlags<TriggerCondition>(cardDesc.cardType)))
+                {
+                    cardEffect.triggerCondition = ProceduralUtils.GetRandomValueExcluding(random, model, triggerBlacklist, CardEnums.GetValidFlags<TriggerCondition>(cardDesc.cardType));
+                }
+                else
+                {
+                    // No triggers available mean each trigger type has been blacklisted 
+
+                    Debug.Log("No effects are valid for budget " + maxAllowableBudget);
+
+                    break;
+                }
+            }
+
+            double triggerBudgetModifier = PowerBudget.GetTriggerModifier(cardEffect.triggerCondition, cardDesc);
+            maxAllowableBudget /= triggerBudgetModifier;
+            minAllowableBudget /= triggerBudgetModifier;
+
+            SortedSet<EffectType> candidatesWithinBudget = ProceduralUtils.GetEffectsWithinBudget(maxAllowableBudget);
+            if (candidatesWithinBudget.Count == 0)
+            {
+                triggerBlacklist.Add(cardEffect.triggerCondition);
+
+                Debug.Log("No effects are valid for budget " + maxAllowableBudget);
+                continue;
             }
 
             bool validEffect = false;
@@ -162,7 +261,7 @@ public class ProceduralCardGenerator : ICardGenerator
                     break;
                 }
 
-                validEffect = GenerateCardEffect(random, model, cardEffect, effectType, minAllowableBudget, maxAllowableBudget, true);
+                validEffect = GenerateCardEffect(random, model, creatureModels, cardEffect, effectType, minAllowableBudget, maxAllowableBudget, true);
             }
 
             // This means that there isn't an effect that meets this condition
@@ -187,11 +286,9 @@ public class ProceduralCardGenerator : ICardGenerator
         if (cardDesc.PowerLevel() > powerMargin)
         {
             // TODO: Drawback should be one of, additional cost, negative effect, or negative modification to existing effect
-            // For now just add additional effect
+            // For now just add additional negative effect
 
             CardEffectDescription cardEffect = new CardEffectDescription();
-
-            double currPower = cardDesc.PowerLevel();
 
             double maxAllowableBudget = (cardDesc.PowerLevel() - powerBudget - PowerBudget.FLAT_EFFECT_COST) / PowerBudget.DOWNSIDE_WEIGHT;
             double minAllowableBudget = (cardDesc.PowerLevel() - powerMargin - PowerBudget.FLAT_EFFECT_COST) / PowerBudget.DOWNSIDE_WEIGHT;
@@ -238,7 +335,7 @@ public class ProceduralCardGenerator : ICardGenerator
                         break;
                     }
 
-                    validEffect = GenerateCardEffect(random, model, cardEffect, effectType, minAllowableBudget, maxAllowableBudget, false);
+                    validEffect = GenerateCardEffect(random, model, creatureModels, cardEffect, effectType, minAllowableBudget, maxAllowableBudget, false);
                 }
 
                 // This means that there isn't an effect that meets this condition
@@ -256,10 +353,10 @@ public class ProceduralCardGenerator : ICardGenerator
 
     }
 
-    static private bool GenerateCardEffect(System.Random random, IHistogram model, CardEffectDescription effectDesc, EffectType effect, double minBudget, double maxBudget, bool positive)
+    static private bool GenerateCardEffect(System.Random random, IHistogram model, CreatureModelIndex creatureModels, CardEffectDescription effectDesc, EffectType effect, double minBudget, double maxBudget, bool positive)
     {
         IProceduralEffectGenerator effectGen = ProceduralUtils.GetProceduralGenerator(effect);
-        effectGen.SetupParameters(random, model, minBudget, maxBudget);
+        effectGen.SetupParameters(random, model, creatureModels, minBudget, maxBudget);
         effectDesc.effectType = effectGen.Generate();
 
         // Adjust budgets

@@ -22,6 +22,15 @@ public class CardHistogram : IHistogram
         [SerializeField]
         private List<EnumHistogramEntry> values;
 
+        public void UpdateTotal()
+        {
+            int total = GetTotal();
+            foreach (EnumHistogramEntry entry in values)
+            {
+                entry.total = total;
+            }
+        }
+
         private void ValidateKey(int key)
         {
             if (!keyIndexMap.ContainsKey(key))
@@ -43,6 +52,8 @@ public class CardHistogram : IHistogram
                 keyIndexMap[val] = i++;
                 values.Add(new EnumHistogramEntry(i - 1, 1, t));
             }
+
+            UpdateTotal();
         }
 
         public void Update()
@@ -51,6 +62,8 @@ public class CardHistogram : IHistogram
             {
                 ValidateKey(val);
             }
+
+            UpdateTotal();
         }
 
         public void AddValue(int key, int value)
@@ -136,6 +149,14 @@ public class CardHistogram : IHistogram
                 typeIndexMap[t] = histograms.Count;
                 histograms.Add(new EnumHistogram(t));
             }
+        }
+    }
+
+    public void OnValidate()
+    {
+        foreach (EnumHistogram histogram in histograms)
+        {
+            histogram.Update();
         }
     }
 

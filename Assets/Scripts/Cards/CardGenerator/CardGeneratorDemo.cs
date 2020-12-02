@@ -10,6 +10,7 @@ public class CardGeneratorDemo : MonoBehaviour
     public CardHistogram model;
     public ImageGlossary images;
     public CardDescription desc;
+    public CreatureModelIndex creatureModels;
 
     private ICardGenerator cardGenerator;
     void Start()
@@ -23,7 +24,7 @@ public class CardGeneratorDemo : MonoBehaviour
         {
             if (desc == null)
             {
-                ICardGenerator cardGenerator = new ProceduralCardGenerator(model, images);
+                ICardGenerator cardGenerator = new ProceduralCardGenerator(model, images, creatureModels);
                 display.SetCard(new CardInstance(cardGenerator.GenerateCard(Random.Range(0, 10000))));
             }
             else

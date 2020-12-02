@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 72eebb8ee9da02843ab77bb77bd7623b, type: 3}
-  m_Name: DefaultModel
+  m_Name: HumanModel
   m_EditorClassIdentifier: 
   histograms:
   - id: CardType
@@ -128,20 +128,20 @@ MonoBehaviour:
   - id: CreatureType
     values:
     - enumVal: 0
-      value: 1
+      value: 5
       enumType: CreatureType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 3
+      total: 7
     - enumVal: 1
       value: 1
       enumType: CreatureType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 3
+      total: 7
     - enumVal: 2
       value: 1
       enumType: CreatureType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 3
+      total: 7
   - id: QualifierType
     values:
     - enumVal: 0
@@ -256,30 +256,30 @@ MonoBehaviour:
   - id: KeywordAttribute
     values:
     - enumVal: 0
-      value: 1
+      value: 5
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 5
+      total: 9
     - enumVal: 1
       value: 1
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 5
+      total: 9
     - enumVal: 2
       value: 1
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 5
+      total: 9
     - enumVal: 3
       value: 1
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 5
+      total: 9
     - enumVal: 4
       value: 1
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 5
+      total: 9
   - id: TriggerCondition
     values:
     - enumVal: 0

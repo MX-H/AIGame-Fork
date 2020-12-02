@@ -6,7 +6,7 @@ public class MultiCardHistogram : IHistogram
 {
     List<IHistogram> histograms;
 
-    MultiCardHistogram(IEnumerable<IHistogram> models)
+    public void Init(IEnumerable<IHistogram> models)
     {
         histograms = new List<IHistogram>(models);
     }

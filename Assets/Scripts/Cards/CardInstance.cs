@@ -36,7 +36,7 @@ public class CardInstance
 
     public string GetCardName()
     {
-        return baseCard.name;
+        return baseCard.cardName;
     }
 
     public int GetManaCost()
@@ -109,6 +109,11 @@ public class CardInstance
     public Texture2D GetImage()
     {
         return baseCard.image;
+    }
+
+    public bool HasKeywordAttribute(KeywordAttribute keyword)
+    {
+        return baseCard.HasKeywordAttribute(keyword);
     }
 
 }

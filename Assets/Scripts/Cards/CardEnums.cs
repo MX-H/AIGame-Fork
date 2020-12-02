@@ -67,7 +67,7 @@ public enum TriggerCondition
     ON_CREATURE_DIES,
 
     ON_SELF_DAMAGE_TAKEN,
-    ON_SELF_DAMAGE_DEALT,
+    ON_SELF_DAMAGE_DEALT_TO_PLAYER,
 
     ON_STACK_UPDATED,
 
@@ -124,11 +124,11 @@ public enum ManaCost
 
 public enum KeywordAttribute
 {
+    NONE,
     EVASION,
     FAST_STRIKE,
     UNTOUCHABLE,
-    PIERCING,
-    SURPRISE
+    PIERCING
 }
 
 static class CardEnums
@@ -271,13 +271,13 @@ static class CardEnums
 
         // Valid trigger conditions for card types
         RegisterFlags(CardType.CREATURE, new TriggerCondition[] { TriggerCondition.ON_SELF_ENTER, TriggerCondition.ON_CREATURE_ENTER, TriggerCondition.ON_SELF_DIES,
-            TriggerCondition.ON_CREATURE_DIES, TriggerCondition.ON_SELF_DAMAGE_TAKEN, TriggerCondition.ON_SELF_DAMAGE_DEALT, TriggerCondition.IS_ALIVE});
+            TriggerCondition.ON_CREATURE_DIES, TriggerCondition.ON_SELF_DAMAGE_TAKEN, TriggerCondition.ON_SELF_DAMAGE_DEALT_TO_PLAYER, TriggerCondition.IS_ALIVE});
         RegisterFlags(CardType.SPELL, new TriggerCondition[] { TriggerCondition.NONE });
         RegisterFlags(CardType.TRAP, new TriggerCondition[] { TriggerCondition.NONE, TriggerCondition.ON_CREATURE_ENTER, TriggerCondition.ON_CREATURE_DIES,
             TriggerCondition.ON_STACK_UPDATED });
 
         // Targetting types for specific triggers
-        RemoveFlags(TriggerCondition.ON_SELF_DAMAGE_DEALT, new TargettingType[] { TargettingType.TARGET, TargettingType.UP_TO_TARGET });
+        RemoveFlags(TriggerCondition.ON_SELF_DAMAGE_DEALT_TO_PLAYER, new TargettingType[] { TargettingType.TARGET, TargettingType.UP_TO_TARGET });
         RemoveFlags(TriggerCondition.ON_SELF_DAMAGE_TAKEN, new TargettingType[] { TargettingType.TARGET, TargettingType.UP_TO_TARGET });
 
         RegisterFlags(QualifierType.NONE, (TargetType[])Enum.GetValues(typeof(TargetType)));

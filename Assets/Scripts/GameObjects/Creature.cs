@@ -129,6 +129,15 @@ public class Creature : Targettable
         }
     }
 
+    public bool HasKeyword(KeywordAttribute keyword)
+    {
+        if (card)
+        {
+            return card.cardData.HasKeywordAttribute(keyword);
+        }
+        return false;
+    }
+
     public override bool IsTargettable()
     {
         return IsDraggable();
@@ -152,6 +161,11 @@ public class Creature : Targettable
             case TargetType.DAMAGEABLE:
                 valid = true;
                 break;
+        }
+
+        if (!targetQuery.ignoreUntouchable && HasKeyword(KeywordAttribute.UNTOUCHABLE))
+        {
+            valid = false;
         }
 
         if (valid)
