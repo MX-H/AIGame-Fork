@@ -37,7 +37,7 @@ public class TargetXDescription : IQualifiableTargettingDescription
     {
         foreach (Targettable target in targets)
         {
-            effect.ApplyToTarget(target, player);
+            effect.ApplyToTarget(target.GetTargettableEntity(), player);
         }
     }
 }

@@ -10,6 +10,7 @@ public class PlayerController : Targettable
     public Deck deck;
     public Arena arena;
     public DiscardPile discard;
+    public PlayerUI playerUI;
 
     [SyncVar]
     public int health;
@@ -31,7 +32,6 @@ public class PlayerController : Targettable
     List<List<Targettable>> allSelectedTargets;
     List<ITargettingDescription> selectableTargetDescriptions;
     List<CardEffectDescription> selectableEffectDescriptions;
-
 
     private TextPrompt selectingTextPrompt;
 
@@ -99,20 +99,47 @@ public class PlayerController : Targettable
                     allSelectedTargets = new List<List<Targettable>>();
 
                     SetTargettingQuery(selectableTargetDescriptions[0]);
-                    SetSelectionPrompt(selectableEffectDescriptions[0]);
+                    SetSelectionPrompt(selectableEffectDescriptions[0], 0);
                 }
 
+            }
+
+            // Cancel actions when right click detected (undo target select, then playing card)
+            if (Input.GetMouseButtonDown(1))
+            {
+                // Back out of target select to the previous selection
+                if (allSelectedTargets.Count > 0)
+                {
+                    int lastInd = allSelectedTargets.Count - 1;
+                    allSelectedTargets.RemoveAt(lastInd);
+
+                    foreach (Targettable t in gameSession.GetPotentialTargets())
+                    {
+                        t.Deselect();
+                    }
+
+                    selectedTargets = new List<Targettable>();
+
+                    SetTargettingQuery(selectableTargetDescriptions[lastInd]);
+                    SetSelectionPrompt(selectableEffectDescriptions[lastInd]);
+
+                }
+                // Send a request to cancel playing card, note: triggered effects cannot be cancelled so this request will do nothing
+                else
+                {
+                    ClientRequestCancelPlayCard();
+                }
             }
         }
     }
 
-    public void SetSelectionPrompt(CardEffectDescription effectDescription)
+    public void SetSelectionPrompt(CardEffectDescription effectDescription, int index = -1)
     {
         if (selectingTextPrompt != null)
         {
             if (effectDescription != null)
             {
-                string selectMessage = "Select ";
+                string selectMessage = ((index < 0) ? "" : "<sprite=" + index + "> ") + "Select ";
                 if (effectDescription.targettingType.targettingType != TargettingType.EXCEPT)
                 {
                     selectMessage += effectDescription.targettingType.CardText() + " that ";
@@ -121,7 +148,7 @@ public class PlayerController : Targettable
                 {
                     ExceptTargetDescription exceptDesc = effectDescription.targettingType as ExceptTargetDescription;
                     ITargettingDescription targetDesc = exceptDesc.targetDescription;
-                    selectMessage += exceptDesc.targetDescription.CardText() + " that " + (targetDesc.RequiresPluralEffect() ? "do not " : "does not "); 
+                    selectMessage += exceptDesc.targetDescription.CardText() + " that " + (targetDesc.RequiresPluralEffect() ? "does not " : "do not "); 
                 }
                 selectMessage += effectDescription.effectType.CardText(effectDescription.targettingType.RequiresPluralEffect());
                 selectingTextPrompt.SetText(selectMessage);
@@ -256,13 +283,48 @@ public class PlayerController : Targettable
     }
 
     [Server]
-    public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId)
+    public void ServerPlayToken(NetworkIdentity cardId, NetworkIdentity creatureId, CreatureType tokenType)
     {
-        ServerPlayCreature(creatureId, cardId, null, null);
+        Card card = cardId.gameObject.GetComponent<Card>();
+        card.cardData = new CardInstance(GameUtils.GetCreatureModelIndex().GetToken(tokenType));
+        card.owner = this;
+        card.controller = this;
+        card.isRevealed = isLocalPlayer;
+        card.isDraggable = isLocalPlayer;
+
+        ServerPlayCreature(creatureId, cardId, false);
+
+        RpcPlayToken(cardId, creatureId, tokenType);
+    }
+
+    [ClientRpc]
+    public void RpcPlayToken(NetworkIdentity cardId, NetworkIdentity creatureId, CreatureType tokenType)
+    {
+        if (!isServer)
+        {
+            Card card = cardId.gameObject.GetComponent<Card>();
+            card.cardData = new CardInstance(GameUtils.GetCreatureModelIndex().GetToken(tokenType));
+            card.owner = this;
+            card.controller = this;
+            card.isRevealed = isLocalPlayer;
+            card.isDraggable = isLocalPlayer;
+
+            Creature creature = creatureId.gameObject.GetComponent<Creature>();
+            creature.controller = this;
+            creature.owner = this;
+            creature.SetCard(card);
+            arena.AddCreature(creature);
+        }
     }
 
     [Server]
-    public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId, NetworkIdentity[] targets, int[] indexes)
+    public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId, bool rpc = true)
+    {
+        ServerPlayCreature(creatureId, cardId, null, null, rpc);
+    }
+
+    [Server]
+    public void ServerPlayCreature(NetworkIdentity creatureId, NetworkIdentity cardId, NetworkIdentity[] targets, int[] indexes, bool rpc = true)
     {
         Card card = cardId.gameObject.GetComponent<Card>();
         Creature creature = creatureId.gameObject.GetComponent<Creature>();
@@ -283,7 +345,10 @@ public class PlayerController : Targettable
         }
         gameSession.ServerTriggerEffects(creature, TriggerCondition.ON_CREATURE_ENTER);
 
-        RpcPlayCreature(creatureId, cardId);
+        if (rpc)
+        {
+            RpcPlayCreature(creatureId, cardId);
+        }
     }
 
     [ClientRpc]
@@ -541,6 +606,22 @@ public class PlayerController : Targettable
         {
             CmdCancelPlayCard();
         }
+    }
+
+    [TargetRpc]
+    public void TargetCancelPlayCard(NetworkConnection target)
+    {
+        foreach (Targettable t in gameSession.GetPotentialTargets())
+        {
+            t.Deselect();
+        }
+
+        RemoveTargettingQuery();
+        HideSelectionPrompt();
+
+        allSelectedTargets = null;
+        selectedTargets = null;
+        selectableTargetDescriptions = null;
     }
 
     [Client]
@@ -855,12 +936,16 @@ public class PlayerController : Targettable
                 }
 
                 CmdSendTargets(targets, indexes);
+
+                allSelectedTargets = null;
+                selectedTargets = null;
+                selectableTargetDescriptions = null;
             }
             else
             {
                 selectedTargets = new List<Targettable>();
                 SetTargettingQuery(selectableTargetDescriptions[allSelectedTargets.Count]);
-                SetSelectionPrompt(selectableEffectDescriptions[allSelectedTargets.Count]);
+                SetSelectionPrompt(selectableEffectDescriptions[allSelectedTargets.Count], allSelectedTargets.Count);
             }
         }
     }
@@ -869,9 +954,6 @@ public class PlayerController : Targettable
     private void CmdSendTargets(NetworkIdentity[] targets, int[] indexes)
     {
         gameSession.ServerSendTargets(netIdentity, targets, indexes);
-        allSelectedTargets = null;
-        selectedTargets = null;
-        selectableTargetDescriptions = null;
     }
 
     public bool IsDead()
@@ -1002,5 +1084,10 @@ public class PlayerController : Targettable
     public bool IsAnOpponent(PlayerController c)
     {
         return GetOpponents().Contains(c);
+    }
+
+    public override Targettable GetTargettableUI()
+    {
+        return playerUI;
     }
 }

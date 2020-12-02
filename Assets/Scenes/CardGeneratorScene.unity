@@ -171,6 +171,7 @@ MonoBehaviour:
   display: {fileID: 10619989}
   model: {fileID: 11400000, guid: bcbec90c9ba264943b094db842f9c18b, type: 2}
   images: {fileID: 11400000, guid: 9730a333d1475fd488f7a8e43a6b6b5c, type: 2}
+  desc: {fileID: 11400000, guid: 67a4a72847ab0dd4b8d8fc50cc1dd557, type: 2}
 --- !u!4 &267740228
 Transform:
   m_ObjectHideFlags: 0

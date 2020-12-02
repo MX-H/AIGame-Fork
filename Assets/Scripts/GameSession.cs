@@ -92,6 +92,7 @@ public class GameSession : NetworkBehaviour
     public AssignableAreas[] playerAreas;
     public EffectStack effectStack;
     public Effect effectPrefab;
+    public CreatureModelIndex creatureModelIndex;
 
     public override void OnStartServer()
     {
@@ -107,6 +108,7 @@ public class GameSession : NetworkBehaviour
         // Create 2 players
         ClientScene.RegisterPrefab(effectPrefab.gameObject);
         GameUtils.SetGameSession(this);
+        GameUtils.SetCreatureModelIndex(creatureModelIndex);
     }
 
     public bool IsGameReady()
@@ -410,6 +412,19 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
+    public void ServerCreateToken(PlayerController player, CreatureType creatureType)
+    {
+        if (IsGameReady())
+        {
+            NetworkIdentity cardId = ServerCreateCard(player);
+            Card card = cardId.gameObject.GetComponent<Card>();
+            card.cardData = new CardInstance(GameUtils.GetCreatureModelIndex().GetToken(creatureType));
+            NetworkIdentity creatureId = ServerCreateCreature(player, card);
+            player.ServerPlayToken(cardId, creatureId, creatureType);
+        }
+    }
+
+    [Server]
     private NetworkIdentity ServerCreateEffect()
     {
         if (IsGameReady())
@@ -430,7 +445,7 @@ public class GameSession : NetworkBehaviour
             for (int i = 0; i < players.Length; i++)
             {
                 PlayerController p = playerList[i];
-                playerAreas[i].playerUI.player = p;
+                playerAreas[i].playerUI.AssignPlayer(p);
                 playerAreas[i].hand.AssignPlayer(p);
                 playerAreas[i].deck.AssignPlayer(p);
                 playerAreas[i].arena.AssignPlayer(p);
@@ -465,7 +480,7 @@ public class GameSession : NetworkBehaviour
         for (int i = 0; i < players.Length; i++)
         {
             PlayerController p = playerList[(startInd + i) % players.Length];
-            playerAreas[i].playerUI.player = p;
+            playerAreas[i].playerUI.AssignPlayer(p);
             playerAreas[i].hand.AssignPlayer(p);
             playerAreas[i].deck.AssignPlayer(p);
             playerAreas[i].arena.AssignPlayer(p);
@@ -600,11 +615,6 @@ public class GameSession : NetworkBehaviour
         Effect effect = effectStack.PopEffect();
         effect.ServerResolve();
         effect.gameObject.SetActive(false);
-
-        if (effectStack.IsEmpty())
-        {
-            ChangeState(GameState.WAIT_ACTIVE);
-        }
 
         playerPasses = 0;
         RpcResolveStack();
@@ -1093,13 +1103,26 @@ public class GameSession : NetworkBehaviour
         {
             Card card = pendingCard.GetComponent<Card>();
             PlayerController player = playerList[waitingIndex];
-            if (pendingTrapIndex < 0)
+            switch (pendingAction)
             {
-                player.ServerAddExistingCardToHand(pendingCard);
-            }
-            else
-            {
-                player.ServerAddTrapBackToArena(pendingCard, pendingTrapIndex);
+                case PendingType.PLAY_CARD:
+                    player.ServerAddExistingCardToHand(pendingCard);
+                    player.TargetCancelPlayCard(playerId.connectionToClient);
+
+                    // Only active player should be able to play cards
+                    ChangeState(GameState.WAIT_ACTIVE);
+
+                    break;
+                case PendingType.USE_TRAP:
+                    player.ServerAddTrapBackToArena(pendingCard, pendingTrapIndex);
+                    player.TargetCancelPlayCard(playerId.connectionToClient);
+
+                    ChangeState((waitingIndex == activeIndex) ? GameState.WAIT_ACTIVE : GameState.WAIT_NON_ACTIVE);
+
+                    break;
+                default:
+                    // We can't do anything about triggered effects, these are mandatory so do nothing
+                    break;
             }
         }
     }

@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using TMPro;
 public abstract class Targettable : NetworkBehaviour
 {
-    public OutlineController outline;
     public bool isTargettable;
     public bool isSelected;
+    public TextMeshProUGUI text;
 
+    private OutlineController outline;
     private TargettingQuery targettingQuery;
 
     // Start is called before the first frame update
@@ -98,12 +100,38 @@ public abstract class Targettable : NetworkBehaviour
         targettingQuery = null;
     }
 
+    public void SetText(string msg)
+    {
+        if (text)
+        {
+            text.text = msg;
+        }
+    }
+
+    public void AddText(string msg)
+    {
+        if (text)
+        {
+            text.text += msg;
+        }
+    }
+
+    public void ClearText()
+    {
+        SetText("");
+    }
+
     public TargettingQuery GetTargettingQuery()
     {
         return targettingQuery;
     }
 
     public virtual Targettable GetTargettableEntity()
+    {
+        return this;
+    }
+
+    public virtual Targettable GetTargettableUI()
     {
         return this;
     }
