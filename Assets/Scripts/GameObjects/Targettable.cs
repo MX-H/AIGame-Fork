@@ -76,6 +76,11 @@ public abstract class Targettable : NetworkBehaviour
         }
     }
 
+    public void Select()
+    {
+        isSelected = true;
+    }
+
     public void Deselect()
     {
         isSelected = false;

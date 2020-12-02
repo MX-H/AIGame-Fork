@@ -45,6 +45,8 @@ public class GameSession : NetworkBehaviour
     [SyncVar]
     int waitingIndex = 0;
 
+    TurnTimer turnTimer;
+
     [SyncVar]
     bool combatWasDeclared = false;
 
@@ -119,6 +121,10 @@ public class GameSession : NetworkBehaviour
         {
             SaveState();
         }
+        if (state == currState) 
+        {
+            return;
+        }
         prevState = currState;
         currState = state;
 
@@ -126,9 +132,23 @@ public class GameSession : NetworkBehaviour
         {
             case GameState.WAIT_ACTIVE:
                 waitingIndex = activeIndex;
+                turnTimer.RestoreTimer();
                 break;
             case GameState.WAIT_NON_ACTIVE:
                 waitingIndex = (activeIndex + 1) % playerList.Length;
+                turnTimer.StoreTimer();
+                turnTimer.ResetTimer(false);
+                break;
+            case GameState.DECLARE_BLOCKS:
+                turnTimer.StoreTimer();
+                turnTimer.ResetTimer(false);
+                break;
+            case GameState.SELECTING_TARGETS:
+                if (activeIndex != waitingIndex) 
+                {
+                    turnTimer.StoreTimer();
+                    turnTimer.ResetTimer(false);
+                }
                 break;
         }
     }
@@ -188,6 +208,7 @@ public class GameSession : NetworkBehaviour
                     break;
                 case GameState.TURN_START:
                     {
+                        turnTimer = GameUtils.GetTurnTimer();
                         playerList[activeIndex].ServerStartTurn();
 
                         NetworkIdentity cardId = ServerCreateCard(playerList[activeIndex]);
@@ -199,6 +220,8 @@ public class GameSession : NetworkBehaviour
 
                         ChangeState(GameState.WAIT_ACTIVE);
                         SaveState();
+                        turnTimer.ResetTimer(true);
+                        turnTimer.StartTimer();
                     }
                     break;
                 case GameState.TRIGGERING_EFFECTS:
@@ -272,6 +295,49 @@ public class GameSession : NetworkBehaviour
                         ServerUpdateGameState();
                     }
                     break;
+                case GameState.WAIT_ACTIVE:
+                    if (turnTimer.IsTimeUp())
+                    {
+                        playerList[activeIndex].ServerForceEndTurn();
+                    }
+                    break;
+                case GameState.WAIT_NON_ACTIVE:
+                    if (turnTimer.IsTimeUp())
+                    {
+                        playerList[waitingIndex].ServerForceConfirmation();
+                    }
+                    break;
+                case GameState.DECLARE_ATTACKS:
+                    if (turnTimer.IsTimeUp())
+                    {
+                        playerList[waitingIndex].ServerForceConfirmation();
+                    }
+                    break;
+                case GameState.DECLARE_BLOCKS:
+                    if (turnTimer.IsTimeUp())
+                    {
+                        playerList[waitingIndex].ServerForceConfirmation();
+                    }
+                    break;
+                case GameState.SELECTING_TARGETS:
+                    if (turnTimer.IsTimeUp())
+                    {
+                        switch (pendingAction)
+                        {
+                            case PendingType.PLAY_CARD:
+                                playerList[waitingIndex].ServerForceCancelPlayCard();
+                                break;
+                            case PendingType.USE_TRAP:
+                                playerList[waitingIndex].ServerForceCancelPlayCard();
+                                break;
+                            case PendingType.TRIGGER_EFFECT:
+                                playerList[waitingIndex].SelectRandomTargets();
+                                playerList[waitingIndex].ConfirmSelectedTargets();
+                                break;
+                        }
+                    }
+                    break;
+
                 default:
                     break;
             }
@@ -715,6 +781,10 @@ public class GameSession : NetworkBehaviour
             {
                 (Creature source, TriggerCondition trigger) = delayedTriggers.Dequeue();
                 ServerTriggerEffects(source, trigger);
+            }
+            if (currState != GameState.TRIGGERING_EFFECTS)
+            {
+                ChangeState(savedState);
             }
         }
     }
@@ -1259,6 +1329,11 @@ public class GameSession : NetworkBehaviour
             return effectStack.IsFull();
         }
         return true;
+    }
+
+    public TurnTimer GetTurnTimer()
+    {
+        return turnTimer;
     }
 
     public PlayerController[] GetPlayerList()

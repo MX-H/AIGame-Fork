@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -44,7 +44,6 @@ public class PlayerController : Targettable
     public override void OnStartClient()
     {
         base.OnStartClient();
-
         gameSession = FindObjectOfType<GameSession>();
     }
 
@@ -433,6 +432,51 @@ public class PlayerController : Targettable
         gameSession.ServerReceiveAcknowledge();
     }
 
+    [Server]
+    public void ServerForceEndTurn()
+    {
+        RpcForceEndTurn();
+    }
+
+    [ClientRpc]
+    public void RpcForceEndTurn()
+    {
+        if (isLocalPlayer)
+        {
+            CmdEndTurn();
+        }
+    }
+
+    [Server]
+    public void ServerForceConfirmation()
+    {
+        RpcForceConfirmation();
+    }
+
+    [ClientRpc]
+    public void RpcForceConfirmation()
+    {
+        if (isLocalPlayer)
+        {
+            CmdSendConfirmation();
+        }
+    }
+
+    [Server]
+    public void ServerForceCancelPlayCard()
+    {
+        RpcForceCancelPlayCard();
+    }
+
+    [ClientRpc]
+    public void RpcForceCancelPlayCard()
+    {
+        if (isLocalPlayer)
+        {
+            CmdCancelPlayCard();
+        }
+    }
+
     public void Reset()
     {
         if (isLocalPlayer)
@@ -760,7 +804,20 @@ public class PlayerController : Targettable
     public void TargetEndGame(NetworkConnection target, bool winner)
     {
         TextMeshProUGUI endGameText = GameObject.Find("GameOverText").GetComponent<TextMeshProUGUI>();
-        endGameText.text = winner ? "VICTORY" : "DEFEAT";   
+        endGameText.text = winner ? "VICTORY" : "DEFEAT";
+    }
+
+    public void SelectRandomTargets()
+    {
+        var random = new System.Random();
+        List<Targettable> targets = gameSession.GetPotentialTargets();
+        while (CanSelectMoreTargets() && !HasValidSelectedTargets())
+        {
+            int index = random.Next(targets.Count);
+            targets[index].Select();
+            AddTarget(targets[index]);
+            targets.RemoveAt(index);
+        }
     }
 
     public void ConfirmSelectedTargets()
