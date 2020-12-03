@@ -123,10 +123,7 @@ public class GameSession : NetworkBehaviour
         {
             SaveState();
         }
-        if (state == currState) 
-        {
-            return;
-        }
+
         prevState = currState;
         currState = state;
 
@@ -134,7 +131,10 @@ public class GameSession : NetworkBehaviour
         {
             case GameState.WAIT_ACTIVE:
                 waitingIndex = activeIndex;
-                turnTimer.RestoreTimer();
+                if (prevState == GameState.RESOLVING_COMBAT || prevState == GameState.RESOLVING_EFFECTS || prevState == GameState.WAIT_NON_ACTIVE)
+                {
+                    turnTimer.RestoreTimer();
+                }
                 break;
             case GameState.WAIT_NON_ACTIVE:
                 waitingIndex = (activeIndex + 1) % playerList.Length;
@@ -791,10 +791,6 @@ public class GameSession : NetworkBehaviour
             {
                 (Creature source, TriggerCondition trigger) = delayedTriggers.Dequeue();
                 ServerTriggerEffects(source, trigger);
-            }
-            if (currState != GameState.TRIGGERING_EFFECTS)
-            {
-                ChangeState(savedState);
             }
         }
     }
