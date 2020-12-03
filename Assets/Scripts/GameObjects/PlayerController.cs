@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
@@ -44,7 +44,6 @@ public class PlayerController : Targettable
     public override void OnStartClient()
     {
         base.OnStartClient();
-
         gameSession = FindObjectOfType<GameSession>();
     }
 
@@ -498,6 +497,51 @@ public class PlayerController : Targettable
         gameSession.ServerReceiveAcknowledge();
     }
 
+    [Server]
+    public void ServerForceEndTurn()
+    {
+        RpcForceEndTurn();
+    }
+
+    [ClientRpc]
+    public void RpcForceEndTurn()
+    {
+        if (isLocalPlayer)
+        {
+            CmdEndTurn();
+        }
+    }
+
+    [Server]
+    public void ServerForceConfirmation()
+    {
+        RpcForceConfirmation();
+    }
+
+    [ClientRpc]
+    public void RpcForceConfirmation()
+    {
+        if (isLocalPlayer)
+        {
+            CmdSendConfirmation();
+        }
+    }
+
+    [Server]
+    public void ServerForceCancelPlayCard()
+    {
+        RpcForceCancelPlayCard();
+    }
+
+    [ClientRpc]
+    public void RpcForceCancelPlayCard()
+    {
+        if (isLocalPlayer)
+        {
+            CmdCancelPlayCard();
+        }
+    }
+
     public void Reset()
     {
         if (isLocalPlayer)
@@ -841,10 +885,29 @@ public class PlayerController : Targettable
     public void TargetEndGame(NetworkConnection target, bool winner)
     {
         TextMeshProUGUI endGameText = GameObject.Find("GameOverText").GetComponent<TextMeshProUGUI>();
-        endGameText.text = winner ? "VICTORY" : "DEFEAT";   
+        endGameText.text = winner ? "VICTORY" : "DEFEAT";
     }
 
-    public void ConfirmSelectedTargets()
+    [TargetRpc]
+    public void TargetSelectRandomTargets(NetworkConnection target)
+    {
+        var random = new System.Random();
+        bool hasMoreSelections = false;
+        do
+        {
+            List<Targettable> targets = gameSession.GetPotentialTargets();
+            while (CanSelectMoreTargets() && !HasValidSelectedTargets())
+            {
+                int index = random.Next(targets.Count);
+                targets[index].Select();
+                AddTarget(targets[index]);
+                targets.RemoveAt(index);
+            }
+            hasMoreSelections = ConfirmSelectedTargets();
+        }  while(hasMoreSelections);
+    }
+
+    public bool ConfirmSelectedTargets()
     {
         if (isLocalPlayer && HasValidSelectedTargets())
         {
@@ -883,14 +946,18 @@ public class PlayerController : Targettable
                 allSelectedTargets = null;
                 selectedTargets = null;
                 selectableTargetDescriptions = null;
+                
+                return false;
             }
             else
             {
                 selectedTargets = new List<Targettable>();
                 SetTargettingQuery(selectableTargetDescriptions[allSelectedTargets.Count]);
                 SetSelectionPrompt(selectableEffectDescriptions[allSelectedTargets.Count], allSelectedTargets.Count);
+                return true;
             }
         }
+        return false;
     }
 
     [Command]
