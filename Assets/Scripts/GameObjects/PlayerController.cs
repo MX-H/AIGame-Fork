@@ -888,20 +888,26 @@ public class PlayerController : Targettable
         endGameText.text = winner ? "VICTORY" : "DEFEAT";
     }
 
-    public void SelectRandomTargets()
+    [TargetRpc]
+    public void TargetSelectRandomTargets(NetworkConnection target)
     {
         var random = new System.Random();
-        List<Targettable> targets = gameSession.GetPotentialTargets();
-        while (CanSelectMoreTargets() && !HasValidSelectedTargets())
+        bool hasMoreSelections = false;
+        do
         {
-            int index = random.Next(targets.Count);
-            targets[index].Select();
-            AddTarget(targets[index]);
-            targets.RemoveAt(index);
-        }
+            List<Targettable> targets = gameSession.GetPotentialTargets();
+            while (CanSelectMoreTargets() && !HasValidSelectedTargets())
+            {
+                int index = random.Next(targets.Count);
+                targets[index].Select();
+                AddTarget(targets[index]);
+                targets.RemoveAt(index);
+            }
+            hasMoreSelections = ConfirmSelectedTargets();
+        }  while(hasMoreSelections);
     }
 
-    public void ConfirmSelectedTargets()
+    public bool ConfirmSelectedTargets()
     {
         if (isLocalPlayer && HasValidSelectedTargets())
         {
@@ -940,14 +946,18 @@ public class PlayerController : Targettable
                 allSelectedTargets = null;
                 selectedTargets = null;
                 selectableTargetDescriptions = null;
+                
+                return false;
             }
             else
             {
                 selectedTargets = new List<Targettable>();
                 SetTargettingQuery(selectableTargetDescriptions[allSelectedTargets.Count]);
                 SetSelectionPrompt(selectableEffectDescriptions[allSelectedTargets.Count], allSelectedTargets.Count);
+                return true;
             }
         }
+        return false;
     }
 
     [Command]

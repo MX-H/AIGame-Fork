@@ -300,7 +300,7 @@ public class GameSession : NetworkBehaviour
                 case GameState.WAIT_ACTIVE:
                     if (turnTimer.IsTimeUp())
                     {
-                        playerList[activeIndex].ServerForceEndTurn();
+                        playerList[waitingIndex].ServerForceEndTurn();
                     }
                     break;
                 case GameState.WAIT_NON_ACTIVE:
@@ -333,8 +333,7 @@ public class GameSession : NetworkBehaviour
                                 playerList[waitingIndex].ServerForceCancelPlayCard();
                                 break;
                             case PendingType.TRIGGER_EFFECT:
-                                playerList[waitingIndex].SelectRandomTargets();
-                                playerList[waitingIndex].ConfirmSelectedTargets();
+                                playerList[waitingIndex].TargetSelectRandomTargets(playerList[waitingIndex].connectionToClient);
                                 break;
                         }
                     }
