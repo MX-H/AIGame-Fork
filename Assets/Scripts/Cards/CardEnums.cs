@@ -4,6 +4,12 @@ using System;
 using UnityEngine;
 using System.Linq;
 
+// Important do not define values for these enums, it will break how the card histograms work
+// since they treat enum values as array indexes
+
+// This also means we cannot remove elements from the enums, replace them with DEPRECATED_X
+// Only add elements to the end of the enums
+
 public enum Alignment
 {
     POSITIVE,
@@ -128,7 +134,8 @@ public enum KeywordAttribute
     EVASION,
     FAST_STRIKE,
     UNTOUCHABLE,
-    PIERCING
+    PIERCING,
+    EAGER
 }
 
 static class CardEnums
@@ -236,6 +243,9 @@ static class CardEnums
         RegisterFlagSet<QualifierType, TargetType>();
         RegisterFlagSet<TargetType, QualifierType>();
 
+        RegisterFlagSet<QualifierType, EffectType>();
+        RegisterFlagSet<EffectType, QualifierType>();
+
         // Valid target types for effects
         RegisterFlags(EffectType.DRAW_CARDS, new TargetType[] { TargetType.PLAYERS });
         RegisterFlags(EffectType.DEAL_DAMAGE, new TargetType[] { TargetType.CREATURES, TargetType.PLAYERS, TargetType.DAMAGEABLE });
@@ -283,6 +293,10 @@ static class CardEnums
         RegisterFlags(QualifierType.NONE, (TargetType[])Enum.GetValues(typeof(TargetType)));
         RegisterFlags(QualifierType.CREATURE_TYPE, new TargetType[] { TargetType.CREATURES, TargetType.CREATURE_CARDS });
         RegisterFlags(QualifierType.CARD_TYPE, new TargetType[] { TargetType.CARDS });
+
+        RegisterFlags(QualifierType.NONE, (EffectType[])Enum.GetValues(typeof(EffectType)));
+        RegisterFlags(QualifierType.CREATURE_TYPE, new EffectType[] { EffectType.DRAW_CARDS });
+        RegisterFlags(QualifierType.CARD_TYPE, new EffectType[] { EffectType.DRAW_CARDS });
     }
 
     static private void RegisterFlags<T1, T2>(T1 key, IEnumerable<T2> flags, bool storeReverse = true)

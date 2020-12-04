@@ -4,5 +4,5 @@ using UnityEngine;
 
 public abstract class ICardGenerator
 {
-    public abstract CardDescription GenerateCard(int seed);
+    public abstract CardDescription GenerateCard(int seed, CardGenerationFlags flags);
 }

@@ -3,10 +3,69 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+[Flags]
+public enum CardGenerationFlags
+{
+    NONE = 0,
+    CREATURE = 1 << 0,
+    SPELL = 1 << 1,
+    TRAP = 1 << 2,
+
+    HUMAN = 1 << 3,
+    GOBLIN = 1 << 4,
+    FAERIE = 1 << 5,
+}
+
+[Flags]
+public enum CardTags
+{
+    NONE = 0,
+    CREATURE = 1 << 0,
+    SPELL = 1 << 1,
+    TRAP = 1 << 2,
+
+    HUMAN = 1 << 3,
+    GOBLIN = 1 << 4,
+    FAERIE = 1 << 5,
+
+    EVASION = 1 << 6
+}
 
 public static class EffectConstants
 {
     public static readonly int MAX_CARD_EFFECTS = 5;
+
+    public static CardGenerationFlags GetGenerationFlags(CardType cardType)
+    {
+        switch (cardType)
+        {
+            case CardType.CREATURE:
+                return CardGenerationFlags.CREATURE;
+            case CardType.SPELL:
+                return CardGenerationFlags.SPELL;
+            case CardType.TRAP:
+                return CardGenerationFlags.TRAP;
+        }
+        return CardGenerationFlags.NONE;
+    }
+
+    public static CardGenerationFlags GetGenerationFlags(CreatureType creatureType)
+    {
+        CardGenerationFlags flag = CardGenerationFlags.CREATURE;
+        switch (creatureType)
+        {
+            case CreatureType.HUMAN:
+                flag |= CardGenerationFlags.HUMAN;
+                break;
+            case CreatureType.GOBLIN:
+                flag |= CardGenerationFlags.GOBLIN;
+                break;
+            case CreatureType.FAERIE:
+                flag |= CardGenerationFlags.FAERIE;
+                break;
+        }
+        return flag;
+    }
 }
 public static class PowerBudget
 {

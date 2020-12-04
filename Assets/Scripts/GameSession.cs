@@ -181,7 +181,7 @@ public class GameSession : NetworkBehaviour
                             for (int j = 0; j < playerList.Length; j++)
                             {
                                 NetworkIdentity cardId = ServerCreateCard(playerList[j]);
-                                playerList[j].ServerAddCardToHand(playerList[j].netIdentity, (int)(UnityEngine.Random.value * Int32.MaxValue), cardId);
+                                playerList[j].ServerAddCardToHand(playerList[j].netIdentity, playerList[j].netIdentity, cardId, (int)(UnityEngine.Random.value * Int32.MaxValue));
                             }
                         }
                         activeIndex = (UnityEngine.Random.value < 0.5f) ? 0 : 1;
@@ -192,8 +192,7 @@ public class GameSession : NetworkBehaviour
                     {
                         playerList[activeIndex].ServerStartTurn();
 
-                        NetworkIdentity cardId = ServerCreateCard(playerList[activeIndex]);
-                        playerList[activeIndex].ServerAddCardToHand(playerList[activeIndex].netIdentity, (int)(UnityEngine.Random.value * Int32.MaxValue), cardId);
+                        ServerPlayerDrawCard(playerList[activeIndex], playerList[activeIndex]);
 
                         waitingIndex = activeIndex;
                         combatWasDeclared = false;
@@ -316,10 +315,10 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public void ServerPlayerDrawCard(PlayerController player)
+    public void ServerPlayerDrawCard(PlayerController player, PlayerController srcPlayer, CardGenerationFlags flags = CardGenerationFlags.NONE)
     {
         NetworkIdentity cardId = ServerCreateCard(player);
-        player.ServerAddCardToHand(player.netIdentity, (int)(UnityEngine.Random.value * Int32.MaxValue), cardId);
+        player.ServerAddCardToHand(player.netIdentity, cardId, srcPlayer.netIdentity, (int)(UnityEngine.Random.value * Int32.MaxValue), flags);
     }
 
     [Server]

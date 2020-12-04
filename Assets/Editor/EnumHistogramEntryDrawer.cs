@@ -29,13 +29,10 @@ public class EnumHistogramEntryDrawer : PropertyDrawer
             var rect4 = new Rect(position.x + 395, position.y, 50, position.height);
             var rect5 = new Rect(position.x + 450, position.y, position.width - 450, position.height);
 
-
-
             SerializedProperty enumVal = property.FindPropertyRelative("enumVal");
             SerializedProperty value = property.FindPropertyRelative("value");
             SerializedProperty enumType = property.FindPropertyRelative("enumType");
             SerializedProperty total = property.FindPropertyRelative("total");
-
 
             string typeName = enumType.stringValue;
             System.Type type = System.Type.GetType(typeName);

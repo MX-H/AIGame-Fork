@@ -42,6 +42,6 @@ public class CardTypeQualifierProceduralGenerator : IProceduralQualifierGenerato
 
     public override double GetMinCost()
     {
-        return 0.0;
+        return GetDescriptionType().PowerLevel();
     }
 }

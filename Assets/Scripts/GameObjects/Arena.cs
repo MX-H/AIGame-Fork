@@ -180,7 +180,7 @@ public class Arena : MonoBehaviour
             }
         }
         // Trying to drop into combat row
-        else
+        else if (!c.creatureState.IsSummoningSick())
         {
             float xVal = cam.WorldToScreenPoint(c.transform.position).x;
             // Compare x values to get position in combat row

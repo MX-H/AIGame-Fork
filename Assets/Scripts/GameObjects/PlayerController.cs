@@ -213,13 +213,13 @@ public class PlayerController : Targettable
     }
 
     [Server]
-    public void ServerAddCardToHand(NetworkIdentity playerId, int seed, NetworkIdentity id)
+    public void ServerAddCardToHand(NetworkIdentity playerId, NetworkIdentity sourcePlayerId, NetworkIdentity cardId, int seed, CardGenerationFlags flags = CardGenerationFlags.NONE)
     {
         if (isServerOnly)
         {
-            Card c = id.gameObject.GetComponent<Card>();
+            Card c = cardId.gameObject.GetComponent<Card>();
 
-            c.cardData = new CardInstance(playerId.GetComponent<PlayerController>(), seed);
+            c.cardData = new CardInstance(sourcePlayerId.GetComponent<PlayerController>(), seed, flags);
 
             c.owner = this;
             c.controller = this;
@@ -229,7 +229,7 @@ public class PlayerController : Targettable
             hand.AddCard(c);
         }
 
-        RpcAddCardToHand(playerId, seed, id);
+        RpcAddCardToHand(playerId, cardId, seed, flags);
     }
 
     [Server]
@@ -269,11 +269,11 @@ public class PlayerController : Targettable
     }
 
     [ClientRpc]
-    public void RpcAddCardToHand(NetworkIdentity playerId, int seed, NetworkIdentity id)
+    public void RpcAddCardToHand(NetworkIdentity playerId, NetworkIdentity id, int seed, CardGenerationFlags flags)
     {
         Card c = id.gameObject.GetComponent<Card>();
 
-        c.cardData = new CardInstance(playerId.GetComponent<PlayerController>(), seed);
+        c.cardData = new CardInstance(playerId.GetComponent<PlayerController>(), seed, flags);
 
         c.owner = this;
         c.controller = this;
@@ -471,6 +471,11 @@ public class PlayerController : Targettable
             totalMana++;
         }
         currMana = totalMana;
+
+        foreach (Creature creature in arena.GetAllCreatures())
+        {
+            creature.creatureState.SetSummoningSick(false);
+        }
     }
 
     [Server]

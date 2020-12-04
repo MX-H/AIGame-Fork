@@ -12,6 +12,7 @@ public class EnumHistogramEntry
         enumType = type.AssemblyQualifiedName;
     }
 
+    [ReadOnly]
     public int enumVal;
 
     [Range(0, 30)]

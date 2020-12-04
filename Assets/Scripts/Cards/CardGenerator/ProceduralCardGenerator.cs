@@ -16,20 +16,35 @@ public class ProceduralCardGenerator : ICardGenerator
         creatureModelIndex = creatureModels;
     }
 
-    public override CardDescription GenerateCard(int seed)
+    public override CardDescription GenerateCard(int seed, CardGenerationFlags flags = CardGenerationFlags.NONE)
     {
         // First select the card type
         System.Random random = new System.Random(seed);
+
+        // Still generate a type even if a flag is provided, so that the generation with a seed matches
+        // ie. we don't want to generate 2 different creatures from the same seed just because we specified a creature flag
         CardType t = ProceduralUtils.GetRandomValue<CardType>(random, model);
+        if ((flags & CardGenerationFlags.CREATURE) == CardGenerationFlags.CREATURE)
+        {
+            t = CardType.CREATURE;
+        }
+        else if ((flags & CardGenerationFlags.SPELL) == CardGenerationFlags.SPELL)
+        {
+            t = CardType.SPELL;
+        }
+        else if ((flags & CardGenerationFlags.TRAP) == CardGenerationFlags.TRAP)
+        {
+            t = CardType.TRAP;
+        }
 
         switch (t)
         {
             case CardType.CREATURE:
-                return GenerateCreatureCard(random, model, images, creatureModelIndex);
+                return GenerateCreatureCard(random, model, images, creatureModelIndex, flags);
             case CardType.SPELL:
-                return GenerateSpellCard(random, model, images, creatureModelIndex);
+                return GenerateSpellCard(random, model, images, creatureModelIndex, flags);
             case CardType.TRAP:
-                return GenerateTrapCard(random, model, images, creatureModelIndex);
+                return GenerateTrapCard(random, model, images, creatureModelIndex, flags);
         }
 
         return new CardDescription();
@@ -91,10 +106,23 @@ public class ProceduralCardGenerator : ICardGenerator
         return ret;
     }
 
-    static private CardDescription GenerateCreatureCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels)
+    static private CardDescription GenerateCreatureCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels, CardGenerationFlags flags)
     {
         CreatureCardDescription card = ScriptableObject.CreateInstance(typeof(CreatureCardDescription)) as CreatureCardDescription;
         card.creatureType = ProceduralUtils.GetRandomValue<CreatureType>(random, model);
+
+        if ((flags & CardGenerationFlags.HUMAN) == CardGenerationFlags.HUMAN)
+        {
+            card.creatureType = CreatureType.HUMAN;
+        }
+        else if ((flags & CardGenerationFlags.GOBLIN) == CardGenerationFlags.GOBLIN)
+        {
+            card.creatureType = CreatureType.GOBLIN;
+        }
+        else if ((flags & CardGenerationFlags.FAERIE) == CardGenerationFlags.FAERIE)
+        {
+            card.creatureType = CreatureType.FAERIE;
+        }
 
         MultiCardHistogram combinedModel = ScriptableObject.CreateInstance(typeof(MultiCardHistogram)) as MultiCardHistogram;
         combinedModel.Init(new IHistogram[] { model, creatureModels.GetModel(card.creatureType) });
@@ -117,14 +145,14 @@ public class ProceduralCardGenerator : ICardGenerator
         //card.name += "(" + powerBudget.ToString() + ")";
 
         // Decide on keyword attributes
-        double keywordPowerLimit = powerLimit - card.PowerLevel();
-        if (keywordPowerLimit < 0)
-        {
-            keywordPowerLimit = 0;
-        }
         int maxKeywords = 3;
         for (int i = 0; i < maxKeywords; i++)
         {
+            double keywordPowerLimit = powerLimit - card.PowerLevel();
+            if (keywordPowerLimit < 0)
+            {
+                keywordPowerLimit = 0;
+            }
             KeywordAttribute keyword = ProceduralUtils.GetRandomValue(random, combinedModel, ProceduralUtils.GetKeywordsWithinBudget(keywordPowerLimit, card.attack, card.health));
             if (keyword == KeywordAttribute.NONE)
             {
@@ -148,7 +176,7 @@ public class ProceduralCardGenerator : ICardGenerator
         return card;
     }
 
-    static private CardDescription GenerateSpellCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels)
+    static private CardDescription GenerateSpellCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels, CardGenerationFlags flags)
     {
         CardDescription card = ScriptableObject.CreateInstance(typeof(CardDescription)) as CardDescription;
         card.cardType = CardType.SPELL;
@@ -174,7 +202,7 @@ public class ProceduralCardGenerator : ICardGenerator
         return card;
     }
 
-    static private CardDescription GenerateTrapCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels)
+    static private CardDescription GenerateTrapCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels, CardGenerationFlags flags)
     {
         CardDescription card = ScriptableObject.CreateInstance(typeof(CardDescription)) as CardDescription;
         card.cardType = CardType.TRAP;
@@ -230,7 +258,7 @@ public class ProceduralCardGenerator : ICardGenerator
                 // If NONE has been blacklisted that means that there are no candidates for the remaining budget
                 if (triggerBlacklist.Contains(TriggerCondition.NONE))
                 {
-                    Debug.Log("No effects are valid for budget " + maxAllowableBudget);
+                    //Debug.Log("No effects are valid for budget " + maxAllowableBudget);
 
                     break;
                 }
@@ -245,7 +273,7 @@ public class ProceduralCardGenerator : ICardGenerator
                 {
                     // No triggers available mean each trigger type has been blacklisted 
 
-                    Debug.Log("No effects are valid for budget " + maxAllowableBudget);
+                    //Debug.Log("No effects are valid for budget " + maxAllowableBudget);
 
                     break;
                 }

@@ -140,7 +140,7 @@ public class Creature : Targettable
 
     public override bool IsTargettable()
     {
-        return IsDraggable();
+        return IsDraggable() && !creatureState.IsSummoningSick();
     }
 
     public override bool IsTargettable(TargettingQuery targetQuery)

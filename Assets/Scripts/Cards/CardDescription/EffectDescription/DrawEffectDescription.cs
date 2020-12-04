@@ -7,6 +7,7 @@ public class DrawEffectDescription : IEffectDescription
 {
     public DrawModifier drawModifier;
     public int amount;
+    public IQualifierDescription cardQualifier;
     public DrawEffectDescription() : base(EffectType.DRAW_CARDS)
     {
         drawModifier = DrawModifier.SELF;
@@ -18,16 +19,80 @@ public class DrawEffectDescription : IEffectDescription
         if (targetPlayer)
         {
             GameSession gameSession = GameUtils.GetGameSession();
+
+            CardGenerationFlags flags = CardGenerationFlags.NONE;
+            if (cardQualifier != null)
+            {
+                switch (cardQualifier.qualifierType)
+                {
+                case QualifierType.CARD_TYPE:
+                    {
+                        CardTypeQualifierDescription cardTypeQualifier = cardQualifier as CardTypeQualifierDescription;
+                        flags |= EffectConstants.GetGenerationFlags(cardTypeQualifier.cardType);
+                    }
+                    break;
+                case QualifierType.CREATURE_TYPE:
+                    {
+                        CreatureTypeQualifierDescription creatureTypeQualifier = cardQualifier as CreatureTypeQualifierDescription;
+                        flags |= EffectConstants.GetGenerationFlags(creatureTypeQualifier.creatureType);
+                    }
+                    break;
+                }
+            }
+
             for (int i = 0; i < amount; i++)
             {
-                gameSession.ServerPlayerDrawCard(targetPlayer);
+                switch (drawModifier)
+                {
+                    case DrawModifier.SELF:
+                    case DrawModifier.RANDOM:
+                        gameSession.ServerPlayerDrawCard(targetPlayer, targetPlayer, flags);
+                        break;
+                    case DrawModifier.OPPONENT_RANDOM:
+                    case DrawModifier.OPPONENT:
+                        gameSession.ServerPlayerDrawCard(targetPlayer, GameUtils.GetGameSession().GetOpponents(targetPlayer)[0], flags);
+                        break;
+                }
             }
         }
     }
 
     public override string CardText(bool plural) 
     {
-        return (plural ? "draws " : "draw ") + amount.ToString() + ((amount == 1) ? " card" : " cards");
+        string text = (plural ? "draws " : "draw ") + amount.ToString();
+
+        if (cardQualifier != null)
+        {
+            switch (cardQualifier.qualifierType)
+            {
+            case QualifierType.CARD_TYPE:
+                {
+                    CardTypeQualifierDescription cardTypeQualifier = cardQualifier as CardTypeQualifierDescription;
+                    text += " " + CardParsing.Parse(cardTypeQualifier.cardType);
+                }
+                break;
+            case QualifierType.CREATURE_TYPE:
+                {
+                    CreatureTypeQualifierDescription creatureTypeQualifier = cardQualifier as CreatureTypeQualifierDescription;
+                    text += " " + CardParsing.Parse(creatureTypeQualifier.creatureType);
+                }
+                break;
+            }
+        }
+
+        text += ((amount == 1) ? " card" : " cards");
+
+        switch (drawModifier)
+        {
+            case DrawModifier.OPPONENT:
+                text += " from opponent's deck";
+                break;
+            case DrawModifier.OPPONENT_RANDOM:
+                text += " from opponent's deck";
+                break;
+        }
+
+        return text;
     }
 
     public override Alignment GetAlignment()
@@ -57,6 +122,17 @@ public class DrawEffectProceduralGenerator : IProceduralEffectGenerator
 
         Assert.IsTrue(max >= min);
         desc.amount = random.Next(min, max);
+
+        // Attempt to narrow down the qualifier pool
+        SortedSet<QualifierType> allowableQualifiers = CardEnums.GetValidFlags<QualifierType>(EffectType.DRAW_CARDS);
+
+        QualifierType qualifier = ProceduralUtils.GetRandomValue(random, model, allowableQualifiers);
+        if (qualifier != QualifierType.NONE)
+        {
+            IProceduralQualifierGenerator qualifierGen = ProceduralUtils.GetProceduralGenerator(qualifier);
+            qualifierGen.SetupParameters(random, model, minAllocatedBudget / desc.PowerLevel(), maxAllocatedBudget / desc.PowerLevel());
+            desc.cardQualifier = qualifierGen.Generate();
+        }
 
         return desc;
     }

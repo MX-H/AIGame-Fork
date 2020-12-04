@@ -7,15 +7,17 @@ public class CardInstance
 {
     public CardDescription baseCard;
     public int cardSeed;
+    public CardGenerationFlags cardFlags;
     public PlayerController srcPlayer;
 
     // TODO: Add card modifications
 
-    public CardInstance(PlayerController src, int seed)
+    public CardInstance(PlayerController src, int seed, CardGenerationFlags flags = CardGenerationFlags.NONE)
     {
         srcPlayer = src;
         cardSeed = seed;
-        baseCard = src.cardGenerator.GenerateCard(seed);
+        cardFlags = flags;
+        baseCard = src.cardGenerator.GenerateCard(seed, flags);
     }
 
     public CardInstance(CardDescription card)
@@ -25,7 +27,7 @@ public class CardInstance
 
     public CardInstance Clone()
     {
-        CardInstance cardInstance = new CardInstance(srcPlayer, cardSeed);
+        CardInstance cardInstance = new CardInstance(srcPlayer, cardSeed, cardFlags);
         return cardInstance;
     }
 

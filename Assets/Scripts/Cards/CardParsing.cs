@@ -21,13 +21,15 @@ static public class CardParsing
             case KeywordAttribute.NONE:
                 return "<NONE>";
             case KeywordAttribute.EVASION:
-                return "Evasion";
+                return "Evasive";
             case KeywordAttribute.FAST_STRIKE:
-                return "Swift Strike";
+                return "Deft";
             case KeywordAttribute.PIERCING:
                 return "Excessive";
             case KeywordAttribute.UNTOUCHABLE:
                 return "Untouchable";
+            case KeywordAttribute.EAGER:
+                return "Eager";
         }
         return PARSE_ERROR;
     }
@@ -41,9 +43,9 @@ static public class CardParsing
             case TriggerCondition.ON_CREATURE_ENTER:
                 return "Creature Arrives";
             case TriggerCondition.ON_SELF_DAMAGE_DEALT_TO_PLAYER:
-                return "Strike Foe";
+                return "Breach";
             case TriggerCondition.ON_SELF_DAMAGE_TAKEN:
-                return "Struck";
+                return "Endure";
             case TriggerCondition.ON_SELF_DIES:
                 return "Departure";
             case TriggerCondition.ON_CREATURE_DIES:

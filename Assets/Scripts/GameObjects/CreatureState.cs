@@ -11,6 +11,9 @@ public class CreatureState : NetworkBehaviour
     [SyncVar]
     int currHealthVal;
 
+    [SyncVar]
+    bool summoningSick;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,6 +31,7 @@ public class CreatureState : NetworkBehaviour
     {
         creature = gameObject.GetComponent<Creature>();
         currHealthVal = GetMaxHealth();
+        summoningSick = creature.HasKeyword(KeywordAttribute.EAGER);
     }
 
     [Server]
@@ -44,6 +48,17 @@ public class CreatureState : NetworkBehaviour
         {
             currHealthVal = GetMaxHealth();
         }
+    }
+
+    [Server]
+    public void SetSummoningSick(bool sick)
+    {
+        summoningSick = sick;
+    }
+
+    public bool IsSummoningSick()
+    {
+        return summoningSick;
     }
 
     public int GetMaxHealth()

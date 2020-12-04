@@ -43,6 +43,6 @@ public class CreatureQualifierProceduralGenerator : IProceduralQualifierGenerato
 
     public override double GetMinCost()
     {
-        return 0.0;
+        return GetDescriptionType().PowerLevel();
     }
 }

@@ -17,12 +17,9 @@ public class CardHistogram : IHistogram
         private class IndexMap : Dictionary<int, int> { }
 
         [SerializeField]
-        private IndexMap keyIndexMap;
-
-        [SerializeField]
         private List<EnumHistogramEntry> values;
 
-        public void UpdateTotal()
+        private void UpdateTotal()
         {
             int total = GetTotal();
             foreach (EnumHistogramEntry entry in values)
@@ -31,36 +28,25 @@ public class CardHistogram : IHistogram
             }
         }
 
-        private void ValidateKey(int key)
-        {
-            if (!keyIndexMap.ContainsKey(key))
-            {
-                keyIndexMap[key] = values.Count;
-                values.Add(new EnumHistogramEntry(values.Count, 1, type));
-            }
-        }
-
         public EnumHistogram(System.Type t)
         {
             id = t.Name;
             type = t;
-            keyIndexMap = new IndexMap();
             values = new List<EnumHistogramEntry>();
             int i = 0;
             foreach (int val in System.Enum.GetValues(t))
             {
-                keyIndexMap[val] = i++;
-                values.Add(new EnumHistogramEntry(i - 1, 1, t));
+                values.Add(new EnumHistogramEntry(val, 1, t));
             }
 
             UpdateTotal();
         }
 
-        public void Update()
+        public void Validate()
         {
-            foreach (int val in System.Enum.GetValues(type))
+            for (int i = values.Count; i < System.Enum.GetValues(type).Length; i++)
             {
-                ValidateKey(val);
+                values.Add(new EnumHistogramEntry(i, 1, type));
             }
 
             UpdateTotal();
@@ -68,26 +54,26 @@ public class CardHistogram : IHistogram
 
         public void AddValue(int key, int value)
         {
-            ValidateKey(key);
-
-            int prevValue = values[keyIndexMap[key]].value;
+            int prevValue = values[key].value;
             if (prevValue + value < 0)
             {
                 value = prevValue;
             }
-            values[keyIndexMap[key]].value += value;
+            values[key].value += value;
+
+            UpdateTotal();
         }
 
         public void SetValue(int key, int value)
         {
-            ValidateKey(key);
-
             if (value < 0)
             {
                 value = 0;
             }
-            int prevValue = values[keyIndexMap[key]].value;
-            values[keyIndexMap[key]].value = value;
+            int prevValue = values[key].value;
+            values[key].value = value;
+
+            UpdateTotal();
         }
 
         public int GetTotal()
@@ -105,17 +91,14 @@ public class CardHistogram : IHistogram
             int total = 0;
             foreach (int key in keys)
             {
-                ValidateKey(key);
-                total += values[keyIndexMap[key]].value;
+                total += values[key].value;
             }
             return total;
         }
 
         public int GetValue(int key)
         {
-            ValidateKey(key);
-
-            return values[keyIndexMap[key]].value;
+            return values[key].value;
         }
     }
 
@@ -136,13 +119,13 @@ public class CardHistogram : IHistogram
         }
     }
 
-    public void Awake()
+    public void OnEnable()
     {
         foreach (System.Type t in CardEnums.EnumTypes)
         {
             if (typeIndexMap.ContainsKey(t))
             {
-                histograms[typeIndexMap[t]].Update();
+                histograms[typeIndexMap[t]].Validate();
             }
             else
             {
@@ -154,10 +137,7 @@ public class CardHistogram : IHistogram
 
     public void OnValidate()
     {
-        foreach (EnumHistogram histogram in histograms)
-        {
-            histogram.Update();
-        }
+        OnEnable();
     }
 
     public void AddValue<T>(T key, int value) where T : System.Enum
