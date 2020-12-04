@@ -190,16 +190,66 @@ public static class PowerBudget
     {
         switch (trigger)
         {
+            // Can happen repeatedly and can make decisions very difficult for opponent
             case TriggerCondition.ON_CREATURE_DIES:
-                return 1.5;
+                return (card is CreatureCardDescription) ? 1.5 : 1.0;
+            // Should occur very frequently, and creature entering is very hard for opponent to play around
+            // Entering is more threatening than dying
             case TriggerCondition.ON_CREATURE_ENTER:
-                return 1.5;
+                return (card is CreatureCardDescription) ? 2.0 : 1.0;
+            // Worse than on enter, on self enter is like a spell so its the baseline for an effects strength
             case TriggerCondition.ON_SELF_DIES:
                 return 0.9;
+            // Very good on bodies with good offensive keywords
             case TriggerCondition.ON_SELF_DAMAGE_DEALT_TO_PLAYER:
-                return 1.0;
+                {
+                    CreatureCardDescription creatureCard = card as CreatureCardDescription;
+                    // Base is worse than a mostly guarenteed trigger like on dies
+                    // Gets better the easier it is to inflict player damage
+
+                    // Much weaker with a 0 power creature, because you require another card or effect to help
+                    double multiplier = (creatureCard.attack == 0) ? 0.25 : 0.5;
+                    if (creatureCard.HasKeywordAttribute(KeywordAttribute.EVASION))
+                    {
+                        // Evasion is the strongest offensive keyword
+                        multiplier += (creatureCard.attack == 0) ? 0.5 : 1;
+                    }
+                    if (creatureCard.HasKeywordAttribute(KeywordAttribute.PIERCING))
+                    {
+                        // Piercing depends on how good the body is, for now we'll say the average blocker has 4 toughness,
+                        // So you get the max effectiveness from piercing at 5 attack
+                        multiplier += 0.5 * Math.Max(5, creatureCard.attack);
+                    }
+                    if (creatureCard.HasKeywordAttribute(KeywordAttribute.FAST_STRIKE))
+                    {
+                        // Fast strike is less appealing to block with high power, like piercing but will not get damage through
+                        // a blocker only deter opponent from blocking so cap is smaller
+                        multiplier += 0.25 * Math.Max(5, creatureCard.attack);
+                    }
+                    if (creatureCard.HasKeywordAttribute(KeywordAttribute.EAGER))
+                    {
+                        // With eager the player can likely guarentee the effect at least once
+                        if (creatureCard.attack > 0)
+                        {
+                            multiplier += 0.5;
+                        }
+                    }
+
+                    return multiplier;
+                }
+            // Good with high health, also good with untouchable because the common way to beat it is through combat
             case TriggerCondition.ON_SELF_DAMAGE_TAKEN:
-                return 1.5;
+                {
+                    CreatureCardDescription creatureCard = card as CreatureCardDescription;
+                    // Assume average damage will come in 3s, but cap how strong the card effect multiplier is
+                    double multiplier = Math.Max(3.0, creatureCard.health / 3.0);
+                    if (!creatureCard.HasKeywordAttribute(KeywordAttribute.UNTOUCHABLE))
+                    {
+                        multiplier *= 0.75;
+                    }
+
+                    return multiplier;
+                }
         }
 
         return 1.0;
