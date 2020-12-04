@@ -8,6 +8,7 @@ public class CreatureCardDescription : CardDescription
     public CreatureType creatureType;
     public int attack;
     public int health;
+    [SerializeField]
     private List<KeywordAttribute> attributes;
 
     public CreatureCardDescription()

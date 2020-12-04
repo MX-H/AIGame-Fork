@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fab008aad5f560458a2b3f83b6b615b, type: 3}
   m_Name: HumanToken
   m_EditorClassIdentifier: 
-  name: Human
-  manaCost: 0
+  cardName: Human [Token]
+  manaCost: 1
   cardType: 0
   image: {fileID: 2800000, guid: 8d1d658c941c4fa4182c8281876a0bb6, type: 3}
   creatureType: 0
-  attack: 1
+  attack: 2
   health: 1
   attributes: 

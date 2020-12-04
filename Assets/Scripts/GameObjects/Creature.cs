@@ -140,7 +140,7 @@ public class Creature : Targettable
 
     public override bool IsTargettable()
     {
-        return IsDraggable() && !creatureState.IsSummoningSick();
+        return IsDraggable();
     }
 
     public override bool IsTargettable(TargettingQuery targetQuery)
@@ -201,7 +201,14 @@ public class Creature : Targettable
     {
         if (controller)
         {
-            return controller.isLocalPlayer && controller.CanMoveCreatures();
+            if (controller.isLocalPlayer && controller.CanMoveCreatures())
+            {
+                if (context.GetState() != Arena.State.BLOCKING)
+                {
+                    return !creatureState.IsSummoningSick();
+                }
+                return true;
+            }
         }
         return false;
     }

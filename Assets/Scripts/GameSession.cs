@@ -383,7 +383,7 @@ public class GameSession : NetworkBehaviour
     public void ServerPlayerDrawCard(PlayerController player, PlayerController srcPlayer, CardGenerationFlags flags = CardGenerationFlags.NONE)
     {
         NetworkIdentity cardId = ServerCreateCard(player);
-        player.ServerAddCardToHand(player.netIdentity, cardId, srcPlayer.netIdentity, (int)(UnityEngine.Random.value * Int32.MaxValue), flags);
+        player.ServerAddCardToHand(player.netIdentity, srcPlayer.netIdentity, cardId, (int)(UnityEngine.Random.value * Int32.MaxValue), flags);
     }
 
     [Server]
@@ -1441,6 +1441,8 @@ public class GameSession : NetworkBehaviour
                     waitingIndex = i;
                 }
             }
+
+            controller.TargetNotifySelectTargets(controller.connectionToClient);
             ChangeState(GameState.SELECTING_TARGETS);
         }
         else

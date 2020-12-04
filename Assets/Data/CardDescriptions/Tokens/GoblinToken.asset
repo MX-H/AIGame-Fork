@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fab008aad5f560458a2b3f83b6b615b, type: 3}
   m_Name: GoblinToken
   m_EditorClassIdentifier: 
-  name: Goblin
+  cardName: Goblin [Token]
   manaCost: 1
   cardType: 0
   image: {fileID: 2800000, guid: 3130ae0b3e11ef844971a5ac83f4c47d, type: 3}
   creatureType: 1
-  attack: 2
+  attack: 1
   health: 1
-  attributes: 
+  attributes: 05000000

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using System;
 
 public class SummonEffectDescription : IEffectDescription
 {
@@ -37,7 +38,7 @@ public class SummonEffectDescription : IEffectDescription
     public override double PowerLevel()
     {
         // Tokens tend to suck
-        return (amount - 0.5) * (manaCost) * PowerBudget.UNIT_COST;
+        return (amount - 0.5) * (Math.Max(manaCost, 0.5)) * PowerBudget.UNIT_COST;
     }
 }
 

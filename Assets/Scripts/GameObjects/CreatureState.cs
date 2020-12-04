@@ -31,7 +31,7 @@ public class CreatureState : NetworkBehaviour
     {
         creature = gameObject.GetComponent<Creature>();
         currHealthVal = GetMaxHealth();
-        summoningSick = creature.HasKeyword(KeywordAttribute.EAGER);
+        summoningSick = !creature.HasKeyword(KeywordAttribute.EAGER);
     }
 
     [Server]

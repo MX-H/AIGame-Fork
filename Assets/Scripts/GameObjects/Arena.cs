@@ -127,11 +127,11 @@ public class Arena : MonoBehaviour
         return arenaState;
     }
 
-    public bool IsValidBlock(Creature c, int ind)
+    public bool IsValidBlock(Creature creature, int ind)
     {
         if (incomingAttackers != null && ind < incomingAttackers.Count)
         {
-            if (!incomingAttackers[ind].HasKeyword(KeywordAttribute.EVASION) || c.HasKeyword(KeywordAttribute.EVASION))
+            if (!incomingAttackers[ind].HasKeyword(KeywordAttribute.EVASION) || creature.HasKeyword(KeywordAttribute.EVASION))
             {
                 return true;
             }
@@ -158,7 +158,7 @@ public class Arena : MonoBehaviour
         c.gameObject.SetActive(false);
     }
 
-    public void DropCreature(Creature c)
+    public void DropCreature(Creature creature)
     {
         if (!player.CanMoveCreatures())
         {
@@ -167,22 +167,22 @@ public class Arena : MonoBehaviour
 
         Camera cam = Camera.main;
 
-        float heightVal = cam.WorldToScreenPoint(c.transform.position).y;
+        float heightVal = cam.WorldToScreenPoint(creature.transform.position).y;
         float creatureDiff = Mathf.Abs(heightVal - cam.WorldToScreenPoint(creatureZones.transform.position).y);
         float combatDiff = Mathf.Abs(heightVal - cam.WorldToScreenPoint(combatZones.transform.position).y);
 
         // Trying to drop into creatures row
         if (creatureDiff < combatDiff)
         {
-            if (!creatures.Contains(c))
+            if (!creatures.Contains(creature))
             {
-                player.ClientRequestRemoveFromCombat(c.gameObject.GetComponent<NetworkIdentity>());
+                player.ClientRequestRemoveFromCombat(creature.netIdentity);
             }
         }
         // Trying to drop into combat row
-        else if (!c.creatureState.IsSummoningSick())
+        else
         {
-            float xVal = cam.WorldToScreenPoint(c.transform.position).x;
+            float xVal = cam.WorldToScreenPoint(creature.transform.position).x;
             // Compare x values to get position in combat row
 
             if (arenaState == State.BLOCKING)
@@ -202,10 +202,10 @@ public class Arena : MonoBehaviour
 
                 if (defenders[closestInd] == null)
                 {
-                    player.ClientRequestMoveToCombat(c.gameObject.GetComponent<NetworkIdentity>(), closestInd);
+                    player.ClientRequestMoveToCombat(creature, closestInd);
                 }
             }
-            else
+            else if (!creature.creatureState.IsSummoningSick())
             {
                 int ind = 0;
                 for (; ind < inCombatCreatures.Count; ind++)
@@ -216,7 +216,7 @@ public class Arena : MonoBehaviour
                     }
                 }
 
-                player.ClientRequestMoveToCombat(c.gameObject.GetComponent<NetworkIdentity>(), ind);
+                player.ClientRequestMoveToCombat(creature, ind);
             }
         }
     }

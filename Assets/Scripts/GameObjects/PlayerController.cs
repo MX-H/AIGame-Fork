@@ -11,6 +11,7 @@ public class PlayerController : Targettable
     public Arena arena;
     public DiscardPile discard;
     public PlayerUI playerUI;
+    public bool hasSentTargets;
 
     [SyncVar]
     public int health;
@@ -77,7 +78,7 @@ public class PlayerController : Targettable
         if (gameSession.CanSelectTargets(this) && isLocalPlayer)
         {
             // Start target selections
-            if (selectableTargetDescriptions == null)
+            if (selectableTargetDescriptions == null && !hasSentTargets)
             {
                 Card card = gameSession.GetPendingCard(this);
                 if (card != null)
@@ -268,9 +269,9 @@ public class PlayerController : Targettable
     }
 
     [ClientRpc]
-    public void RpcAddCardToHand(NetworkIdentity playerId, NetworkIdentity id, int seed, CardGenerationFlags flags)
+    public void RpcAddCardToHand(NetworkIdentity playerId, NetworkIdentity cardId, int seed, CardGenerationFlags flags)
     {
-        Card c = id.gameObject.GetComponent<Card>();
+        Card c = cardId.gameObject.GetComponent<Card>();
 
         c.cardData = new CardInstance(playerId.GetComponent<PlayerController>(), seed, flags);
 
@@ -695,14 +696,14 @@ public class PlayerController : Targettable
     }
 
     [Client]
-    public void ClientRequestMoveToCombat(NetworkIdentity creature, int ind)
+    public void ClientRequestMoveToCombat(Creature creature, int ind)
     {
         if (isLocalPlayer && CanMoveCreatures())
         {
             bool validPos = true;
             if (arena.GetState() == Arena.State.BLOCKING)
             {
-                if (arena.IsValidBlock(creature.gameObject.GetComponent<Creature>(), ind))
+                if (!arena.IsValidBlock(creature, ind))
                 {
                     validPos = false;
                 }
@@ -710,7 +711,7 @@ public class PlayerController : Targettable
 
             if (validPos)
             {
-                CmdMoveToCombat(creature, ind);
+                CmdMoveToCombat(creature.netIdentity, ind);
             }
         }
     }
@@ -924,6 +925,12 @@ public class PlayerController : Targettable
         }  while(hasMoreSelections);
     }
 
+    [TargetRpc]
+    public void TargetNotifySelectTargets(NetworkConnection target)
+    {
+        hasSentTargets = false;
+    }
+
     public bool ConfirmSelectedTargets()
     {
         if (isLocalPlayer && HasValidSelectedTargets())
@@ -963,6 +970,8 @@ public class PlayerController : Targettable
                 allSelectedTargets = null;
                 selectedTargets = null;
                 selectableTargetDescriptions = null;
+
+                hasSentTargets = true;
                 
                 return false;
             }

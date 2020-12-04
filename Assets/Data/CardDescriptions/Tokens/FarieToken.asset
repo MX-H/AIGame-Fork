@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fab008aad5f560458a2b3f83b6b615b, type: 3}
   m_Name: FarieToken
   m_EditorClassIdentifier: 
-  name: Faerie
+  cardName: Faerie [Token]
   manaCost: 1
   cardType: 0
   image: {fileID: 2800000, guid: ef6de36842e464d4991c4e8519188415, type: 3}
   creatureType: 2
   attack: 1
   health: 1
-  attributes: 00000000
+  attributes: 01000000
