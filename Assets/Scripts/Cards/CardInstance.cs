@@ -102,7 +102,7 @@ public class CardInstance
     {
         if (GetCardType() == CardType.CREATURE)
         {
-            return new SortedSet<KeywordAttribute>((baseCard as CreatureCardDescription).attributes);
+            return new SortedSet<KeywordAttribute>((baseCard as CreatureCardDescription).GetAttributes());
         }
 
         return new SortedSet<KeywordAttribute>();

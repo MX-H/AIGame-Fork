@@ -8,7 +8,7 @@ public class CreatureCardDescription : CardDescription
     public CreatureType creatureType;
     public int attack;
     public int health;
-    public List<KeywordAttribute> attributes;
+    private List<KeywordAttribute> attributes;
 
     public CreatureCardDescription()
     {
@@ -21,6 +21,11 @@ public class CreatureCardDescription : CardDescription
         {
             attributes.Add(attribute);
         }
+    }
+
+    public List<KeywordAttribute> GetAttributes()
+    {
+        return attributes;
     }
 
     public override bool HasKeywordAttribute(KeywordAttribute keyword)

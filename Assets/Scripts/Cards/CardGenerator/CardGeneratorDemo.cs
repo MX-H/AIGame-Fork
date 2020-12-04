@@ -14,6 +14,11 @@ public class CardGeneratorDemo : MonoBehaviour
     public CardGenerationFlags flags;
 
     private ICardGenerator cardGenerator;
+
+    public CardInstance instance;
+    public int providedSeed;
+    public int generatedSeed;
+
     void Start()
     {
     }
@@ -26,11 +31,29 @@ public class CardGeneratorDemo : MonoBehaviour
             if (desc == null)
             {
                 ICardGenerator cardGenerator = new ProceduralCardGenerator(model, images, creatureModels);
-                display.SetCard(new CardInstance(cardGenerator.GenerateCard(Random.Range(0, 10000), flags)));
+
+                if (providedSeed == 0)
+                {
+                    generatedSeed = Random.Range(0, 10000);
+                }
+                else
+                {
+                    generatedSeed = providedSeed;
+                }
+                instance = new CardInstance(cardGenerator.GenerateCard(generatedSeed, flags));
             }
             else
             {
                 display.SetCard(new CardInstance(desc));
+            }
+            display.SetCard(instance);
+        }
+        else if (Input.GetKeyDown("q"))
+        {
+            if (instance != null)
+            {
+                double power = instance.baseCard.PowerLevel();
+                double mana = PowerBudget.PowerLevelToMana(power);
             }
         }
     }

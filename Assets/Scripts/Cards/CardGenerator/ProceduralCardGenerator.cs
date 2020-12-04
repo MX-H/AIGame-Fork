@@ -158,7 +158,7 @@ public class ProceduralCardGenerator : ICardGenerator
             {
                 break;
             }
-            card.attributes.Add(keyword);
+            card.AddAttribute(keyword);
         }
 
         // Decide on effects

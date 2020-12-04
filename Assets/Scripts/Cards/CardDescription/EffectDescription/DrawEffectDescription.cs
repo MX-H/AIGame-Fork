@@ -85,10 +85,10 @@ public class DrawEffectDescription : IEffectDescription
         switch (drawModifier)
         {
             case DrawModifier.OPPONENT:
-                text += " from opponent's deck";
+                text += " from the other player's deck";
                 break;
             case DrawModifier.OPPONENT_RANDOM:
-                text += " from opponent's deck";
+                text += " from the other player's deck";
                 break;
         }
 

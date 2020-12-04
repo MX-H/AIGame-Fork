@@ -179,6 +179,8 @@ public static class PowerBudget
                 return 0.5 * (atk / 2.0 + def / 3.0) * UNIT_COST;
             case KeywordAttribute.UNTOUCHABLE:
                 return UNIT_COST;
+            case KeywordAttribute.EAGER:
+                return UNIT_COST * 0.75;
         }
 
         // If we have not defined a cost function return a really high cost so we don't generate this effect
