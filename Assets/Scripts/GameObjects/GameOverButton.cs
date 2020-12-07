@@ -34,11 +34,6 @@ public class GameOverButton : Targettable
         return false;
     }
 
-    public void InvokeUpdate()
-    {
-        Update();
-    }
-
     // Update is called once per frame
     protected override void Update()
     {
