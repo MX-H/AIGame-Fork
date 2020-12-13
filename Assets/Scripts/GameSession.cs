@@ -410,6 +410,7 @@ public class GameSession : NetworkBehaviour
         if (stateChanged && isServer)
         {
             RpcStateChange(stateStatus, nextState, nextSubstateIndex);
+            ServerSyncTimer();
         }
 
         if (stateStack.Count > 0)
@@ -622,8 +623,12 @@ public class GameSession : NetworkBehaviour
     [Server]
     public void ServerSyncTimer()
     {
-        PlayerController p = playerList[activeIndex];
-        p.RpcSyncTimer(turnTimer.turnTime, turnTimer.currTurnTime, turnTimer.timerText.text);
+        if (IsGameReady())
+        {
+            PlayerController p = playerList[activeIndex];
+            TurnTimer turnTimer = GameUtils.GetTurnTimer();
+            p.RpcSyncTimer(turnTimer.turnTime, turnTimer.currTurnTime, turnTimer.timerText.text);
+        }
     }
 
     [Server]

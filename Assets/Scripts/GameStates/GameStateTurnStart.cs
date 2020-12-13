@@ -41,7 +41,6 @@ public class GameStateTurnStart : IGameState
 
             TurnTimer turnTimer = GameUtils.GetTurnTimer();
             turnTimer.ResetTimer(true);
-            turnTimer.StartTimer();
             turnTimer.StoreTimer();
 
             activePlayer = null;
