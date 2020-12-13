@@ -10,7 +10,7 @@ public static class GameConstants
     public static readonly int MAX_MANA = 10;
     public static readonly int MAX_CREATURES = 5;
     public static readonly int MAX_TRAPS = 5;
-    public static readonly int STARTING_HAND_SIZE = 4;
+    public static readonly int STARTING_HAND_SIZE = 3;
     public static readonly int MAX_STACK_SIZE = 5;
     public static readonly float TURN_DURATION = 60.0f;
     public static readonly float CONFIRM_DURATION = 30.0f;

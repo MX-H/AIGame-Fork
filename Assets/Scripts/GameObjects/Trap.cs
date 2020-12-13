@@ -106,7 +106,7 @@ public class Trap : Targettable
 
             if (IsTargettable() && transform.position.y >= (originalY + activateYThreshold))
             {
-                owner.ClientRequestActivateTrap(card.netIdentity);
+                owner.ClientRequestActivateTrap(card);
             }
         }
     }

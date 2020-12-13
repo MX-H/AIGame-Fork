@@ -48,7 +48,14 @@ public class ConfirmButton : Targettable
                 confirmText.text = "OK";
                 break;
             case State.END_TURN:
-                confirmText.text = "END TURN";
+                if (localPlayer.IsActivePlayer())
+                {
+                    confirmText.text = "END TURN";
+                }
+                else
+                {
+                    confirmText.text = "START TURN";
+                }
                 break;
         }
 
@@ -73,7 +80,7 @@ public class ConfirmButton : Targettable
                     }
                     break;
                 case State.END_TURN:
-                    localPlayer.ClientRequestEndTurn();
+                    localPlayer.ClientRequestSendConfirmation();
                     break;
             }
         }
@@ -99,7 +106,7 @@ public class ConfirmButton : Targettable
                     state = State.AWAITING_SELECTION;
                 }
             }
-            else if (!localPlayer.IsInCombat() && !localPlayer.IsResolving() && gameSession.IsActivePlayer(localPlayer))
+            else if (!localPlayer.IsInCombat() && !localPlayer.IsResolving())
             {
                 state = State.END_TURN;
             }

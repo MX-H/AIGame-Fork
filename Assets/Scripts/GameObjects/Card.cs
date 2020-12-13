@@ -87,7 +87,7 @@ public class Card : Targettable
         {
             if (transform.position.y > GameConstants.Y_LAYERS.PLAY_LEVEL && IsTargettable() && controller.CanPlayCards())
             {
-                controller.ClientRequestPlayCard(gameObject.GetComponent<NetworkIdentity>());
+                controller.ClientRequestPlayCard(this);
             }
             dragging = false;
         }

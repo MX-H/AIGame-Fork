@@ -176,7 +176,7 @@ public class Arena : MonoBehaviour
         {
             if (!creatures.Contains(creature))
             {
-                player.ClientRequestRemoveFromCombat(creature.netIdentity);
+                player.ClientRequestRemoveFromCombat(creature);
             }
         }
         // Trying to drop into combat row
@@ -397,6 +397,10 @@ public class Arena : MonoBehaviour
     public int InCombatCount()
     {
         return inCombatCreatures.Count;
+    }
+    public bool IsInCombat()
+    {
+        return arenaState != State.NONE;
     }
 
     public List<Targettable> GetTargettables()
