@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 823c3f620d5c50e4788f704fe86ef1d1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - victorySound: {fileID: 8300000, guid: 71b7715dacc2a974ea2665f67c0756d7, type: 3}
+  - defeatSound: {fileID: 8300000, guid: a228da2c463d2a543b7f315f7142c0b6, type: 3}
+  - combatSound: {fileID: 8300000, guid: 64819e0ea74f20f49b02ea826024a1d6, type: 3}
+  - turnStartSound: {fileID: 8300000, guid: eba7faf7666128b4b8e455e6aeab7836, type: 3}
+  - drawSound: {fileID: 8300000, guid: 36a1ae21d862b134db346f457fcfbd52, type: 3}
+  - gameStartSound: {fileID: 8300000, guid: 84caf9e5a55023144853c62944dd9a4b, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
