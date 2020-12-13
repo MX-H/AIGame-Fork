@@ -36,6 +36,8 @@ public class PlayerController : Targettable
 
     private TextPrompt selectingTextPrompt;
 
+    private TurnTimer turnTimer;
+
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -73,6 +75,7 @@ public class PlayerController : Targettable
             SurrenderButton surrenderButton = FindObjectOfType<SurrenderButton>();
             surrenderButton.localPlayer = this;
         }
+        turnTimer = FindObjectOfType<TurnTimer>();
     }
 
     // Update is called once per frame
@@ -495,6 +498,17 @@ public class PlayerController : Targettable
             Card card = cardId.GetComponent<Card>();
             arena.RemoveTrap(card);
             card.gameObject.SetActive(false);
+        }
+    }
+
+    [ClientRpc]
+    public void RpcSyncTimer(float turnTime, float currTurnTime, String timerText)
+    {
+        if (!isServer)
+        {
+            turnTimer.turnTime = turnTime;
+            turnTimer.currTurnTime = currTurnTime;
+            turnTimer.timerText.text = timerText;
         }
     }
 

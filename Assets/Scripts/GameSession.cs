@@ -248,6 +248,7 @@ public class GameSession : NetworkBehaviour
                 }
                 break;
         }
+        ServerSyncTimer();
     }
     */
 
@@ -490,7 +491,7 @@ public class GameSession : NetworkBehaviour
                         ChangeState(GameState.WAIT_ACTIVE);
                         SaveState();
                         turnTimer.ResetTimer(true);
-                        turnTimer.StartTimer();
+                        ServerSyncTimer();
                     }
                     break;
                 case GameState.TRIGGERING_EFFECTS:
@@ -616,6 +617,13 @@ public class GameSession : NetworkBehaviour
             }
         }
         */
+    }
+
+    [Server]
+    public void ServerSyncTimer()
+    {
+        PlayerController p = playerList[activeIndex];
+        p.RpcSyncTimer(turnTimer.turnTime, turnTimer.currTurnTime, turnTimer.timerText.text);
     }
 
     [Server]
