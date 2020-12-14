@@ -224,7 +224,7 @@ MonoBehaviour:
   - word: Wandering
     requiredTags: 0
     categoryTags: 0
-    wordTags: 6291456
+    wordTags: 4194304
   - word: Wave
     requiredTags: 268435456
     categoryTags: 6

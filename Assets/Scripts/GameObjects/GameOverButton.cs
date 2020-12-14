@@ -66,7 +66,7 @@ public class GameOverButton : Targettable
         GameSession gameSession = FindObjectOfType<GameSession>();
         if (gameSession && localPlayer)
         {
-            if (gameSession.isGameOverState())
+            if (gameSession.IsGameOverState())
             {
                 state = State.OVER;
                 GetComponent<Renderer>().enabled = true;

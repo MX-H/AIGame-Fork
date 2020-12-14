@@ -33,6 +33,11 @@ public class GameStateSelectTargets : IGameState
         {
             GameUtils.GetTurnTimer().StoreTimer();
         }
+
+        if (gameSession.GetLocalPlayer() == gameSession.GetWaitingOnPlayer())
+        {
+            gameSession.GetLocalPlayer().StopSelectingTargets();
+        }
     }
 
     public override void Update(float frameDelta)

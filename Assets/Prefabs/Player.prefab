@@ -62,15 +62,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  isTargettable: 0
+  isSelected: 0
+  text: {fileID: 0}
   hand: {fileID: 0}
   deck: {fileID: 0}
   arena: {fileID: 0}
   discard: {fileID: 0}
+  playerUI: {fileID: 0}
+  hasSentTargets: 0
   health: 0
   currMana: 0
   totalMana: 0
   model: {fileID: 11400000, guid: bcbec90c9ba264943b094db842f9c18b, type: 2}
   imageGlossary: {fileID: 11400000, guid: 9730a333d1475fd488f7a8e43a6b6b5c, type: 2}
+  nameModel: {fileID: 11400000, guid: 0038c7d304ab60c449b2d39ec217a1d5, type: 2}
   cardPrefab: {fileID: 7826359536346464351, guid: a230248f1058d0d4d900b14ac753a656,
     type: 3}
   creaturePrefab: {fileID: 5119441606187241201, guid: 8b7d9804acfd9514e83f65cc9fafa99f,

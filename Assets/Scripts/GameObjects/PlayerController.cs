@@ -547,61 +547,12 @@ public class PlayerController : Targettable
         currMana = totalMana = 0;
     }
 
-    [Command]
-    public void CmdSendAcknowledgement()
-    {
-        gameSession.ServerReceiveAcknowledge();
-    }
-
-    /*
-    [Server]
-    public void ServerForceEndTurn()
-    {
-        RpcForceEndTurn();
-    }
-
-    [ClientRpc]
-    public void RpcForceEndTurn()
-    {
-        if (isLocalPlayer)
-        {
-            CmdEndTurn();
-        }
-    }
-    */
-
     [Server]
     public void ServerForceConfirmation()
     {
         ConfirmationEvent confirm = new ConfirmationEvent(this);
         gameSession.HandleEvent(confirm);
     }
-
-    [ClientRpc]
-    public void RpcForceConfirmation()
-    {
-        if (isLocalPlayer)
-        {
-            ClientRequestSendConfirmation();
-        }
-    }
-
-    /*
-    [Server]
-    public void ServerForceCancelPlayCard()
-    {
-        RpcForceCancelPlayCard();
-    }
-
-    [ClientRpc]
-    public void RpcForceCancelPlayCard()
-    {
-        if (isLocalPlayer)
-        {
-            CmdCancelPlayCard();
-        }
-    }
-    */
 
     public void Reset()
     {
@@ -623,17 +574,6 @@ public class PlayerController : Targettable
             arena.Reset();
         }
     }
-
-    /*
-    [Client]
-    public void ClientRequestEndTurn()
-    {
-        if (isLocalPlayer)
-        {
-            CmdEndTurn();
-        }
-    }
-    */
 
     [Client]
     public void ClientRequestSendConfirmation()
@@ -701,14 +641,6 @@ public class PlayerController : Targettable
         }
     }
 
-    /*
-    [Command]
-    private void CmdRemoveFromCombat(NetworkIdentity creature)
-    {
-        gameSession.ServerRemoveFromCombat(netIdentity, creature);
-    }
-    */
-
     [Server]
     public void ServerRemoveFromCombat(NetworkIdentity creature)
     {
@@ -771,19 +703,9 @@ public class PlayerController : Targettable
             {
                 CreatureMoveToCombatEvent combatEvent = new CreatureMoveToCombatEvent(this, creature, ind);
                 CmdSendMoveToCombatEvent(combatEvent);
-
-                //CmdMoveToCombat(creature.netIdentity, ind);
             }
         }
     }
-
-    /*
-    [Command]
-    private void CmdMoveToCombat(NetworkIdentity creature, int ind)
-    {
-        gameSession.ServerMoveToCombat(netIdentity, creature, ind);
-    }
-    */
 
     [Server]
     public void ServerMoveToCombat(NetworkIdentity creature, int ind, bool declaringAttack)
@@ -825,23 +747,6 @@ public class PlayerController : Targettable
         arena.SetState(Arena.State.NONE);
     }
 
-    /*
-    [Command]
-    private void CmdLeaveCombat()
-    {
-        if (gameSession.CanChooseAttackers(this) && arena.InCombatCount() == 0)
-        {
-            gameSession.ServerLeaveCombat(netIdentity);
-        }
-    }
-
-    [Command]
-    private void CmdEndTurn()
-    {
-        gameSession.ServerEndTurn(netIdentity);
-    }
-    */
-
     [Client]
     public void ClientRequestSurrender() 
     {
@@ -853,14 +758,6 @@ public class PlayerController : Targettable
     {
         gameSession.ServerSurrender(netIdentity);
     }
-
-    /*
-    [Command]
-    private void CmdSendConfirmation()
-    {
-        gameSession.ServerSendConfirmation(netIdentity);
-    }
-    */
 
     public bool CanPlayCard(Card card)
     {
@@ -885,80 +782,6 @@ public class PlayerController : Targettable
         }
         return canUse;
     }
-
-    /*
-    [Command]
-    private void CmdPlayCard(NetworkIdentity card)
-    {
-        Card c = card.gameObject.GetComponent<Card>();
-        if (c != null && c.cardData != null)
-        {
-            if (hand.HasCard(c) && c.cardData.GetManaCost() <= currMana && CanPlayCards())
-            {
-                TriggerCondition trigger = (c.cardData.GetCardType() == CardType.CREATURE) ? TriggerCondition.ON_SELF_ENTER : TriggerCondition.NONE;
-
-                List<ITargettingDescription> targets = new List<ITargettingDescription>();
-
-                // Traps do not need conditions to be played from hand
-                if (c.cardData.GetCardType() != CardType.TRAP)
-                {
-                    targets = c.cardData.GetSelectableTargets(trigger);
-                }
-
-                // If need to select targets select targets first
-                if (targets.Count > 0)
-                {
-                    if (c.HasValidTargets(targets))
-                    {
-                        gameSession.ServerPlayCardAndSelectTargets(netIdentity, card);
-                    }
-                    else if (c.cardData.GetCardType() == CardType.CREATURE)
-                    {
-                        // Creatures do not need to have valid targets to be played, the enter effect just doesn't occur
-                        gameSession.ServerPlayCard(netIdentity, card);
-                    }
-                }
-                else
-                {
-                    // Resolve card
-                    gameSession.ServerPlayCard(netIdentity, card);
-                }
-            }
-        }
-    }
-    */
-
-    /*
-    [Command]
-    private void CmdActivateTrap(NetworkIdentity cardId)
-    {
-        Card card = cardId.GetComponent<Card>();
-        if (arena.IsTrap(card) && CanActivateTraps())
-        {
-            List<ITargettingDescription> targets = card.cardData.GetSelectableTargets(TriggerCondition.NONE);
-
-            if (targets.Count > 0)
-            {
-                if (card.HasValidTargets(targets))
-                {
-                    gameSession.ServerActivateTrapAndSelectTargets(netIdentity, cardId);
-                }
-            }
-            else
-            {
-                gameSession.ServerActivateTrap(netIdentity, cardId);
-            }
-        }
-    }
-    */
-
-    /*
-    [Command]
-    private void CmdCancelPlayCard()
-    {
-        gameSession.ServerCancelPlayCard(netIdentity);
-    }
-    */
 
     [Server]
     public void ServerDoDamage(int damage)
@@ -1028,6 +851,21 @@ public class PlayerController : Targettable
         hasSentTargets = false;
     }
 
+    public void StopSelectingTargets()
+    {
+        foreach (Targettable t in gameSession.GetPotentialTargets())
+        {
+            t.Deselect();
+        }
+
+        RemoveTargettingQuery();
+        HideSelectionPrompt();
+
+        allSelectedTargets = null;
+        selectedTargets = null;
+        selectableTargetDescriptions = null;
+    }
+
     public bool ConfirmSelectedTargets()
     {
         if (isLocalPlayer && HasValidSelectedTargets())
@@ -1040,36 +878,10 @@ public class PlayerController : Targettable
 
             if (allSelectedTargets.Count == selectableTargetDescriptions.Count)
             {
-                // Send all selected targets to the server
-                RemoveTargettingQuery();
-                HideSelectionPrompt();
-
-                int[] indexes = new int[allSelectedTargets.Count];
-                int totalSize = 0;
-                for (int i = 0; i < allSelectedTargets.Count; i++)
-                {
-                    totalSize += allSelectedTargets[i].Count;
-                    indexes[i] = allSelectedTargets[i].Count;
-                }
-
-                NetworkIdentity[] targets = new NetworkIdentity[totalSize];
-                int ind = 0;
-                for (int i = 0; i < allSelectedTargets.Count; i++)
-                {
-                    for (int j = 0; j < allSelectedTargets[i].Count; j++, ind++)
-                    {
-                        targets[ind] = allSelectedTargets[i][j].GetComponent<NetworkIdentity>();
-                    }
-                }
-
                 TargetSelectionEvent targetEvent = new TargetSelectionEvent(this, allSelectedTargets);
                 CmdSendTargetSelectionEvent(targetEvent);
-                
-                //CmdSendTargets(targets, indexes);
-                
-                allSelectedTargets = null;
-                selectedTargets = null;
-                selectableTargetDescriptions = null;
+
+                StopSelectingTargets();
 
                 hasSentTargets = true;
                 
@@ -1085,14 +897,6 @@ public class PlayerController : Targettable
         }
         return false;
     }
-
-    /*
-    [Command]
-    private void CmdSendTargets(NetworkIdentity[] targets, int[] indexes)
-    {
-        gameSession.ServerSendTargets(netIdentity, targets, indexes);
-    }
-    */
 
     public bool IsDead()
     {
