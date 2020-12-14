@@ -258,7 +258,7 @@ static class CardEnums
         RemoveFlags(EffectType.DRAW_CARDS, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
         RemoveFlags(EffectType.DEAL_DAMAGE, new TriggerCondition[] { TriggerCondition.IS_ALIVE, TriggerCondition.ON_SELF_DAMAGE_TAKEN });
         RemoveFlags(EffectType.HEAL_DAMAGE, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
-        RemoveFlags(EffectType.SUMMON_TOKEN, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
+        RemoveFlags(EffectType.SUMMON_TOKEN, new TriggerCondition[] { TriggerCondition.IS_ALIVE, TriggerCondition.ON_CREATURE_ENTER });
         RemoveFlags(EffectType.NEGATE,  ((TriggerCondition[])System.Enum.GetValues(typeof(TriggerCondition))).Except(new TriggerCondition[] { TriggerCondition.ON_STACK_UPDATED }));
 
         // Valid targetting types for targets

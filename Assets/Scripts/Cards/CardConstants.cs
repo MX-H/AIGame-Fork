@@ -19,16 +19,198 @@ public enum CardGenerationFlags
 [Flags]
 public enum CardTags
 {
-    NONE = 0,
-    CREATURE = 1 << 0,
-    SPELL = 1 << 1,
-    TRAP = 1 << 2,
+    NONE            = 0,
+    CREATURE        = 1 << 0,
+    SPELL           = 1 << 1,
+    TRAP            = 1 << 2,
 
-    HUMAN = 1 << 3,
-    GOBLIN = 1 << 4,
-    FAERIE = 1 << 5,
+    // Cost based
+    LOW_COST        = 1 << 3,
+    MID_COST        = 1 << 4,
+    HIGH_COST       = 1 << 5,
 
-    EVASION = 1 << 6
+    // Reserve 10 spots for creature types
+    HUMAN           = 1 << 6,
+    GOBLIN          = 1 << 7,
+    FAERIE          = 1 << 8,
+
+    // Reserve 10 spots for keywords
+    EVASION         = 1 << 16,
+    FAST_STRIKE     = 1 << 17,
+    UNTOUCHABLE     = 1 << 18,
+    PIERCING        = 1 << 19,
+    EAGER           = 1 << 20,
+
+    // Targetting types
+    SINGLE_TARGET   = 1 << 26,
+    MULTI_TARGET    = 1 << 27,
+    AOE             = 1 << 28,
+}
+
+// Try not to reorder any existing flags, we will need to retag everything if that happens
+[Flags]
+public enum WordTags
+{
+    NONE                = 0,
+
+    // Types of nouns
+    NOUN_PROPER                 = 1 << 1,
+    NOUN_CONCRETE               = 1 << 2,
+    NOUN_ABSTRACT               = 1 << 3,
+    NOUN_COLLECTIVE             = 1 << 4,
+    NOUN_ATTRIBUTIVE            = 1 << 5,
+
+    // This is a seperate noun flag, each noun is countable or uncountable
+    NOUN_UNCOUNTABLE              = 1 << 7,
+    NOUN_PLURAL                 = 1 << 8,
+    NOUN_SINGULAR               = 1 << 9,
+    
+    // Types of adjectives
+    ADJ_DESCRIPTIVE             = 1 << 10,
+    ADJ_QUANTITATIVE_CARDINAL   = 1 << 11,
+    ADJ_QUANTITATIVE_ORDINAL    = 1 << 12,
+    ADJ_PROPER                  = 1 << 13,
+
+    // For the names of cards we only need to use non-finite action verbs ie. flying goblin
+    VERB_ACTION                 = 1 << 20,
+    VERB_GERUND                 = 1 << 21,
+    VERB_ADJ                    = 1 << 22,
+
+    ADVERB_FREQUENCY            = 1 << 26,
+    ADVERB_DEGREE               = 1 << 27,
+    ADVERB_MANNER               = 1 << 28,
+}
+
+public static class CardTagging
+{
+    public static CardTags GetCardTags(CardDescription cardDesc)
+    {
+        CardTags tags = GetCardTagsFromCardType(cardDesc.cardType);
+        tags |= GetCardTagsFromManaCost(cardDesc.manaCost);
+        switch (cardDesc.cardType)
+        {
+            case CardType.CREATURE:
+                CreatureCardDescription creatureDesc = cardDesc as CreatureCardDescription;
+                tags |= GetCardTagsFromCreatureType(creatureDesc.creatureType);
+                foreach (KeywordAttribute keywords in creatureDesc.GetAttributes())
+                {
+                    tags |= GetCardTagsFromKeywordAttributes(keywords);
+                }
+
+                break;
+            case CardType.SPELL:
+            case CardType.TRAP:
+                foreach (CardEffectDescription effect in cardDesc.cardEffects)
+                {
+                    if (effect.GetAlignment() == Alignment.POSITIVE)
+                    {
+                        tags |= GetCardTagsFromTargetType(effect.targettingType);
+                    }
+                }
+
+                break;
+        }
+        return tags;
+    }
+
+    public static CardTags GetCardTagsFromCardType(CardType cardType)
+    {
+        switch (cardType)
+        {
+            case CardType.CREATURE:
+                return CardTags.CREATURE;
+            case CardType.SPELL:
+                return CardTags.SPELL;
+            case CardType.TRAP:
+                return CardTags.TRAP;
+        }
+        return CardTags.NONE;
+    }
+
+    public static CardTags GetCardTagsFromCreatureType(CreatureType creatureType)
+    {
+        switch (creatureType)
+        {
+            case CreatureType.HUMAN:
+                return CardTags.HUMAN;
+            case CreatureType.GOBLIN:
+                return CardTags.GOBLIN;
+            case CreatureType.FAERIE:
+                return CardTags.FAERIE;
+        }
+        return CardTags.NONE;
+    }
+
+    public static CardTags GetCardTagsFromKeywordAttributes(KeywordAttribute keyword)
+    {
+        switch (keyword)
+        {
+            case KeywordAttribute.EVASION:
+                return CardTags.EVASION;
+            case KeywordAttribute.FAST_STRIKE:
+                return CardTags.FAST_STRIKE;
+            case KeywordAttribute.UNTOUCHABLE:
+                return CardTags.UNTOUCHABLE;
+            case KeywordAttribute.PIERCING:
+                return CardTags.PIERCING;
+            case KeywordAttribute.EAGER:
+                return CardTags.EAGER;
+        }
+        return CardTags.NONE;
+    }
+
+    public static CardTags GetCardTagsFromManaCost(int mana)
+    {
+        if (mana < 4)
+        {
+            return CardTags.LOW_COST;
+        }
+        else if (mana < 7)
+        {
+            return CardTags.MID_COST;
+        }
+        else
+        {
+            return CardTags.HIGH_COST;
+        }
+    }
+
+    public static CardTags GetCardTagsFromTargetType(ITargettingDescription targettingDesc)
+    {
+        switch(targettingDesc.targettingType)
+        {
+            case TargettingType.TARGET:
+                if (targettingDesc is TargetXDescription targetDesc)
+                {
+                    if (targetDesc.amount == 1)
+                    {
+                        return CardTags.SINGLE_TARGET;
+                    }
+                    else
+                    {
+                        return CardTags.MULTI_TARGET;
+                    }
+                }
+                break;
+            case TargettingType.UP_TO_TARGET:
+                if (targettingDesc is UpToXTargetDescription upToTargetDesc)
+                {
+                    if (upToTargetDesc.amount == 1)
+                    {
+                        return CardTags.SINGLE_TARGET;
+                    }
+                    else
+                    {
+                        return CardTags.MULTI_TARGET;
+                    }
+                }
+                break;
+            case TargettingType.ALL:
+                return CardTags.AOE;
+        }
+        return CardTags.NONE;
+    }
+
 }
 
 public static class EffectConstants
@@ -70,7 +252,7 @@ public static class EffectConstants
 public static class PowerBudget
 {
     public static readonly double UNIT_COST = 1.0;
-    public static readonly double DOWNSIDE_WEIGHT = 1.2;
+    public static readonly double DOWNSIDE_WEIGHT = 1.25;
     public static readonly double FLAT_EFFECT_COST = 0.5;
 
     public static double ManaFunction(double mana)
@@ -117,7 +299,7 @@ public static class PowerBudget
     public static double StatsToPowerBudget(int statTotal)
     {
         double manaCost = (statTotal / 2.0) - 0.5;
-        return ManaFunction(manaCost);
+        return manaCost * UNIT_COST;
     }
 
     public static readonly double[] ManaPowerBudgets = new double[]
@@ -194,11 +376,11 @@ public static class PowerBudget
         {
             // Can happen repeatedly and can make decisions very difficult for opponent
             case TriggerCondition.ON_CREATURE_DIES:
-                return (card is CreatureCardDescription) ? 1.5 : 1.0;
+                return (card is CreatureCardDescription) ? 2.5 : 1.0;
             // Should occur very frequently, and creature entering is very hard for opponent to play around
             // Entering is more threatening than dying
             case TriggerCondition.ON_CREATURE_ENTER:
-                return (card is CreatureCardDescription) ? 2.0 : 1.0;
+                return (card is CreatureCardDescription) ? 3 : 1.0;
             // Worse than on enter, on self enter is like a spell so its the baseline for an effects strength
             case TriggerCondition.ON_SELF_DIES:
                 return 0.9;
@@ -220,13 +402,13 @@ public static class PowerBudget
                     {
                         // Piercing depends on how good the body is, for now we'll say the average blocker has 4 toughness,
                         // So you get the max effectiveness from piercing at 5 attack
-                        multiplier += 0.5 * Math.Max(5, creatureCard.attack);
+                        multiplier += 0.5 * Math.Min(5, creatureCard.attack) / 5;
                     }
                     if (creatureCard.HasKeywordAttribute(KeywordAttribute.FAST_STRIKE))
                     {
                         // Fast strike is less appealing to block with high power, like piercing but will not get damage through
                         // a blocker only deter opponent from blocking so cap is smaller
-                        multiplier += 0.25 * Math.Max(5, creatureCard.attack);
+                        multiplier += 0.25 * Math.Min(5, creatureCard.attack) / 5;
                     }
                     if (creatureCard.HasKeywordAttribute(KeywordAttribute.EAGER))
                     {

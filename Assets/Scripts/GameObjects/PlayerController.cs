@@ -25,6 +25,7 @@ public class PlayerController : Targettable
     public ICardGenerator cardGenerator;
     public IHistogram model;
     public ImageGlossary imageGlossary;
+    public NameModel nameModel;
     public Card cardPrefab;
     public Creature creaturePrefab;
     GameSession gameSession;
@@ -65,7 +66,7 @@ public class PlayerController : Targettable
             selectingTextPrompt = GameObject.Find("Player Selection Prompt").GetComponent<TextPrompt>();
             selectingTextPrompt.gameObject.SetActive(false);
         }
-        cardGenerator = new ProceduralCardGenerator(model, imageGlossary, gameSession.creatureModelIndex);
+        cardGenerator = new ProceduralCardGenerator(model, imageGlossary, gameSession.creatureModelIndex, nameModel);
         if (isLocalPlayer)
         {
             ConfirmButton confirmButton = FindObjectOfType<ConfirmButton>();

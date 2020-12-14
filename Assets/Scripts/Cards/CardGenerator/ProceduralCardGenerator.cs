@@ -9,11 +9,13 @@ public class ProceduralCardGenerator : ICardGenerator
     private IHistogram model;
     private ImageGlossary images;
     private CreatureModelIndex creatureModelIndex;
-    public ProceduralCardGenerator(IHistogram m, ImageGlossary i, CreatureModelIndex creatureModels)
+    private NameModel nameModel;
+    public ProceduralCardGenerator(IHistogram m, ImageGlossary i, CreatureModelIndex creatureModels, NameModel name)
     {
         model = m;
         images = i;
         creatureModelIndex = creatureModels;
+        nameModel = name;
     }
 
     public override CardDescription GenerateCard(int seed, CardGenerationFlags flags = CardGenerationFlags.NONE)
@@ -40,11 +42,11 @@ public class ProceduralCardGenerator : ICardGenerator
         switch (t)
         {
             case CardType.CREATURE:
-                return GenerateCreatureCard(random, model, images, creatureModelIndex, flags);
+                return GenerateCreatureCard(random, model, images, creatureModelIndex, nameModel, flags);
             case CardType.SPELL:
-                return GenerateSpellCard(random, model, images, creatureModelIndex, flags);
+                return GenerateSpellCard(random, model, images, creatureModelIndex, nameModel, flags);
             case CardType.TRAP:
-                return GenerateTrapCard(random, model, images, creatureModelIndex, flags);
+                return GenerateTrapCard(random, model, images, creatureModelIndex, nameModel, flags);
         }
 
         return new CardDescription();
@@ -106,7 +108,7 @@ public class ProceduralCardGenerator : ICardGenerator
         return ret;
     }
 
-    static private CardDescription GenerateCreatureCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels, CardGenerationFlags flags)
+    static private CardDescription GenerateCreatureCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels, NameModel nameModel, CardGenerationFlags flags)
     {
         CreatureCardDescription card = ScriptableObject.CreateInstance(typeof(CreatureCardDescription)) as CreatureCardDescription;
         card.creatureType = ProceduralUtils.GetRandomValue<CreatureType>(random, model);
@@ -173,10 +175,13 @@ public class ProceduralCardGenerator : ICardGenerator
         }
         card.image = ProceduralUtils.GetRandomTexture(random, images.GetCreatureImages(card.creatureType));
 
+        CardTags tags = CardTagging.GetCardTags(card);
+        card.cardName = nameModel.GenerateName(random, tags);
+
         return card;
     }
 
-    static private CardDescription GenerateSpellCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels, CardGenerationFlags flags)
+    static private CardDescription GenerateSpellCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels, NameModel nameModel, CardGenerationFlags flags)
     {
         CardDescription card = ScriptableObject.CreateInstance(typeof(CardDescription)) as CardDescription;
         card.cardType = CardType.SPELL;
@@ -199,10 +204,13 @@ public class ProceduralCardGenerator : ICardGenerator
         }
         card.image = ProceduralUtils.GetRandomTexture(random, images.GetSpellImages());
 
+        CardTags tags = CardTagging.GetCardTags(card);
+        card.cardName = nameModel.GenerateName(random, tags);
+
         return card;
     }
 
-    static private CardDescription GenerateTrapCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels, CardGenerationFlags flags)
+    static private CardDescription GenerateTrapCard(System.Random random, IHistogram model, ImageGlossary images, CreatureModelIndex creatureModels, NameModel nameModel, CardGenerationFlags flags)
     {
         CardDescription card = ScriptableObject.CreateInstance(typeof(CardDescription)) as CardDescription;
         card.cardType = CardType.TRAP;
@@ -224,6 +232,9 @@ public class ProceduralCardGenerator : ICardGenerator
             card.manaCost = revisedMana;
         }
         card.image = ProceduralUtils.GetRandomTexture(random, images.GetTrapImages());
+
+        CardTags tags = CardTagging.GetCardTags(card);
+        card.cardName = nameModel.GenerateName(random, tags);
 
         return card;
     }
@@ -299,8 +310,7 @@ public class ProceduralCardGenerator : ICardGenerator
 
             while (!validEffect && effectCandidates.Count > 0)
             {
-                EffectType effectType = ProceduralUtils.GetRandomValueExcluding(random, model, new EffectType[] { EffectType.NONE },
-                    CardEnums.GetValidFlags<EffectType>(cardEffect.triggerCondition));
+                EffectType effectType = ProceduralUtils.GetRandomValueExcluding(random, model, new EffectType[] { EffectType.NONE }, effectCandidates);
                 // This means that there isn't an effect that meets this condition
                 if (effectType == EffectType.NONE)
                 {
@@ -394,8 +404,7 @@ public class ProceduralCardGenerator : ICardGenerator
 
             while (!validEffect && effectCandidates.Count > 0)
             {
-                EffectType effectType = ProceduralUtils.GetRandomValueExcluding(random, model, new EffectType[] { EffectType.NONE },
-                    CardEnums.GetValidFlags<EffectType>(cardEffect.triggerCondition));
+                EffectType effectType = ProceduralUtils.GetRandomValueExcluding(random, model, new EffectType[] { EffectType.NONE }, effectCandidates);
                 // This means that there isn't an effect that meets this condition
                 if (effectType == EffectType.NONE)
                 {

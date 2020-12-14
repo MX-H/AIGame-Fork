@@ -43,7 +43,7 @@ public class DamageEffectDescription : IEffectDescription
     }
     public override double PowerLevel()
     {
-        return ((effectType == EffectType.HEAL_DAMAGE) ? 1.0 / 2.0 : 1.0) * (amount - 0.5) * PowerBudget.UNIT_COST;
+        return ((effectType == EffectType.HEAL_DAMAGE) ? 0.5 : 1.0) * (amount - 0.5) * PowerBudget.UNIT_COST;
     }
 }
 

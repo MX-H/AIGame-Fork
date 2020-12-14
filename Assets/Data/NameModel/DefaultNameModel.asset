@@ -1,0 +1,185 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc80edd5cb0a67b44b0acfcde51b52b8, type: 3}
+  m_Name: DefaultNameModel
+  m_EditorClassIdentifier: 
+  wordBank: {fileID: 11400000, guid: a080dece0ce933944af8903040170b4c, type: 2}
+  nameTemplates:
+  - template: '[ADJ_DESCRIPTIVE] [NOUN_CONCRETE]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 4
+  - template: '[ADJ_DESCRIPTIVE] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 6
+    outputTags: 2097152
+  - template: '[NOUN_ATTRIBUTIVE] [NOUN_COLLECTIVE]'
+    requiredTags: 1
+    categoryTags: 48
+    outputTags: 16
+  - template: '[NOUN_ATTRIBUTIVE] [NOUN_CONCRETE]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 4
+  - template: '[NOUN_ATTRIBUTIVE] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 6
+    outputTags: 2097156
+  - template: '[ADVERB_FREQUENCY] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 6
+    outputTags: 2097152
+  - template: '[ADVERB_MANNER] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 6
+    outputTags: 2097152
+  - template: '[NOUN_COLLECTIVE] of [NOUN_CONCRETE, NOUN_PLURAL]'
+    requiredTags: 1
+    categoryTags: 48
+    outputTags: 16
+  - template: '[NOUN_CONCRETE] of [NOUN_ABSTRACT]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 4
+  - template: '[VERB_ACTION]'
+    requiredTags: 8
+    categoryTags: 6
+    outputTags: 0
+  - template: '[VERB_ACTION] the [NOUN_ABSTRACT]'
+    requiredTags: 0
+    categoryTags: 6
+    outputTags: 1048576
+  - template: '[VERB_ADJ] [NOUN_CONCRETE]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 4
+  - template: '[VERB_GERUND] [ADVERB_MANNER]'
+    requiredTags: 0
+    categoryTags: 6
+    outputTags: 2097152
+  - template: The [ADJ_QUANTITATIVE_CARDINAL] [NOUN_CONCRETE, NOUN_PLURAL]
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: The [ADJ_QUANTITATIVE_ORDINAL] [NOUN_CONCRETE, NOUN_SINGULAR]
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  combinedTemplates:
+  - template: '[ADJ_DESCRIPTIVE] [ADVERB_FREQUENCY] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADJ_DESCRIPTIVE] [ADVERB_MANNER] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADJ_DESCRIPTIVE] [NOUN_ATTRIBUTIVE] [NOUN_CONCRETE]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADJ_DESCRIPTIVE] [NOUN_ATTRIBUTIVE] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADJ_DESCRIPTIVE] [NOUN_CONCRETE] of [NOUN_ABSTRACT]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADJ_DESCRIPTIVE] [VERB_ADJ] [NOUN_CONCRETE]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADJ_DESCRIPTIVE] [VERB_GERUND] [ADVERB_MANNER]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADVERB_FREQUENCY] [ADJ_DESCRIPTIVE] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADVERB_FREQUENCY] [ADVERB_MANNER] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADVERB_FREQUENCY] [NOUN_ATTRIBUTIVE] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADVERB_FREQUENCY] [VERB_GERUND] [ADVERB_MANNER]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADVERB_MANNER] [ADJ_DESCRIPTIVE] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADVERB_MANNER] [ADVERB_FREQUENCY] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADVERB_MANNER] [NOUN_ATTRIBUTIVE] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[ADVERB_MANNER] [VERB_GERUND] [ADVERB_MANNER]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[NOUN_ATTRIBUTIVE] [ADJ_DESCRIPTIVE] [NOUN_CONCRETE]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[NOUN_ATTRIBUTIVE] [ADJ_DESCRIPTIVE] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[NOUN_ATTRIBUTIVE] [ADVERB_FREQUENCY] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[NOUN_ATTRIBUTIVE] [ADVERB_MANNER] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[NOUN_ATTRIBUTIVE] [NOUN_COLLECTIVE] of [NOUN_CONCRETE, NOUN_PLURAL]'
+    requiredTags: 0
+    categoryTags: 1
+    outputTags: 0
+  - template: '[NOUN_ATTRIBUTIVE] [NOUN_CONCRETE] of [NOUN_ABSTRACT]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[NOUN_ATTRIBUTIVE] [VERB_ADJ] [NOUN_CONCRETE]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[NOUN_ATTRIBUTIVE] [VERB_GERUND] [ADVERB_MANNER]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[VERB_ACTION] the [NOUN_ABSTRACT]'
+    requiredTags: 0
+    categoryTags: 8
+    outputTags: 0
+  - template: '[VERB_ADJ] [ADJ_DESCRIPTIVE] [NOUN_CONCRETE]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[VERB_ADJ] [NOUN_ATTRIBUTIVE] [NOUN_CONCRETE]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0
+  - template: '[VERB_ADJ] [NOUN_CONCRETE] of [NOUN_ABSTRACT]'
+    requiredTags: 0
+    categoryTags: 0
+    outputTags: 0

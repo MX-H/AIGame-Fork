@@ -1,0 +1,239 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ee78e62bd562b7448793091b52294c1, type: 3}
+  m_Name: DefaultWordBank
+  m_EditorClassIdentifier: 
+  words:
+  - word: Alert
+    requiredTags: 0
+    categoryTags: 0
+    wordTags: 1024
+  - word: Arcanist
+    requiredTags: 64
+    categoryTags: 0
+    wordTags: 516
+  - word: Barrage
+    requiredTags: 0
+    categoryTags: 6
+    wordTags: 516
+  - word: Behold
+    requiredTags: 0
+    categoryTags: 0
+    wordTags: 1048576
+  - word: Beyond
+    requiredTags: 0
+    categoryTags: 0
+    wordTags: 136
+  - word: Blast
+    requiredTags: 0
+    categoryTags: 6
+    wordTags: 516
+  - word: Calamity
+    requiredTags: 32
+    categoryTags: 0
+    wordTags: 8712
+  - word: Darkness
+    requiredTags: 0
+    categoryTags: 0
+    wordTags: 136
+  - word: Dreams
+    requiredTags: 0
+    categoryTags: 262
+    wordTags: 264
+  - word: Duelist
+    requiredTags: 131072
+    categoryTags: 0
+    wordTags: 8708
+  - word: Eternity
+    requiredTags: 0
+    categoryTags: 48
+    wordTags: 136
+  - word: Exotic
+    requiredTags: 0
+    categoryTags: 262144
+    wordTags: 1024
+  - word: Faerie
+    requiredTags: 256
+    categoryTags: 0
+    wordTags: 548
+  - word: Faeries
+    requiredTags: 256
+    categoryTags: 0
+    wordTags: 260
+  - word: Family
+    requiredTags: 0
+    categoryTags: 0
+    wordTags: 528
+  - word: Fatal
+    requiredTags: 0
+    categoryTags: 6
+    wordTags: 1024
+  - word: Feisty
+    requiredTags: 1048577
+    categoryTags: 0
+    wordTags: 1024
+  - word: Ferocious
+    requiredTags: 0
+    categoryTags: 524320
+    wordTags: 1024
+  - word: First
+    requiredTags: 0
+    categoryTags: 0
+    wordTags: 4096
+  - word: Flying
+    requiredTags: 0
+    categoryTags: 65536
+    wordTags: 6291456
+  - word: Forever
+    requiredTags: 0
+    categoryTags: 0
+    wordTags: 67108864
+  - word: Fragile
+    requiredTags: 8
+    categoryTags: 0
+    wordTags: 1024
+  - word: Gang
+    requiredTags: 0
+    categoryTags: 0
+    wordTags: 528
+  - word: Goblin
+    requiredTags: 128
+    categoryTags: 0
+    wordTags: 548
+  - word: Goblins
+    requiredTags: 128
+    categoryTags: 0
+    wordTags: 260
+  - word: Guide
+    requiredTags: 1
+    categoryTags: 0
+    wordTags: 516
+  - word: Heroic
+    requiredTags: 1
+    categoryTags: 0
+    wordTags: 1024
+  - word: Hobgoblin
+    requiredTags: 128
+    categoryTags: 48
+    wordTags: 548
+  - word: Hunter
+    requiredTags: 1
+    categoryTags: 0
+    wordTags: 516
+  - word: Knight
+    requiredTags: 1
+    categoryTags: 48
+    wordTags: 516
+  - word: Kobold
+    requiredTags: 128
+    categoryTags: 24
+    wordTags: 548
+  - word: Last
+    requiredTags: 0
+    categoryTags: 0
+    wordTags: 4096
+  - word: Magical
+    requiredTags: 0
+    categoryTags: 54
+    wordTags: 1024
+  - word: Mini
+    requiredTags: 8
+    categoryTags: 0
+    wordTags: 1024
+  - word: Mob
+    requiredTags: 1
+    categoryTags: 0
+    wordTags: 528
+  - word: Overlord
+    requiredTags: 33
+    categoryTags: 0
+    wordTags: 516
+  - word: Peasant
+    requiredTags: 8
+    categoryTags: 64
+    wordTags: 516
+  - word: Perfectly
+    requiredTags: 0
+    categoryTags: 48
+    wordTags: 268435456
+  - word: Pilot
+    requiredTags: 65600
+    categoryTags: 0
+    wordTags: 516
+  - word: Pixie
+    requiredTags: 256
+    categoryTags: 8
+    wordTags: 548
+  - word: Pulse
+    requiredTags: 268435456
+    categoryTags: 6
+    wordTags: 516
+  - word: Quickly
+    requiredTags: 0
+    categoryTags: 1048580
+    wordTags: 268435456
+  - word: Samurai
+    requiredTags: 1
+    categoryTags: 131072
+    wordTags: 772
+  - word: Seeker
+    requiredTags: 0
+    categoryTags: 320
+    wordTags: 516
+  - word: Small
+    requiredTags: 8
+    categoryTags: 0
+    wordTags: 1024
+  - word: Strike
+    requiredTags: 0
+    categoryTags: 6
+    wordTags: 1048576
+  - word: Swarm
+    requiredTags: 0
+    categoryTags: 256
+    wordTags: 528
+  - word: Swift
+    requiredTags: 0
+    categoryTags: 1179648
+    wordTags: 1024
+  - word: Tiny
+    requiredTags: 8
+    categoryTags: 0
+    wordTags: 1024
+  - word: Ultimate
+    requiredTags: 32
+    categoryTags: 0
+    wordTags: 1024
+  - word: Vanishing
+    requiredTags: 0
+    categoryTags: 262150
+    wordTags: 6291456
+  - word: Wanderer
+    requiredTags: 1
+    categoryTags: 0
+    wordTags: 516
+  - word: Wandering
+    requiredTags: 0
+    categoryTags: 0
+    wordTags: 6291456
+  - word: Wave
+    requiredTags: 268435456
+    categoryTags: 6
+    wordTags: 516
+  - word: Winged
+    requiredTags: 65537
+    categoryTags: 0
+    wordTags: 1024
+  - word: Zap
+    requiredTags: 0
+    categoryTags: 0
+    wordTags: 1048576

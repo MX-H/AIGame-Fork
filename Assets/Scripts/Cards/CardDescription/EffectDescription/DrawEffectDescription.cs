@@ -102,7 +102,7 @@ public class DrawEffectDescription : IEffectDescription
 
     public override double PowerLevel()
     {
-        return (amount - 0.5) * 2 * PowerBudget.UNIT_COST;
+        return amount * 1.5 * PowerBudget.UNIT_COST;
     }
 }
 

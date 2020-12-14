@@ -12,6 +12,7 @@ public class CardGeneratorDemo : MonoBehaviour
     public CardDescription desc;
     public CreatureModelIndex creatureModels;
     public CardGenerationFlags flags;
+    public NameModel nameModel;
 
     private ICardGenerator cardGenerator;
 
@@ -30,7 +31,7 @@ public class CardGeneratorDemo : MonoBehaviour
         {
             if (desc == null)
             {
-                ICardGenerator cardGenerator = new ProceduralCardGenerator(model, images, creatureModels);
+                ICardGenerator cardGenerator = new ProceduralCardGenerator(model, images, creatureModels, nameModel);
 
                 if (providedSeed == 0)
                 {
