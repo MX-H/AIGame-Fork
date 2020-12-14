@@ -22,6 +22,18 @@ MonoBehaviour:
     requiredTags: 0
     categoryTags: 6
     outputTags: 2097152
+  - template: '[ADVERB_FREQUENCY] [ADJ_DESCRIPTIVE]'
+    requiredTags: 0
+    categoryTags: 6
+    outputTags: 1024
+  - template: '[ADVERB_FREQUENCY] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 6
+    outputTags: 2097152
+  - template: '[ADVERB_MANNER] [VERB_GERUND]'
+    requiredTags: 0
+    categoryTags: 6
+    outputTags: 2097152
   - template: '[NOUN_ATTRIBUTIVE] [NOUN_COLLECTIVE]'
     requiredTags: 1
     categoryTags: 48
@@ -34,14 +46,6 @@ MonoBehaviour:
     requiredTags: 0
     categoryTags: 6
     outputTags: 2097156
-  - template: '[ADVERB_FREQUENCY] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 6
-    outputTags: 2097152
-  - template: '[ADVERB_MANNER] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 6
-    outputTags: 2097152
   - template: '[NOUN_COLLECTIVE] of [NOUN_CONCRETE, NOUN_PLURAL]'
     requiredTags: 1
     categoryTags: 48
@@ -76,110 +80,106 @@ MonoBehaviour:
     outputTags: 0
   combinedTemplates:
   - template: '[ADJ_DESCRIPTIVE] [ADVERB_FREQUENCY] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[ADJ_DESCRIPTIVE] [ADVERB_MANNER] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[ADJ_DESCRIPTIVE] [NOUN_ATTRIBUTIVE] [NOUN_CONCRETE]'
-    requiredTags: 0
+    requiredTags: 48
     categoryTags: 0
     outputTags: 0
   - template: '[ADJ_DESCRIPTIVE] [NOUN_ATTRIBUTIVE] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[ADJ_DESCRIPTIVE] [NOUN_CONCRETE] of [NOUN_ABSTRACT]'
-    requiredTags: 0
+    requiredTags: 48
     categoryTags: 0
     outputTags: 0
   - template: '[ADJ_DESCRIPTIVE] [VERB_ADJ] [NOUN_CONCRETE]'
-    requiredTags: 0
+    requiredTags: 48
     categoryTags: 0
     outputTags: 0
   - template: '[ADJ_DESCRIPTIVE] [VERB_GERUND] [ADVERB_MANNER]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[ADVERB_FREQUENCY] [ADJ_DESCRIPTIVE] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[ADVERB_FREQUENCY] [ADVERB_MANNER] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[ADVERB_FREQUENCY] [NOUN_ATTRIBUTIVE] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[ADVERB_FREQUENCY] [VERB_GERUND] [ADVERB_MANNER]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[ADVERB_MANNER] [ADJ_DESCRIPTIVE] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[ADVERB_MANNER] [ADVERB_FREQUENCY] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[ADVERB_MANNER] [NOUN_ATTRIBUTIVE] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[ADVERB_MANNER] [VERB_GERUND] [ADVERB_MANNER]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[NOUN_ATTRIBUTIVE] [ADJ_DESCRIPTIVE] [NOUN_CONCRETE]'
-    requiredTags: 0
+    requiredTags: 48
     categoryTags: 0
     outputTags: 0
   - template: '[NOUN_ATTRIBUTIVE] [ADJ_DESCRIPTIVE] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[NOUN_ATTRIBUTIVE] [ADVERB_FREQUENCY] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[NOUN_ATTRIBUTIVE] [ADVERB_MANNER] [VERB_GERUND]'
-    requiredTags: 0
-    categoryTags: 0
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[NOUN_ATTRIBUTIVE] [NOUN_COLLECTIVE] of [NOUN_CONCRETE, NOUN_PLURAL]'
-    requiredTags: 0
-    categoryTags: 1
+    requiredTags: 49
+    categoryTags: 48
     outputTags: 0
   - template: '[NOUN_ATTRIBUTIVE] [NOUN_CONCRETE] of [NOUN_ABSTRACT]'
-    requiredTags: 0
+    requiredTags: 48
     categoryTags: 0
     outputTags: 0
   - template: '[NOUN_ATTRIBUTIVE] [VERB_ADJ] [NOUN_CONCRETE]'
-    requiredTags: 0
+    requiredTags: 48
     categoryTags: 0
     outputTags: 0
   - template: '[NOUN_ATTRIBUTIVE] [VERB_GERUND] [ADVERB_MANNER]'
-    requiredTags: 0
-    categoryTags: 0
-    outputTags: 0
-  - template: '[VERB_ACTION] the [NOUN_ABSTRACT]'
-    requiredTags: 0
-    categoryTags: 8
+    requiredTags: 48
+    categoryTags: 6
     outputTags: 0
   - template: '[VERB_ADJ] [ADJ_DESCRIPTIVE] [NOUN_CONCRETE]'
-    requiredTags: 0
+    requiredTags: 48
     categoryTags: 0
     outputTags: 0
   - template: '[VERB_ADJ] [NOUN_ATTRIBUTIVE] [NOUN_CONCRETE]'
-    requiredTags: 0
+    requiredTags: 48
     categoryTags: 0
     outputTags: 0
   - template: '[VERB_ADJ] [NOUN_CONCRETE] of [NOUN_ABSTRACT]'
-    requiredTags: 0
+    requiredTags: 48
     categoryTags: 0
     outputTags: 0

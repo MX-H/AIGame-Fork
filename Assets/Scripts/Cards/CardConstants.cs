@@ -299,7 +299,7 @@ public static class PowerBudget
     public static double StatsToPowerBudget(int statTotal)
     {
         double manaCost = (statTotal / 2.0) - 0.5;
-        return manaCost * UNIT_COST;
+        return ManaFunction(manaCost);
     }
 
     public static readonly double[] ManaPowerBudgets = new double[]

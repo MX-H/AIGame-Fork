@@ -17,13 +17,17 @@ MonoBehaviour:
     requiredTags: 0
     categoryTags: 0
     wordTags: 1024
+  - word: Always
+    requiredTags: 0
+    categoryTags: 0
+    wordTags: 67108864
   - word: Arcanist
     requiredTags: 64
     categoryTags: 0
     wordTags: 516
   - word: Barrage
     requiredTags: 0
-    categoryTags: 6
+    categoryTags: 402653184
     wordTags: 516
   - word: Behold
     requiredTags: 0
@@ -37,13 +41,25 @@ MonoBehaviour:
     requiredTags: 0
     categoryTags: 6
     wordTags: 516
+  - word: Bolt
+    requiredTags: 67108866
+    categoryTags: 0
+    wordTags: 516
+  - word: Bolts
+    requiredTags: 134217730
+    categoryTags: 0
+    wordTags: 260
   - word: Calamity
     requiredTags: 32
     categoryTags: 0
     wordTags: 8712
-  - word: Darkness
+  - word: Conjuring
     requiredTags: 0
     categoryTags: 0
+    wordTags: 6291456
+  - word: Darkness
+    requiredTags: 0
+    categoryTags: 48
     wordTags: 136
   - word: Dreams
     requiredTags: 0
@@ -113,6 +129,10 @@ MonoBehaviour:
     requiredTags: 128
     categoryTags: 0
     wordTags: 260
+  - word: Guard
+    requiredTags: 9
+    categoryTags: 0
+    wordTags: 516
   - word: Guide
     requiredTags: 1
     categoryTags: 0
@@ -143,11 +163,15 @@ MonoBehaviour:
     wordTags: 4096
   - word: Magical
     requiredTags: 0
-    categoryTags: 54
+    categoryTags: 262198
     wordTags: 1024
   - word: Mini
     requiredTags: 8
     categoryTags: 0
+    wordTags: 1024
+  - word: Mischievous
+    requiredTags: 0
+    categoryTags: 262
     wordTags: 1024
   - word: Mob
     requiredTags: 1
@@ -169,6 +193,10 @@ MonoBehaviour:
     requiredTags: 65600
     categoryTags: 0
     wordTags: 516
+  - word: Pitfall
+    requiredTags: 4
+    categoryTags: 0
+    wordTags: 516
   - word: Pixie
     requiredTags: 256
     categoryTags: 8
@@ -181,6 +209,10 @@ MonoBehaviour:
     requiredTags: 0
     categoryTags: 1048580
     wordTags: 268435456
+  - word: Reckless
+    requiredTags: 1
+    categoryTags: 192
+    wordTags: 1024
   - word: Samurai
     requiredTags: 1
     categoryTags: 131072
@@ -211,10 +243,14 @@ MonoBehaviour:
     wordTags: 1024
   - word: Ultimate
     requiredTags: 32
+    categoryTags: 402653185
+    wordTags: 1024
+  - word: Unseen
+    requiredTags: 4
     categoryTags: 0
     wordTags: 1024
   - word: Vanishing
-    requiredTags: 0
+    requiredTags: 67108864
     categoryTags: 262150
     wordTags: 6291456
   - word: Wanderer
@@ -233,6 +269,10 @@ MonoBehaviour:
     requiredTags: 65537
     categoryTags: 0
     wordTags: 1024
+  - word: Wistful
+    requiredTags: 256
+    categoryTags: 0
+    wordTags: 1049600
   - word: Zap
     requiredTags: 0
     categoryTags: 0
