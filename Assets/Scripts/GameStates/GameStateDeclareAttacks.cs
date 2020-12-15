@@ -52,7 +52,6 @@ public class GameStateDeclareAttacks : IGameState
                 if (!creature.creatureState.IsSummoningSick())
                 {
                     gameSession.GetActivePlayer().ServerMoveToCombat(combatAddEvent.creatureId, combatAddEvent.arenaPosition, false);
-                    ChangeState(GameSession.GameState.DECLARE_ATTACKS);
                 }
             }
 

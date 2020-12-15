@@ -31,8 +31,10 @@ public class ExceptTargetDescription : IQualifiableTargettingDescription
         return targetDescription.RequiresSelection();
     }
 
-    public override void ResolveEffectWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    public override Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
     {
+        Queue<EffectResolutionTask> tasks = new Queue<EffectResolutionTask>();
+
         TargetXDescription targetDescription = new TargetXDescription(targetType);
         targetDescription.amount = 1;
         targetDescription.qualifier = qualifier;
@@ -57,10 +59,16 @@ public class ExceptTargetDescription : IQualifiableTargettingDescription
                 }
                 if (valid)
                 {
-                    effect.ApplyToTarget(targetableEntity, player);
+                    EffectResolutionTask task = new EffectResolutionTask();
+                    task.effect = effect;
+                    task.target = targetableEntity;
+                    task.player = player;
+
+                    tasks.Enqueue(task);
                 }
             }
         }
+        return tasks;
     }
 }
 

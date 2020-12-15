@@ -28,8 +28,9 @@ public class AllTargetDescription : IQualifiableTargettingDescription
         return false;
     }
 
-    public override void ResolveEffectWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    public override Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
     {
+        Queue<EffectResolutionTask> tasks = new Queue<EffectResolutionTask>();
         TargetXDescription targetDescription = new TargetXDescription(targetType);
         targetDescription.amount = 1;
         targetDescription.qualifier = qualifier;
@@ -42,9 +43,16 @@ public class AllTargetDescription : IQualifiableTargettingDescription
         {
             if (t.IsTargettable(query))
             {
-                effect.ApplyToTarget(t.GetTargettableEntity(), player);
+                EffectResolutionTask task = new EffectResolutionTask();
+                task.effect = effect;
+                task.target = t.GetTargettableEntity();
+                task.player = player;
+
+                tasks.Enqueue(task);
             }
         }
+
+        return tasks;
     }
 }
 

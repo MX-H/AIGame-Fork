@@ -117,9 +117,9 @@ public class Effect : Targettable
         targetList = targets;
     }
 
-    [Server]
-    public void ServerResolve()
+    public Queue<EffectResolutionTask> GetEffectTasks()
     {
+        Queue<EffectResolutionTask> tasks = new Queue<EffectResolutionTask>();
         List<CardEffectDescription> effectList = source.cardData.GetEffectsOnTrigger(triggerCondition);
 
         int targetIndex = 0;
@@ -127,13 +127,23 @@ public class Effect : Targettable
         {
             if (effect.targettingType != null && effect.targettingType.RequiresSelection())
             {
-                effect.ResolveEffect(targetList[targetIndex], source.controller);
+                Queue<EffectResolutionTask> effectTasks = effect.GetEffectTasks(targetList[targetIndex], source.controller);
+                while (effectTasks.Count > 0)
+                {
+                    tasks.Enqueue(effectTasks.Dequeue());
+                }
+
                 targetIndex++;
             }
             else
             {
-                effect.ResolveEffect(null, source.controller);
+                Queue<EffectResolutionTask> effectTasks = effect.GetEffectTasks(null, source.controller);
+                while (effectTasks.Count > 0)
+                {
+                    tasks.Enqueue(effectTasks.Dequeue());
+                }
             }
         }
+        return tasks;
     }
 }

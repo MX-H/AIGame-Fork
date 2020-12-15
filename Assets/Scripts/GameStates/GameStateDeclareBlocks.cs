@@ -54,7 +54,6 @@ public class GameStateDeclareBlocks : IGameState
                 if (!creature.creatureState.IsSummoningSick() && nonActivePlayer.arena.IsValidBlock(creature, combatAddEvent.arenaPosition))
                 {
                     nonActivePlayer.ServerMoveToCombat(combatAddEvent.creatureId, combatAddEvent.arenaPosition, false);
-                    ChangeState(GameSession.GameState.DECLARE_ATTACKS);
                 }
             }
 
