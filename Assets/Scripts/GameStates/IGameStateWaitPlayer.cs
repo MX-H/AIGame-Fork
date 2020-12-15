@@ -30,9 +30,10 @@ public abstract class IGameStateWaitPlayer : IGameState
     {
         PlayerController player = trapEvent.playerId.GetComponent<PlayerController>();
         Card card = trapEvent.cardId.GetComponent<Card>();
-        if (player.CanUseTrap(card))
+
+        if (trapEvent.flattenedTargets == null)
         {
-            if (trapEvent.flattenedTargets == null)
+            if (player.CanUseTrap(card))
             {
                 List<ITargettingDescription> targets = card.cardData.GetSelectableTargets(TriggerCondition.NONE);
 
@@ -40,8 +41,8 @@ public abstract class IGameStateWaitPlayer : IGameState
                 {
                     if (card.HasValidTargets(targets))
                     {
-                        player.ServerRemoveTrapFromArena(card);
                         gameSession.StartSelectingTargets(card, player, TriggerCondition.NONE);
+                        player.ServerRemoveTrapFromArena(card);
                     }
                 }
                 else
@@ -51,12 +52,12 @@ public abstract class IGameStateWaitPlayer : IGameState
                     gameSession.ResetPriorityPasses();
                 }
             }
-            else
-            {
-                player.ServerActivateTrap(card, trapEvent.flattenedTargets, trapEvent.indexes);
-                gameSession.ResetPriorityPasses();
-            }
-            gameSession.ServerUpdateGameState();
         }
+        else
+        {
+            player.ServerActivateTrap(card, trapEvent.flattenedTargets, trapEvent.indexes);
+            gameSession.ResetPriorityPasses();
+        }
+        gameSession.ServerUpdateGameState();
     }
 }

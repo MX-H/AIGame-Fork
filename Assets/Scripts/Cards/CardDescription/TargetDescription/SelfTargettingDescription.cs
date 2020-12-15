@@ -32,10 +32,16 @@ public class SelfTargettingDescription : ITargettingDescription
         return false;
     }
 
-    public override void ResolveEffectWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    public override Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
     {
-        effect.ApplyToTarget(player, player);
+        EffectResolutionTask task = new EffectResolutionTask();
+        task.effect = effect;
+        task.target = player;
+        task.player = player;
+
+        return new Queue<EffectResolutionTask>(new EffectResolutionTask[] { task });
     }
+
 }
 
 public class SelfTargettingProceduralGenerator : IProceduralTargettingGenerator

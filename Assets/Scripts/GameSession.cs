@@ -756,18 +756,17 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public void ServerResolveStack()
+    public Effect ServerPopStack()
     {
         Effect effect = effectStack.PopEffect();
-        effect.ServerResolve();
         effect.gameObject.SetActive(false);
 
-        playerPasses = 0;
-        RpcResolveStack();
+        RpcPopStack();
+        return effect;
     }
 
     [ClientRpc]
-    public void RpcResolveStack()
+    public void RpcPopStack()
     {
         if (!isServer)
         {

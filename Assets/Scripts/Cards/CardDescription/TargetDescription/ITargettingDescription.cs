@@ -18,7 +18,14 @@ public abstract class ITargettingDescription : IDescription
     public abstract string CardText(bool plural = false);
     public abstract Alignment GetAlignment();
     public abstract double PowerLevel();
-    public abstract void ResolveEffectWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player);
+    public abstract Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player);
+}
+
+public struct EffectResolutionTask
+{
+    public Targettable target;
+    public IEffectDescription effect;
+    public PlayerController player;
 }
 
 public abstract class IQualifiableTargettingDescription : ITargettingDescription

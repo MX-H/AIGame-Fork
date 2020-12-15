@@ -4,27 +4,66 @@ using UnityEngine;
 
 public class GameStateResolveEffects : IGameState
 {
+    Queue<EffectResolutionTask> effectTasks;
+    bool receivedAcknowledgement;
+    System.Type acknowledgementType;
     public GameStateResolveEffects(GameSession gameSession) : base(gameSession)
     { }
+
+    public override void OnEnter()
+    {
+        receivedAcknowledgement = true;
+    }
 
     public override void Update(float frameDelta)
     {
         if (gameSession.isServer)
         {
-            gameSession.ServerResolveStack();
-
-            if (gameSession.IsStackEmpty())
+            if (receivedAcknowledgement)
             {
-                if (gameSession.GetLocalPlayer().IsInCombat())
+                if (effectTasks == null || effectTasks.Count == 0)
                 {
-                    ExitState();
+                    gameSession.ServerUpdateGameState();
+
+                    if (gameSession.IsStackEmpty())
+                    {
+                        if (gameSession.GetLocalPlayer().IsInCombat())
+                        {
+                            ExitState();
+                        }
+                        else
+                        {
+                            ChangeState(GameSession.GameState.WAIT_ACTIVE);
+                        }
+                    }
+                    else
+                    {
+                        Effect effect = gameSession.ServerPopStack();
+                        effectTasks = effect.GetEffectTasks();
+                    }
                 }
                 else
                 {
-                    ChangeState(GameSession.GameState.WAIT_ACTIVE);
+                    EffectResolutionTask task = effectTasks.Dequeue();
+                    task.effect.ApplyToTarget(task.target, task.player);
+                    acknowledgementType = task.effect.GetAcknowlegementType();
+                    if (acknowledgementType != null)
+                    {
+                        receivedAcknowledgement = false;
+                    }
                 }
             }
-            gameSession.ServerUpdateGameState();
+        }
+    }
+
+    public override void HandleEvent(IEvent eventInfo)
+    {
+        if (gameSession.isServer)
+        {
+            if (eventInfo.GetType() == acknowledgementType)
+            {
+                receivedAcknowledgement = true;
+            }
         }
     }
 

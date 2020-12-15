@@ -85,14 +85,13 @@ public class GameStateWaitActivePlayer : IGameStateWaitPlayer
             if (eventInfo is PlayCardEvent playCardEvent)
             {
                 Card card = playCardEvent.cardId.GetComponent<Card>();
-                // Can only play a card once 
-                if (player.CanPlayCard(card))
-                {
-                    switch (card.cardData.GetCardType())
-                    {
-                        case CardType.CREATURE:
 
-                            if (playCardEvent.flattenedTargets == null)
+                switch (card.cardData.GetCardType())
+                {
+                    case CardType.CREATURE:
+                        if (playCardEvent.flattenedTargets == null)
+                        {
+                            if (player.CanPlayCard(card))
                             {
                                 player.ServerRemoveCardFromHand(card);
 
@@ -109,19 +108,20 @@ public class GameStateWaitActivePlayer : IGameStateWaitPlayer
                                     gameSession.ResetPriorityPasses();
                                 }
                             }
-                            else
-                            {
-                                player.ServerPayCost(card);
-                                Creature creature = gameSession.ServerCreateCreature(player, card);
-                                player.ServerPlayCreature(creature, card, playCardEvent.flattenedTargets, playCardEvent.indexes);
-                                gameSession.ResetPriorityPasses();
-                            }
+                        }
+                        else
+                        {
+                            player.ServerPayCost(card);
+                            Creature creature = gameSession.ServerCreateCreature(player, card);
+                            player.ServerPlayCreature(creature, card, playCardEvent.flattenedTargets, playCardEvent.indexes);
+                            gameSession.ResetPriorityPasses();
+                        }
 
-                            break;
-                        case CardType.SPELL:
-                            player.ServerRemoveCardFromHand(card);
-
-                            if (playCardEvent.flattenedTargets == null)
+                        break;
+                    case CardType.SPELL:
+                        if (playCardEvent.flattenedTargets == null)
+                        {
+                            if (player.CanPlayCard(card))
                             {
                                 List<ITargettingDescription> targets = card.cardData.GetSelectableTargets(TriggerCondition.ON_SELF_ENTER);
                                 if (targets.Count > 0)
@@ -140,23 +140,26 @@ public class GameStateWaitActivePlayer : IGameStateWaitPlayer
                                     gameSession.ResetPriorityPasses();
                                 }
                             }
-                            else
-                            {
-                                player.ServerPayCost(card);
-                                player.ServerPlaySpell(card);
-                                gameSession.ResetPriorityPasses();
-                            }
-                            break;
-                        case CardType.TRAP:
+                        }
+                        else
+                        {
+                            player.ServerPayCost(card);
+                            player.ServerPlaySpell(card);
+                            gameSession.ResetPriorityPasses();
+                        }
+                        break;
+                    case CardType.TRAP:
+                        if (player.CanPlayCard(card))
+                        {
                             player.ServerRemoveCardFromHand(card);
                             player.ServerPayCost(card);
                             player.ServerPlayTrap(card);
                             gameSession.ResetPriorityPasses();
-                            break;
-                    }
-
-                    gameSession.ServerUpdateGameState();
+                        }
+                        break;
                 }
+
+                gameSession.ServerUpdateGameState();
             }
 
             if (eventInfo is UseTrapEvent trapEvent)

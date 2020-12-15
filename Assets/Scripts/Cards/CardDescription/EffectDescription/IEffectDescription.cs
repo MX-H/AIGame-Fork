@@ -17,6 +17,10 @@ public abstract class IEffectDescription : IDescription
     public abstract Alignment GetAlignment();
     public abstract double PowerLevel();
     public abstract void ApplyToTarget(Targettable target, PlayerController player);
+    public virtual System.Type GetAcknowlegementType()
+    {
+        return null;
+    }
 }
 
 public abstract class IEffectGenerator

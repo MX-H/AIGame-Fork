@@ -30,12 +30,21 @@ public class UpToXTargetDescription : IQualifiableTargettingDescription
         return true;
     }
 
-    public override void ResolveEffectWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    public override Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
     {
+        Queue<EffectResolutionTask> tasks = new Queue<EffectResolutionTask>();
+
         foreach (Targettable target in targets)
         {
-            effect.ApplyToTarget(target.GetTargettableEntity(), player);
+            EffectResolutionTask task = new EffectResolutionTask();
+            task.effect = effect;
+            task.target = target.GetTargettableEntity();
+            task.player = player;
+
+            tasks.Enqueue(task);
         }
+
+        return tasks;
     }
 }
 
