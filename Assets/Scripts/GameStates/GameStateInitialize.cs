@@ -27,6 +27,7 @@ public class GameStateInitialize : IGameState
         playerAcknowledgements = 0;
         substate = Substate.INITIALIZE;
         hasSentConfirmation = false;
+        GameUtils.GetCardSelector().HideSelections();
     }
 
     public override void OnExit()

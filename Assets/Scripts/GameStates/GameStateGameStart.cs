@@ -40,7 +40,7 @@ public class GameStateGameStart : IGameState
                     cardCount++;
                     foreach (PlayerController player in gameSession.GetPlayerList())
                     {
-                        gameSession.ServerPlayerDrawCard(player, player);
+                        gameSession.ServerPlayerDrawCard(player, player, CardGenerationFlags.NONE, true);
                     }
                 }
             }

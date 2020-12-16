@@ -15,6 +15,8 @@ public class Card : Targettable
 
     public bool isDraggable = true;
 
+    public bool selectorOption = false;
+
     public Vector3 currMousePos;
 
     private Vector3 savedPosition;
@@ -47,7 +49,15 @@ public class Card : Targettable
     protected override void OnMouseDown()
     {
         base.OnMouseDown();
-        if (isDraggable && isRevealed && context != null && !controller.IsSelectingTargets())
+
+        if (selectorOption)
+        {
+            if (isRevealed && owner.IsWaitingOnPlayer() && owner.isLocalPlayer)
+            {
+                owner.ClientRequestCardSelection(cardData.srcPlayer, cardData.cardSeed, cardData.cardFlags);
+            }
+        }
+        else if (isDraggable && isRevealed && context != null && !controller.IsSelectingTargets())
         {
             dragging = true;
             currMousePos = Camera.main.ScreenToWorldPoint(
@@ -110,7 +120,7 @@ public class Card : Targettable
 
     public bool IsInteracting()
     {
-        return selected || dragging || hovering;
+        return selected || dragging || hovering || selectorOption;
     }
 
     public void HoverZoom()
@@ -204,6 +214,13 @@ public class Card : Targettable
                     }
                     return true;
                 }
+            }
+        }
+        else if (owner)
+        {
+            if (owner.isLocalPlayer && selectorOption)
+            {
+                return true;
             }
         }
         return false;

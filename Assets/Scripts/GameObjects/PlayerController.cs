@@ -262,6 +262,32 @@ public class PlayerController : Targettable
         gameSession.HandleEvent(eventInfo);
     }
 
+    [Command]
+    public void CmdSendCardSelectionEvent(CardSelectionEvent eventInfo)
+    {
+        gameSession.HandleEvent(eventInfo);
+    }
+
+    [Server]
+    public void ServerStartCardSelection(PlayerController src, int seed1, int seed2, int seed3, CardGenerationFlags flags)
+    {
+        CardSelector cardSelector = GameUtils.GetCardSelector();
+        cardSelector.SetCardSelection(this, src, seed1, seed2, seed3, flags);
+        cardSelector.ShowSelections(this);
+        RpcStartCardSelection(src.netIdentity, seed1, seed2, seed3, flags);
+    }
+
+    [ClientRpc]
+    public void RpcStartCardSelection(NetworkIdentity src, int seed1, int seed2, int seed3, CardGenerationFlags flags)
+    {
+        if (!isServerOnly)
+        {
+            CardSelector cardSelector = GameUtils.GetCardSelector();
+            cardSelector.SetCardSelection(this, src.GetComponent<PlayerController>(), seed1, seed2, seed3, flags);
+            cardSelector.ShowSelections(this);
+        }
+    }
+
     [Server]
     public void ServerAddCardToHand(PlayerController source, Card card, int seed, CardGenerationFlags flags = CardGenerationFlags.NONE)
     {
@@ -612,6 +638,16 @@ public class PlayerController : Targettable
         {
             CancelPlayCardEvent cancelEvent = new CancelPlayCardEvent(this);
             CmdSendCancelPlayCardEvent(cancelEvent);
+        }
+    }
+
+    [Client]
+    public void ClientRequestCardSelection(PlayerController src, int seed, CardGenerationFlags flags)
+    {
+        if (isLocalPlayer)
+        {
+            CardSelectionEvent cardEvent = new CardSelectionEvent(this, src, seed, flags);
+            CmdSendCardSelectionEvent(cardEvent);
         }
     }
 
@@ -1016,6 +1052,11 @@ public class PlayerController : Targettable
     public bool IsActivePlayer()
     {
         return gameSession.IsActivePlayer(this);
+    }
+
+    public bool IsWaitingOnPlayer()
+    {
+        return gameSession.IsWaitingOnPlayer(this);
     }
 
     public List<PlayerController> GetOpponents()

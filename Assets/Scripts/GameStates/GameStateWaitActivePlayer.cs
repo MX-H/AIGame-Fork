@@ -136,7 +136,7 @@ public class GameStateWaitActivePlayer : IGameStateWaitPlayer
                                 {
                                     player.ServerRemoveCardFromHand(card);
                                     player.ServerPayCost(card);
-                                    player.ServerPlaySpell(card, playCardEvent.flattenedTargets, playCardEvent.indexes);
+                                    player.ServerPlaySpell(card);
                                     gameSession.ResetPriorityPasses();
                                 }
                             }
@@ -144,7 +144,7 @@ public class GameStateWaitActivePlayer : IGameStateWaitPlayer
                         else
                         {
                             player.ServerPayCost(card);
-                            player.ServerPlaySpell(card);
+                            player.ServerPlaySpell(card, playCardEvent.flattenedTargets, playCardEvent.indexes);
                             gameSession.ResetPriorityPasses();
                         }
                         break;

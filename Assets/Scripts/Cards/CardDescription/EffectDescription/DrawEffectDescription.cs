@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -11,6 +12,11 @@ public class DrawEffectDescription : IEffectDescription
     public DrawEffectDescription() : base(EffectType.DRAW_CARDS)
     {
         drawModifier = DrawModifier.SELF;
+    }
+
+    public override Type GetAcknowlegementType()
+    {
+        return typeof(CardDrawnEvent);
     }
 
     public override void ApplyToTarget(Targettable target, PlayerController player)
@@ -44,11 +50,15 @@ public class DrawEffectDescription : IEffectDescription
             {
                 switch (drawModifier)
                 {
-                    case DrawModifier.SELF:
                     case DrawModifier.RANDOM:
+                        gameSession.ServerPlayerDrawCard(targetPlayer, targetPlayer, flags, true);
+                        break;
+                    case DrawModifier.SELF:
                         gameSession.ServerPlayerDrawCard(targetPlayer, targetPlayer, flags);
                         break;
                     case DrawModifier.OPPONENT_RANDOM:
+                        gameSession.ServerPlayerDrawCard(targetPlayer, GameUtils.GetGameSession().GetOpponents(targetPlayer)[0], flags, true);
+                        break;
                     case DrawModifier.OPPONENT:
                         gameSession.ServerPlayerDrawCard(targetPlayer, GameUtils.GetGameSession().GetOpponents(targetPlayer)[0], flags);
                         break;
@@ -84,11 +94,14 @@ public class DrawEffectDescription : IEffectDescription
 
         switch (drawModifier)
         {
+            case DrawModifier.RANDOM:
+                text += " randomly";
+                break;
             case DrawModifier.OPPONENT:
                 text += " from the other player's deck";
                 break;
             case DrawModifier.OPPONENT_RANDOM:
-                text += " from the other player's deck";
+                text += " randomly from the other player's deck";
                 break;
         }
 

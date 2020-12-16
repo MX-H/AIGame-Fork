@@ -7,6 +7,7 @@ public static class GameUtils
     private static GameSession gameSession;
     private static CreatureModelIndex creatureModelIndex;
     private static TurnTimer turnTimer;
+    private static CardSelector cardSelector;
     public static void SetGameSession(GameSession game)
     {
         gameSession = game;
@@ -35,5 +36,15 @@ public static class GameUtils
     public static TurnTimer GetTurnTimer()
     {
         return turnTimer;
+    }
+
+    public static void SetCardSelector(CardSelector selector)
+    {
+        cardSelector = selector;
+    }
+
+    public static CardSelector GetCardSelector()
+    {
+        return cardSelector;
     }
 }

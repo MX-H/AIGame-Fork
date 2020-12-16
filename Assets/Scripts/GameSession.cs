@@ -10,7 +10,6 @@ public class GameSession : NetworkBehaviour
     {
         NONE,
         INITIALIZE,
-        WAIT_FOR_INITIALIZE,
         GAME_START,
         DECLARE_ATTACKS,
         DECLARE_BLOCKS,
@@ -22,7 +21,8 @@ public class GameSession : NetworkBehaviour
         SELECTING_TARGETS,
         RESOLVING_EFFECTS,
         TRIGGERING_EFFECTS,
-        GAME_OVER
+        GAME_OVER,
+        CARD_SELECT
     }
 
     public enum PendingType
@@ -118,6 +118,7 @@ public class GameSession : NetworkBehaviour
         ClientScene.RegisterPrefab(effectPrefab.gameObject);
         GameUtils.SetGameSession(this);
         GameUtils.SetCreatureModelIndex(creatureModelIndex);
+        GameUtils.SetCardSelector(FindObjectOfType<CardSelector>());
         SetupGameStates();
 
         receivedEvents = new Queue<IEvent>();
@@ -141,6 +142,7 @@ public class GameSession : NetworkBehaviour
         gameStates.Add(GameState.TRIGGERING_EFFECTS,    new GameStateTriggerEffects(this));
         gameStates.Add(GameState.RESOLVING_EFFECTS,     new GameStateResolveEffects(this));
         gameStates.Add(GameState.GAME_OVER,             new GameStateGameOver(this));
+        gameStates.Add(GameState.CARD_SELECT,           new GameStateCardSelect(this));
     }
 
     [Server]
@@ -282,6 +284,16 @@ public class GameSession : NetworkBehaviour
         return waitingIndex;
     }
 
+    public int GetPlayerIndex(PlayerController player)
+    {
+        for (int i = 0; i < GetMaxPlayers(); i++)
+        {
+            if (playerList[i] == player)
+                return i;
+        }
+        return -1;
+    }
+
     public PlayerController[] GetPlayerList()
     {
         return (PlayerController[])playerList.Clone();
@@ -342,7 +354,7 @@ public class GameSession : NetworkBehaviour
 
     public bool IsGameReady()
     {
-        return currState != GameState.INITIALIZE && currState != GameState.WAIT_FOR_INITIALIZE && currState != GameState.NONE;
+        return currState != GameState.INITIALIZE && currState != GameState.NONE;
     }
 
     [Server]
@@ -590,13 +602,13 @@ public class GameSession : NetworkBehaviour
             nextState = GameState.NONE;
             nextSubstateIndex = 0;
 
-            IGameState currState = stateStack.Peek();
-            currState.Update(Time.deltaTime);
-
-            // Copy over the list of events so handling events doesn't add events to get processed on the same frame
+            // Copy over the list of events so handling events frmo updating doesn't add events to get processed on the same frame
             // This also allows us to forward events to the next frame which might be a state change
             Queue<IEvent> events = new Queue<IEvent>(receivedEvents);
             receivedEvents.Clear();
+
+            IGameState currState = stateStack.Peek();
+            currState.Update(Time.deltaTime);
 
             while (events.Count > 0)
             {
@@ -643,10 +655,31 @@ public class GameSession : NetworkBehaviour
 
 
     [Server]
-    public void ServerPlayerDrawCard(PlayerController player, PlayerController srcPlayer, CardGenerationFlags flags = CardGenerationFlags.NONE)
+    public void ServerPlayerDrawCard(PlayerController player, PlayerController srcPlayer, CardGenerationFlags flags = CardGenerationFlags.NONE, bool random = false)
+    {
+        if (random)
+        {
+            Card card = ServerCreateCard(player);
+            player.ServerAddCardToHand(srcPlayer, card, (int)(UnityEngine.Random.value * Int32.MaxValue), flags);
+
+            CardDrawnEvent cardDrawEvent = new CardDrawnEvent(player, card);
+            HandleEvent(cardDrawEvent);
+        }
+        else
+        {
+            StartCardSelectionEvent startSelectionEvent = new StartCardSelectionEvent(player, srcPlayer,
+                (int)(UnityEngine.Random.value * Int32.MaxValue), (int)(UnityEngine.Random.value * Int32.MaxValue), (int)(UnityEngine.Random.value * Int32.MaxValue), flags);
+            HandleEvent(startSelectionEvent);
+
+            ServerPushState(GameState.CARD_SELECT);
+        }
+    }
+
+    [Server]
+    public void ServerPlayerDrawCard(PlayerController player, PlayerController srcPlayer, int seed, CardGenerationFlags flags = CardGenerationFlags.NONE)
     {
         Card card = ServerCreateCard(player);
-        player.ServerAddCardToHand(srcPlayer, card, (int)(UnityEngine.Random.value * Int32.MaxValue), flags);
+        player.ServerAddCardToHand(srcPlayer, card, seed, flags);
 
         CardDrawnEvent cardDrawEvent = new CardDrawnEvent(player, card);
         HandleEvent(cardDrawEvent);
