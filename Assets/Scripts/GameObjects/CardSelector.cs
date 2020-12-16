@@ -8,6 +8,9 @@ public class CardSelector : MonoBehaviour
     private Card[] cardSelection = new Card[3];
 
     // Start is called before the first frame update
+    public float CARD_HIDDEN_Y_OFFSET = 3;
+    public float CARD_HIDDEN_Z_OFFSET = 15;
+
     void Start()
     {
         foreach (Card card in cardSelection)
@@ -40,6 +43,15 @@ public class CardSelector : MonoBehaviour
             card.isRevealed = revealed;
             card.enabled = revealed;
             card.transform.eulerAngles = new Vector3(0, (revealed ? 0 : 180), 0);
+            if (revealed)
+            {
+                card.transform.localPosition = new Vector3(card.transform.localPosition.x, 0, 0);
+            }
+            else
+            {
+                card.transform.localPosition = new Vector3(card.transform.localPosition.x, CARD_HIDDEN_Y_OFFSET, CARD_HIDDEN_Z_OFFSET);
+            }
+
             card.gameObject.SetActive(true);
         }
     }
@@ -50,6 +62,8 @@ public class CardSelector : MonoBehaviour
         {
             card.gameObject.SetActive(false);
             card.enabled = false;
+            card.isSelected = false;
+            card.isTargettable = false;
         }
     }
 }
