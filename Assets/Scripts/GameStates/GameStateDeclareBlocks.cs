@@ -51,7 +51,7 @@ public class GameStateDeclareBlocks : IGameState
             if (eventInfo is CreatureMoveToCombatEvent combatAddEvent)
             {
                 Creature creature = combatAddEvent.creatureId.GetComponent<Creature>();
-                if (!creature.creatureState.IsSummoningSick() && nonActivePlayer.arena.IsValidBlock(creature, combatAddEvent.arenaPosition))
+                if (nonActivePlayer.arena.IsValidBlock(creature, combatAddEvent.arenaPosition))
                 {
                     nonActivePlayer.ServerMoveToCombat(combatAddEvent.creatureId, combatAddEvent.arenaPosition, false);
                 }
