@@ -14,8 +14,9 @@ public class TargetXDescription : IQualifiableTargettingDescription
     public override string CardText(bool plural)
     {
         plural = amount != 1;
-        string targetString = QualifierText() + CardParsing.Parse(targetType, plural);
-        return (plural ? amount.ToString() + " target " : "target ") + targetString;
+        string targetString = (plural ? amount.ToString() : "a") + " " + QualifierText() + CardParsing.Parse(targetType, plural);
+        return targetString;
+        //return (plural ? amount.ToString() + " " : "target ") + targetString;
     }
 
     public override double PowerLevel()

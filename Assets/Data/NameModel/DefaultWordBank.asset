@@ -215,7 +215,7 @@ MonoBehaviour:
     wordTags: 1024
   - word: Samurai
     requiredTags: 1
-    categoryTags: 131072
+    categoryTags: 131136
     wordTags: 772
   - word: Seeker
     requiredTags: 0

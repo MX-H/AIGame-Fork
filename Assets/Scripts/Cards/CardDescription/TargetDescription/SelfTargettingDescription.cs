@@ -9,7 +9,7 @@ public class SelfTargettingDescription : ITargettingDescription
     }
     public override string CardText(bool plural)
     {
-        return "you";
+        return "yourself";
     }
 
     public override Alignment GetAlignment()

@@ -14,7 +14,7 @@ public class UpToXTargetDescription : IQualifiableTargettingDescription
 
     public override string CardText(bool plural)
     {
-        return "up to " + amount.ToString() + " target " + QualifierText() + CardParsing.Parse(targetType, amount != 1);
+        return "up to " + amount.ToString() + " " + QualifierText() + CardParsing.Parse(targetType, amount != 1);
     }
     public override double PowerLevel()
     {

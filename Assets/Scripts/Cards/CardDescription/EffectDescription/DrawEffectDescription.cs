@@ -69,7 +69,7 @@ public class DrawEffectDescription : IEffectDescription
 
     public override string CardText(bool plural) 
     {
-        string text = (plural ? "draws " : "draw ") + amount.ToString();
+        string text = (plural ? "draws " : "draw ") + ((amount == 1) ? "a" : amount.ToString());
 
         if (cardQualifier != null)
         {
@@ -98,10 +98,10 @@ public class DrawEffectDescription : IEffectDescription
                 text += " randomly";
                 break;
             case DrawModifier.OPPONENT:
-                text += " from the other player's deck";
+                text += " from the opposite deck";
                 break;
             case DrawModifier.OPPONENT_RANDOM:
-                text += " randomly from the other player's deck";
+                text += " randomly from the opposite deck";
                 break;
         }
 

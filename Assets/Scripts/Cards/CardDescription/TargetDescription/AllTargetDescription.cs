@@ -10,6 +10,11 @@ public class AllTargetDescription : IQualifiableTargettingDescription
 
     public override string CardText(bool plural)
     {
+
+        if (targetType == TargetType.PLAYERS)
+        {
+            return "each player";
+        }
         return "all " + QualifierText() + CardParsing.Parse(targetType, true);
     }
 
@@ -20,6 +25,10 @@ public class AllTargetDescription : IQualifiableTargettingDescription
 
     public override bool RequiresPluralEffect()
     {
+        if (targetType == TargetType.PLAYERS)
+        {
+            return true;
+        }
         return false;
     }
 

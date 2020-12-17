@@ -11,8 +11,24 @@ public class CardEffectDescription : IDescription
 
     public string CardText(bool plural = false)
     {
-        return ((triggerCondition == TriggerCondition.NONE) ? "" : CardParsing.Parse(triggerCondition) + ": ")
-            + CardParsing.CapitalizeSentence(targettingType.CardText() + " " + effectType.CardText(targettingType.RequiresPluralEffect()));
+        string text = ((triggerCondition == TriggerCondition.NONE) ? "" : CardParsing.Parse(triggerCondition) + ": ");
+        if (effectType is DrawEffectDescription || effectType is SummonEffectDescription)
+        {
+            if (targettingType is SelfTargettingDescription)
+            {
+                text += CardParsing.CapitalizeSentence(effectType.CardText(targettingType.RequiresPluralEffect()));
+            }
+            else
+            {
+                text += CardParsing.CapitalizeSentence(targettingType.CardText() + " " + effectType.CardText(targettingType.RequiresPluralEffect()));
+            }
+        }
+        else
+        {
+            text += CardParsing.CapitalizeSentence(effectType.CardText(false) + " " + targettingType.CardText());
+        }
+        text += ".";
+        return text;
     }
 
     public Alignment GetAlignment()

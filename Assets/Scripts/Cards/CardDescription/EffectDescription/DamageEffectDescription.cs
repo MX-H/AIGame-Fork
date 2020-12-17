@@ -25,6 +25,16 @@ public class DamageEffectDescription : IEffectDescription
 
     public override string CardText(bool plural)
     {
+        if (effectType == EffectType.HEAL_DAMAGE)
+        {
+            return "heal " + amount + " health to";
+        }
+        else
+        {
+            return "deal " + amount + " damage to";
+        }
+
+        /*
         string text = "";
         if (effectType == EffectType.HEAL_DAMAGE)
         {
@@ -36,6 +46,7 @@ public class DamageEffectDescription : IEffectDescription
         }
         text += amount.ToString() + " damage";
         return text;
+        */
     }
     public override Alignment GetAlignment()
     {

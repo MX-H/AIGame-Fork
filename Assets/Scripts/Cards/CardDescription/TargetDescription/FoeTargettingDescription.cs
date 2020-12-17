@@ -9,7 +9,7 @@ public class FoeTargettingDescription : ITargettingDescription
     }
     public override string CardText(bool plural)
     {
-        return "opponent";
+        return "the opponent";
     }
 
     public override Alignment GetAlignment()

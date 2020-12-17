@@ -18,7 +18,8 @@ public class NegateEffectDescription : IEffectDescription
 
     public override string CardText(bool plural)
     {
-        return (plural ? "is" : "are") + " negated";
+        return "negate";
+        //return (plural ? "is" : "are") + " negated";
     }
 
     public override Alignment GetAlignment()
