@@ -6,6 +6,7 @@ public class GameStateResolveEffects : IGameState
 {
     Queue<EffectResolutionTask> effectTasks;
     bool receivedAcknowledgement;
+    bool stateUpdated;
     System.Type acknowledgementType;
     public GameStateResolveEffects(GameSession gameSession) : base(gameSession)
     { }
@@ -13,6 +14,7 @@ public class GameStateResolveEffects : IGameState
     public override void OnEnter()
     {
         receivedAcknowledgement = true;
+        stateUpdated = true;
     }
 
     public override void Update(float frameDelta)
@@ -23,23 +25,32 @@ public class GameStateResolveEffects : IGameState
             {
                 if (effectTasks == null || effectTasks.Count == 0)
                 {
-                    gameSession.ServerUpdateGameState();
-
-                    if (gameSession.IsStackEmpty())
+                    if (!stateUpdated)
                     {
-                        if (gameSession.GetLocalPlayer().IsInCombat())
-                        {
-                            ExitState();
-                        }
-                        else
-                        {
-                            ChangeState(GameSession.GameState.WAIT_ACTIVE);
-                        }
+                        // This might trigger a state push of trigger effects
+                        // Don't make an exit request on the same frame so only do this for the whole frame
+                        gameSession.ServerUpdateGameState();
+                        stateUpdated = true;
                     }
                     else
                     {
-                        Effect effect = gameSession.ServerPopStack();
-                        effectTasks = effect.GetEffectTasks();
+                        stateUpdated = false;
+                        if (gameSession.IsStackEmpty())
+                        {
+                            if (gameSession.GetLocalPlayer().IsInCombat())
+                            {
+                                ExitState();
+                            }
+                            else
+                            {
+                                ChangeState(GameSession.GameState.WAIT_ACTIVE);
+                            }
+                        }
+                        else
+                        {
+                            Effect effect = gameSession.ServerPopStack();
+                            effectTasks = effect.GetEffectTasks();
+                        }
                     }
                 }
                 else
