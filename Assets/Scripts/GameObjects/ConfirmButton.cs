@@ -1,12 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
-public class ConfirmButton : Targettable
+[RequireComponent(typeof(Button))]
+public class ConfirmButton : MonoBehaviour
 {
     public PlayerController localPlayer;
-    public TextMeshProUGUI confirmText;
+    private TextMeshProUGUI confirmText;
+    private Button button;
+
     private enum State
     {
         AWAITING_CONFIRMATION,
@@ -16,38 +20,34 @@ public class ConfirmButton : Targettable
     }
 
     State state;
-    protected override void Start()
+    void Start()
     {
-        base.Start();
         state = State.INACTIVE;
-    }
-
-    public override bool IsTargettable()
-    {
-        return (state != State.INACTIVE) && (state != State.AWAITING_SELECTION);
-    }
-
-    public override bool IsTargettable(TargettingQuery targetQuery)
-    {
-        return false;
+        confirmText = GetComponentInChildren<TextMeshProUGUI>();
+        button = GetComponent<Button>();
+        button.onClick.AddListener(OnClick);
     }
 
     // Update is called once per frame
-    protected override void Update()
+    void Update()
     {
         DetermineState();
         switch (state)
         {
             case State.AWAITING_SELECTION:
                 confirmText.text = "CHOOSE";
+                button.interactable = false;
                 break;
             case State.INACTIVE:
                 confirmText.text = "WAIT";
+                button.interactable = false;
                 break;
             case State.AWAITING_CONFIRMATION:
                 confirmText.text = "OK";
+                button.interactable = true;
                 break;
             case State.END_TURN:
+                button.interactable = true;
                 if (localPlayer.IsActivePlayer())
                 {
                     confirmText.text = "END TURN";
@@ -57,13 +57,10 @@ public class ConfirmButton : Targettable
                     confirmText.text = "START TURN";
                 }
                 break;
-        }
-
-        base.Update();
-        
+        }        
     }
 
-    protected override void OnMouseDown()
+    public void OnClick()
     {
         if (localPlayer)
         {

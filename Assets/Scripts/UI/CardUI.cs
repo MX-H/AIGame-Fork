@@ -109,7 +109,7 @@ public class CardUI : MonoBehaviour
             if (cardDesc.GetImage())
             {
                 Sprite[] sprites = Resources.LoadAll<Sprite>(GameConstants.PATHS.CARD_IMAGES + cardDesc.GetImage().name);
-                cardImage.sprite = sprites[1];
+                cardImage.sprite = sprites[0];
             }
         }
     }

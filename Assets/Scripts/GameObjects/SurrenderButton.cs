@@ -1,34 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
-public class SurrenderButton : Targettable
+[RequireComponent(typeof(Button))]
+
+public class SurrenderButton : MonoBehaviour
 {
     public PlayerController localPlayer;
+    private Button button;
 
-    protected override void Start()
+    void Start()
     {
-        base.Start();
+        button = GetComponent<Button>();
+        button.onClick.AddListener(OnClick);
     }
 
-    public override bool IsTargettable()
-    {
-        return true;
-    }
-
-    public override bool IsTargettable(TargettingQuery targetQuery)
-    {
-        return true;
-    }
-
-    // Update is called once per frame
-    protected override void Update()
-    {
-        base.Update();
-    }
-
-    protected override void OnMouseDown()
+    void OnClick()
     {
         if (localPlayer)
         {

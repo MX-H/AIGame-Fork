@@ -96,9 +96,9 @@ TextureImporter:
       name: faerie_0001_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 127
         y: 0
-        width: 1620
+        width: 1440
         height: 1080
       alignment: 0
       pivot: {x: 0.5, y: 0.5}

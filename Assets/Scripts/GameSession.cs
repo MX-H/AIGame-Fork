@@ -876,6 +876,7 @@ public class GameSession : NetworkBehaviour
         CheckGameOver(loser);
     }
 
+    [Server]
     private void CheckGameOver(PlayerController loser) {
         if (loser != null)
         {

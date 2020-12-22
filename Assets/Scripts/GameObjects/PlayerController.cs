@@ -61,14 +61,13 @@ public class PlayerController : Targettable
         base.Start();
         ClientScene.RegisterPrefab(cardPrefab.gameObject);
         ClientScene.RegisterPrefab(creaturePrefab.gameObject);
-        if (isLocalPlayer)
-        {
-            selectingTextPrompt = GameObject.Find("Player Selection Prompt").GetComponent<TextPrompt>();
-            selectingTextPrompt.gameObject.SetActive(false);
-        }
+
         cardGenerator = new ProceduralCardGenerator(model, imageGlossary, gameSession.creatureModelIndex, nameModel);
         if (isLocalPlayer)
         {
+            selectingTextPrompt = GameObject.Find("ScreenUI/SelectPrompt").GetComponent<TextPrompt>();
+            selectingTextPrompt.gameObject.SetActive(false);
+
             ConfirmButton confirmButton = FindObjectOfType<ConfirmButton>();
             confirmButton.localPlayer = this;
             GameOverButton gameOverButton = FindObjectOfType<GameOverButton>();

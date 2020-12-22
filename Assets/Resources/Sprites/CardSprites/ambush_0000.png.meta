@@ -8,6 +8,9 @@ TextureImporter:
   - first:
       213: 8679519678260841044
     second: ambush_0000_1
+  - first:
+      213: -5392096923014433455
+    second: ambush_0000_2
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -96,12 +99,12 @@ TextureImporter:
       name: ambush_0000_0
       rect:
         serializedVersion: 2
-        x: 133
+        x: 173
         y: 0
-        width: 720
+        width: 640
         height: 480
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -122,7 +125,7 @@ TextureImporter:
         width: 480
         height: 480
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
