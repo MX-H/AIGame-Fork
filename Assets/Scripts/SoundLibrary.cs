@@ -8,11 +8,18 @@ using UnityEngine;
 
 public class SoundLibrary : MonoBehaviour
 {
-    public AudioClip victorySound, defeatSound, combatSound, turnStartSound, drawSound, gameStartSound;
-    AudioSource audioSource;
+    public static AudioClip victorySound, defeatSound, combatSound, drawSound, addEffectSound, playCardSound, activateTrapSound;
+    static AudioSource audioSource;
     
     void Start()
     {
+        victorySound = Resources.Load<AudioClip>("Music/SFX/Victory");
+        defeatSound = Resources.Load<AudioClip>("Music/SFX/Defeat");
+        combatSound = Resources.Load<AudioClip>("Music/SFX/Combat");
+        drawSound = Resources.Load<AudioClip>("Music/SFX/DrawCard");
+        addEffectSound = Resources.Load<AudioClip>("Music/SFX/AddEffect");
+        playCardSound = Resources.Load<AudioClip>("Music/SFX/PlayCard");
+        activateTrapSound = Resources.Load<AudioClip>("Music/SFX/ActivateTrap");
         audioSource = GetComponent<AudioSource>();
     }
 
@@ -21,16 +28,10 @@ public class SoundLibrary : MonoBehaviour
     
     }
 
-    public void PlaySound(string action)
+    public static void PlaySound(string action)
     {
         switch (action)
         {
-            case "gameStart":
-                audioSource.PlayOneShot(gameStartSound);
-                break;
-            case "turnStart":
-                audioSource.PlayOneShot(turnStartSound);
-                break;
             case "draw":
                 audioSource.PlayOneShot(drawSound);
                 break;
@@ -42,6 +43,15 @@ public class SoundLibrary : MonoBehaviour
                 break;
             case "combat":
                 audioSource.PlayOneShot(combatSound);
+                break;
+            case "card":
+                audioSource.PlayOneShot(playCardSound);
+                break;
+            case "trap":
+                audioSource.PlayOneShot(activateTrapSound);
+                break;
+            case "effect":
+                audioSource.PlayOneShot(addEffectSound);
                 break;
         }
     }
