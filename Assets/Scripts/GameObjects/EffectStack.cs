@@ -31,6 +31,7 @@ public class EffectStack : MonoBehaviour
 
     public void PushEffect(Effect effect)
     {
+        SoundLibrary.PlaySound("effect");
         effectStack.Add(effect);
         effect.transform.SetParent(transform);
     }

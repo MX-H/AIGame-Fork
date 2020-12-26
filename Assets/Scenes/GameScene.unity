@@ -740,7 +740,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.279
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -832,7 +832,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 452863121}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 37321.5, y: 34453.188, z: -61439.875}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -850,12 +850,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 823c3f620d5c50e4788f704fe86ef1d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  victorySound: {fileID: 8300000, guid: 71b7715dacc2a974ea2665f67c0756d7, type: 3}
-  defeatSound: {fileID: 8300000, guid: a228da2c463d2a543b7f315f7142c0b6, type: 3}
-  combatSound: {fileID: 8300000, guid: 64819e0ea74f20f49b02ea826024a1d6, type: 3}
-  turnStartSound: {fileID: 8300000, guid: eba7faf7666128b4b8e455e6aeab7836, type: 3}
-  drawSound: {fileID: 8300000, guid: 36a1ae21d862b134db346f457fcfbd52, type: 3}
-  gameStartSound: {fileID: 8300000, guid: 84caf9e5a55023144853c62944dd9a4b, type: 3}
 --- !u!1 &477863472
 GameObject:
   m_ObjectHideFlags: 0

@@ -350,7 +350,7 @@ public class PlayerController : Targettable
         c.controller = this;
         c.isRevealed = isLocalPlayer;
         c.isDraggable = isLocalPlayer;
-
+        SoundLibrary.PlaySound("draw");
         hand.AddCard(c);
     }
 
@@ -615,6 +615,7 @@ public class PlayerController : Targettable
     {
         if (isLocalPlayer && CanPlayCard(card))
         {
+            SoundLibrary.PlaySound("card");
             PlayCardEvent playEvent = new PlayCardEvent(this, card);
             CmdSendPlayCardEvent(playEvent);
         }
@@ -625,6 +626,7 @@ public class PlayerController : Targettable
     {
         if (isLocalPlayer && CanUseTrap(card))
         {
+            SoundLibrary.PlaySound("trap");
             UseTrapEvent trapEvent = new UseTrapEvent(this, card);
             CmdSendUseTrapEvent(trapEvent);
         }
@@ -859,6 +861,7 @@ public class PlayerController : Targettable
     {
         TextMeshProUGUI endGameText = GameObject.Find("GameOverText").GetComponent<TextMeshProUGUI>();
         endGameText.text = winner ? "VICTORY" : "DEFEAT";
+        SoundLibrary.PlaySound(winner ? "victory" : "defeat");
     }
 
     [TargetRpc]
