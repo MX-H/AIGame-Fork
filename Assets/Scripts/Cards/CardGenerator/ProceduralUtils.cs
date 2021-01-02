@@ -177,23 +177,10 @@ public static class ProceduralUtils
         return new SortedSet<QualifierType>(qualifiersByAlignment[a]);
     }
 
-    static public int GetLowerBound(IDescription desc, ref int field, int min, int max, double budget)
-    {
-        // Find the lower bound of card amount
-        int bound;
-        for (bound = min; bound < max; bound++)
-        {
-            field = bound;
-            if (desc.PowerLevel() >= budget)
-            {
-                break;
-            }
-        }
-        return bound;
-    }
-
     static public int GetUpperBound(IDescription desc, ref int field, int min, int max, double budget)
     {
+        int originalVal = field;
+
         // Find the lower bound of card amount
         int bound;
         for (bound = max; bound > min; bound--)
@@ -204,8 +191,76 @@ public static class ProceduralUtils
                 break;
             }
         }
+
+        field = originalVal;
+
         return bound;
     }
+
+    static public int GetLowerBound(IDescription desc, ref int field, int min, int max, double budget)
+    {
+        int originalVal = field;
+
+        // Find the lower bound of card amount
+        int bound;
+        for (bound = min; bound < max; bound++)
+        {
+            field = bound;
+            if (desc.PowerLevel() >= budget)
+            {
+                break;
+            }
+        }
+
+        field = originalVal;
+        return bound;
+    }
+
+    static public int GetUpperBound(IDescription desc, ref int field1, ref int field2, int min, int max, double budget)
+    {
+        int original1 = field1;
+        int original2 = field2;
+
+        // Find the lower bound of card amount
+        int bound;
+        for (bound = max; bound > min; bound--)
+        {
+            field1 = bound;
+            field2 = bound;
+            if (desc.PowerLevel() <= budget)
+            {
+                break;
+            }
+        }
+
+        field1 = original1;
+        field2 = original2;
+
+        return bound;
+    }
+    static public int GetLowerBound(IDescription desc, ref int field1, ref int field2, int min, int max, double budget)
+    {
+        int original1 = field1;
+        int original2 = field2;
+
+        // Find the lower bound of card amount
+        int bound;
+        for (bound = min; bound < max; bound++)
+        {
+            field1 = bound;
+            field2 = bound;
+            if (desc.PowerLevel() >= budget)
+            {
+                break;
+            }
+        }
+
+        field1 = original1;
+        field2 = original2;
+
+        return bound;
+    }
+
     static public T GetRandomValue<T>(System.Random random, IHistogram model) where T : Enum
     {
         return GetRandomValue<T>(random, model, (T[])Enum.GetValues(typeof(T)));
@@ -322,6 +377,9 @@ public static class ProceduralUtils
         RegisterProceduralGenerator(EffectType.HEAL_DAMAGE, new DamageEffectProceduralGenerator(true));
         RegisterProceduralGenerator(EffectType.NEGATE, new NegateEffectProceduralGenerator());
         RegisterProceduralGenerator(EffectType.SUMMON_TOKEN, new SummonEffectProceduralGenerator());
+        RegisterProceduralGenerator(EffectType.GIVE_POSITIVE_STATS, new GiveModifierEffectProceduralGenerator(EffectType.GIVE_POSITIVE_STATS));
+        RegisterProceduralGenerator(EffectType.GIVE_NEGATIVE_STATS, new GiveModifierEffectProceduralGenerator(EffectType.GIVE_NEGATIVE_STATS));
+        RegisterProceduralGenerator(EffectType.GIVE_KEYWORD, new GiveModifierEffectProceduralGenerator(EffectType.GIVE_KEYWORD));
 
         RegisterProceduralGenerator(TargettingType.TARGET, new TargetXProceduralGenerator());
         RegisterProceduralGenerator(TargettingType.UP_TO_TARGET, new UpToXProceduralGenerator());

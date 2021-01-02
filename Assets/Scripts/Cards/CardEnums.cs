@@ -102,7 +102,14 @@ public enum EffectType
     DEAL_DAMAGE,
     HEAL_DAMAGE,
     SUMMON_TOKEN,
-    NEGATE
+    NEGATE,
+
+    GIVE_POSITIVE_STATS,
+    GIVE_NEGATIVE_STATS,
+    GIVE_KEYWORD,
+    AURA_POSITIVE_STATS,
+    AURA_NEGATIVE_STATS,
+    AURA_KEYWORD,
 }
 
 public enum DrawModifier
@@ -138,6 +145,19 @@ public enum KeywordAttribute
     EAGER
 }
 
+public enum ModifierType
+{
+    STAT,
+    KEYWORD
+}
+
+public enum DurationType
+{
+    FOREVER,
+    AURA,
+    END_OF_TURN,
+}
+
 static class CardEnums
 {
     public static System.Type[] EnumTypes = new System.Type[]
@@ -151,7 +171,8 @@ static class CardEnums
             typeof(ManaCost),
             typeof(DrawModifier),
             typeof(KeywordAttribute),
-            typeof(TriggerCondition)
+            typeof(TriggerCondition),
+            typeof(ModifierType)
         };
 
 
@@ -253,6 +274,9 @@ static class CardEnums
         RegisterFlags(EffectType.SUMMON_TOKEN, new TargetType[] { TargetType.PLAYERS });
         RegisterFlags(EffectType.NEGATE, new TargetType[] { TargetType.SPELLS, TargetType.ACTIVE_TRAPS, TargetType.EFFECTS,
             TargetType.SPELLS_AND_EFFECTS, TargetType.SPELLS_AND_TRAPS, TargetType.TRAPS_AND_EFFECTS, TargetType.STACK_ITEMS });
+        RegisterFlags(EffectType.GIVE_POSITIVE_STATS, new TargetType[] { TargetType.CREATURES });
+        RegisterFlags(EffectType.GIVE_NEGATIVE_STATS, new TargetType[] { TargetType.CREATURES });
+        RegisterFlags(EffectType.GIVE_KEYWORD, new TargetType[] { TargetType.CREATURES });
 
         // Valid trigger conditions to perform effects
         RemoveFlags(EffectType.DRAW_CARDS, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
@@ -260,6 +284,9 @@ static class CardEnums
         RemoveFlags(EffectType.HEAL_DAMAGE, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
         RemoveFlags(EffectType.SUMMON_TOKEN, new TriggerCondition[] { TriggerCondition.IS_ALIVE, TriggerCondition.ON_CREATURE_ENTER, TriggerCondition.ON_CREATURE_DIES });
         RemoveFlags(EffectType.NEGATE,  ((TriggerCondition[])System.Enum.GetValues(typeof(TriggerCondition))).Except(new TriggerCondition[] { TriggerCondition.ON_STACK_UPDATED }));
+        RemoveFlags(EffectType.GIVE_POSITIVE_STATS, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
+        RemoveFlags(EffectType.GIVE_NEGATIVE_STATS, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
+        RemoveFlags(EffectType.GIVE_KEYWORD, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
 
         // Valid targetting types for targets
         RegisterFlags(TargetType.CREATURES, new TargettingType[] { TargettingType.ALL, TargettingType.TARGET, TargettingType.UP_TO_TARGET, TargettingType.EXCEPT });

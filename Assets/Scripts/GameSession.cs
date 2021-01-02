@@ -789,6 +789,12 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
+    public void ServerApplyModifier(Creature target, IModifier modifier)
+    {
+        target.creatureState.ServerAddModifier(modifier);
+    }
+
+    [Server]
     public Effect ServerPopStack()
     {
         Effect effect = effectStack.PopEffect();

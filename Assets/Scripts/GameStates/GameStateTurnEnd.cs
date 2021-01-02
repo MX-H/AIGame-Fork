@@ -8,6 +8,17 @@ public class GameStateTurnEnd : IGameState
     {
     }
 
+    public override void OnEnter()
+    {
+        foreach (PlayerController player in gameSession.GetPlayerList())
+        {
+            foreach (Creature creature in player.arena.GetAllCreatures())
+            {
+                creature.creatureState.RemoveEndOfTurnModifiers();
+            }
+        }
+    }
+
     public override void Update(float frameDelta)
     {
         if (gameSession.isServer)

@@ -13,10 +13,6 @@ public class CardHistogram : IHistogram
         public string id;
 
         [SerializeField]
-        public readonly System.Type type;
-        private class IndexMap : Dictionary<int, int> { }
-
-        [SerializeField]
         private List<EnumHistogramEntry> values;
 
         private void UpdateTotal()
@@ -31,7 +27,6 @@ public class CardHistogram : IHistogram
         public EnumHistogram(System.Type t)
         {
             id = t.Name;
-            type = t;
             values = new List<EnumHistogramEntry>();
             int i = 0;
             foreach (int val in System.Enum.GetValues(t))
@@ -44,6 +39,8 @@ public class CardHistogram : IHistogram
 
         public void Validate()
         {
+            System.Type type = System.Type.GetType(id);
+
             for (int i = values.Count; i < System.Enum.GetValues(type).Length; i++)
             {
                 values.Add(new EnumHistogramEntry(i, 1, type));
@@ -123,7 +120,7 @@ public class CardHistogram : IHistogram
     {
         foreach (System.Type t in CardEnums.EnumTypes)
         {
-            if (typeIndexMap.ContainsKey(t))
+            if (typeIndexMap.ContainsKey(t) && typeIndexMap[t] < histograms.Count)
             {
                 histograms[typeIndexMap[t]].Validate();
             }

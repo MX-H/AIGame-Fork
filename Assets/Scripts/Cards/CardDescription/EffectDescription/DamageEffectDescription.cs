@@ -77,7 +77,7 @@ public class DamageEffectProceduralGenerator : IProceduralEffectGenerator
         int min = ProceduralUtils.GetLowerBound(desc, ref desc.amount, MIN_DAMAGE, max, minAllocatedBudget);
 
         Assert.IsTrue(max >= min);
-        desc.amount = random.Next(min, max);
+        desc.amount = random.Next(min, max + 1);
 
         return desc;
     }

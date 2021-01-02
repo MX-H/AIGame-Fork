@@ -10,7 +10,13 @@ public class CardInstance
     public CardGenerationFlags cardFlags;
     public PlayerController srcPlayer;
 
+    public List<IModifier> modifiers;
+
     // TODO: Add card modifications
+    public void AddModifier(IModifier modifier)
+    {
+        modifiers.Add(modifier);
+    }
 
     public CardInstance(PlayerController src, int seed, CardGenerationFlags flags = CardGenerationFlags.NONE)
     {
@@ -18,6 +24,7 @@ public class CardInstance
         cardSeed = seed;
         cardFlags = flags;
         baseCard = src.cardGenerator.GenerateCard(seed, flags);
+        modifiers = new List<IModifier>();
     }
 
     public CardInstance(CardDescription card)
@@ -51,11 +58,34 @@ public class CardInstance
         return baseCard.cardEffects;
     }
 
+    public void RemoveEndOfTurnModifiers()
+    {
+        modifiers.RemoveAll(x => x.modifierDuration == DurationType.END_OF_TURN);
+    }
+
+    public void RemoveAuraModifiers(Creature source)
+    {
+        modifiers.RemoveAll(x => x.auraSource == source.netIdentity);
+    }
+
+    public void RemoveAllModifiers()
+    {
+        modifiers.Clear();
+    }
+
     public int GetAttackVal()
     {
         if (GetCardType() == CardType.CREATURE)
         {
-            return (baseCard as CreatureCardDescription).attack;
+            int atk = (baseCard as CreatureCardDescription).attack;
+            foreach (IModifier mod in modifiers)
+            {
+                if (mod is StatModifier statMod)
+                {
+                    atk += statMod.atkModifier;
+                }
+            }
+            return atk;
         }
 
         return 0;
@@ -64,11 +94,40 @@ public class CardInstance
     {
         if (GetCardType() == CardType.CREATURE)
         {
+            int hp = (baseCard as CreatureCardDescription).health;
+            foreach (IModifier mod in modifiers)
+            {
+                if (mod is StatModifier statMod)
+                {
+                    hp += statMod.defModifier;
+                }
+            }
+            return hp;
+        }
+
+        return 0;
+    }
+
+    public int GetBaseAttackVal()
+    {
+        if (GetCardType() == CardType.CREATURE)
+        {
+            return (baseCard as CreatureCardDescription).attack;
+        }
+
+        return 0;
+    }
+
+    public int GetBaseHealthVal()
+    {
+        if (GetCardType() == CardType.CREATURE)
+        {
             return (baseCard as CreatureCardDescription).health;
         }
 
         return 0;
     }
+
     public CreatureType GetCreatureType()
     {
         if (GetCardType() == CardType.CREATURE)
@@ -102,6 +161,24 @@ public class CardInstance
     {
         if (GetCardType() == CardType.CREATURE)
         {
+            SortedSet<KeywordAttribute> keywords = new SortedSet<KeywordAttribute>((baseCard as CreatureCardDescription).GetAttributes());
+            foreach (IModifier mod in modifiers)
+            {
+                if (mod is KeywordModifier keywordMod)
+                {
+                    keywords.Add(keywordMod.keywordAttribute);
+                }
+            }
+            return keywords;
+        }
+
+        return new SortedSet<KeywordAttribute>();
+    }
+
+    public SortedSet<KeywordAttribute> GetBaseAttributes()
+    {
+        if (GetCardType() == CardType.CREATURE)
+        {
             return new SortedSet<KeywordAttribute>((baseCard as CreatureCardDescription).GetAttributes());
         }
 
@@ -115,7 +192,20 @@ public class CardInstance
 
     public bool HasKeywordAttribute(KeywordAttribute keyword)
     {
-        return baseCard.HasKeywordAttribute(keyword);
+        bool hasKeyword = baseCard.HasKeywordAttribute(keyword);
+
+        foreach (IModifier mod in modifiers)
+        {
+            if (mod is KeywordModifier keywordMod)
+            {
+                if (keyword == keywordMod.keywordAttribute)
+                {
+                    hasKeyword = true;
+                }
+            }
+        }
+
+        return hasKeyword;
     }
 
 }

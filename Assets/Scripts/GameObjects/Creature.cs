@@ -44,8 +44,32 @@ public class Creature : Targettable
 
         if (card != null && card.cardData != null)
         {
-            atkText.text = creatureState.GetAttack().ToString();
-            hpText.text = (creatureState.GetHealth() == creatureState.GetMaxHealth()) ? creatureState.GetHealth().ToString() : "<color=yellow>" + creatureState.GetHealth().ToString() + "</color>";
+            int atk = creatureState.GetAttack();
+            int baseAtk = creatureState.GetBaseAttack();
+
+            int hp = creatureState.GetHealth();
+            int maxHp = creatureState.GetMaxHealth();
+            int baseHp = creatureState.GetBaseHealth();
+
+            atkText.text = atk.ToString();
+            if (atk > baseAtk)
+            {
+                atkText.text = "<color=green>" + atkText.text + "</color>";
+            }
+            else if (atk < baseAtk)
+            {
+                atkText.text = "<color=yellow>" + atkText.text + "</color>";
+            }
+
+            hpText.text = hp.ToString();
+            if (hp < maxHp)
+            {
+                hpText.text = "<color=yellow>" + hpText.text + "</color>";
+            }
+            else if (maxHp > baseHp)
+            {
+                hpText.text = "<color=green>" + hpText.text + "</color>";
+            }
         }
         else
         {

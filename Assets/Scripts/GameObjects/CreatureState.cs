@@ -15,6 +15,11 @@ public class CreatureState : NetworkBehaviour
     bool summoningSick;
 
     // Start is called before the first frame update
+
+    public CreatureState()
+    {
+    }
+
     void Start()
     {
         creature = gameObject.GetComponent<Creature>();
@@ -56,6 +61,65 @@ public class CreatureState : NetworkBehaviour
         summoningSick = sick;
     }
 
+    [Server]
+    public void ServerAddModifier(IModifier modifier)
+    {
+        if (modifier is StatModifier statMod)
+        {
+            creature.card.cardData.AddModifier(modifier);
+            currHealthVal += statMod.defModifier;
+
+            RpcAddStatModifier(statMod);
+        }
+        else if (modifier is KeywordModifier keywordMod)
+        {
+            creature.card.cardData.AddModifier(modifier);
+            RpcAddKeywordModifier(keywordMod);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcAddStatModifier(StatModifier modifier)
+    {
+        if (!isServer)
+        {
+            creature.card.cardData.AddModifier(modifier);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcAddKeywordModifier(KeywordModifier modifier)
+    {
+        if (!isServer)
+        {
+            creature.card.cardData.AddModifier(modifier);
+        }
+    }
+
+    public void RemoveEndOfTurnModifiers()
+    {
+        creature.card.cardData.RemoveEndOfTurnModifiers();
+        if (isServer)
+        {
+            if (GetHealth() > GetMaxHealth())
+            {
+                currHealthVal = GetMaxHealth();
+            }
+        }
+    }
+
+    public void RemoveAuraModifiers(Creature source)
+    {
+        creature.card.cardData.RemoveAuraModifiers(source);
+        if (isServer)
+        {
+            if (GetHealth() > GetMaxHealth())
+            {
+                currHealthVal = GetMaxHealth();
+            }
+        }
+    }
+
     public bool IsSummoningSick()
     {
         return summoningSick;
@@ -74,6 +138,16 @@ public class CreatureState : NetworkBehaviour
     public int GetAttack()
     {
         return creature.card.cardData.GetAttackVal();
+    }
+
+    public int GetBaseHealth()
+    {
+        return creature.card.cardData.GetBaseHealthVal();
+    }
+
+    public int GetBaseAttack()
+    {
+        return creature.card.cardData.GetBaseAttackVal();
     }
 
     public bool IsDead()

@@ -52,9 +52,38 @@ public class CardUI : MonoBehaviour
 
                     creatureFields.SetActive(true);
                     creatureType.text = CardParsing.Parse(cardDesc.GetCreatureType()).ToUpper();
-                    atk.text = cardDesc.GetAttackVal().ToString();
-                    def.text = cardDesc.GetHealthVal().ToString();
+
+                    int atkVal = cardDesc.GetAttackVal();
+                    int baseAtkVal = cardDesc.GetBaseAttackVal();
+
+                    int hpVal = cardDesc.GetHealthVal();
+                    int hpBaseVal = cardDesc.GetBaseHealthVal();
+
+                    atk.text = atkVal.ToString();
+                    def.text = hpVal.ToString();
+
+                    if (atkVal > baseAtkVal)
+                    {
+                        atk.text = "<color=green>" + atk.text + "</color>";
+                    }
+                    else if (atkVal < baseAtkVal)
+                    {
+                        atk.text = "<color=red>" + atk.text + "</color>";
+                    }
+
+                    if (hpVal > hpBaseVal)
+                    {
+                        def.text = "<color=green>" + def.text + "</color>";
+                    }
+                    else if (hpVal < hpBaseVal)
+                    {
+                        def.text = "<color=red>" + def.text + "</color>";
+                    }
+
                     bool first = true;
+
+                    SortedSet<KeywordAttribute> baseAttributes = cardDesc.GetBaseAttributes();
+
                     foreach (KeywordAttribute a in cardDesc.GetAttributes())
                     {
                         if (first)
@@ -65,7 +94,15 @@ public class CardUI : MonoBehaviour
                         {
                             effectText += ", ";
                         }
-                        effectText += CardParsing.Parse(a);
+
+                        if (baseAttributes.Contains(a))
+                        {
+                            effectText += CardParsing.Parse(a);
+                        }
+                        else
+                        {
+                            effectText += "<color=green>" + CardParsing.Parse(a) + "</color>";
+                        }
                     }
                     if (!first)
                     {
@@ -88,19 +125,7 @@ public class CardUI : MonoBehaviour
             foreach (CardEffectDescription effect in cardDesc.GetCardEffects())
             {
                 string effectString = effect.CardText();
-                /*
-                effectString += "(";
-                if (effect.GetAlignment() == Alignment.NEGATIVE)
-                {
-                    effectString += (-(PowerBudget.DOWNSIDE_WEIGHT * effect.PowerLevel())).ToString();
 
-                }
-                else
-                {
-                    effectString += effect.PowerLevel().ToString();
-                }
-                effectString += ").";
-                */
                 effectString += '\n';
                 effectText += effectString;
             }

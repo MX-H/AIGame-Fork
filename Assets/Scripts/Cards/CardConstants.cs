@@ -319,32 +319,32 @@ public static class PowerBudget
 
     public static readonly double[] ManaPowerMargin = new double[]
     {
-            ManaFunction(0.5) * UNIT_COST,
-            ManaFunction(1.5) * UNIT_COST,
-            ManaFunction(2.5) * UNIT_COST,
-            ManaFunction(3.5) * UNIT_COST,
-            ManaFunction(4.5) * UNIT_COST,
-            ManaFunction(5.5) * UNIT_COST,
-            ManaFunction(6.5) * UNIT_COST,
-            ManaFunction(7.5) * UNIT_COST,
-            ManaFunction(8.5) * UNIT_COST,
-            ManaFunction(9.5) * UNIT_COST,
-            ManaFunction(10.5) * UNIT_COST,
+        ManaFunction(0.5) * UNIT_COST,
+        ManaFunction(1.5) * UNIT_COST,
+        ManaFunction(2.5) * UNIT_COST,
+        ManaFunction(3.5) * UNIT_COST,
+        ManaFunction(4.5) * UNIT_COST,
+        ManaFunction(5.5) * UNIT_COST,
+        ManaFunction(6.5) * UNIT_COST,
+        ManaFunction(7.5) * UNIT_COST,
+        ManaFunction(8.5) * UNIT_COST,
+        ManaFunction(9.5) * UNIT_COST,
+        ManaFunction(10.5) * UNIT_COST,
     };
 
     public static readonly double[] ManaPowerLimit = new double[]
     {
-            ManaFunction(1) * UNIT_COST,
-            ManaFunction(2) * UNIT_COST,
-            ManaFunction(3) * UNIT_COST,
-            ManaFunction(4) * UNIT_COST,
-            ManaFunction(5) * UNIT_COST,
-            ManaFunction(6) * UNIT_COST,
-            ManaFunction(7) * UNIT_COST,
-            ManaFunction(8) * UNIT_COST,
-            ManaFunction(9) * UNIT_COST,
-            ManaFunction(10) * UNIT_COST,
-            ManaFunction(11) * UNIT_COST,
+        ManaFunction(1) * UNIT_COST,
+        ManaFunction(2) * UNIT_COST,
+        ManaFunction(3) * UNIT_COST,
+        ManaFunction(4) * UNIT_COST,
+        ManaFunction(5) * UNIT_COST,
+        ManaFunction(6) * UNIT_COST,
+        ManaFunction(7) * UNIT_COST,
+        ManaFunction(8) * UNIT_COST,
+        ManaFunction(9) * UNIT_COST,
+        ManaFunction(10) * UNIT_COST,
+        ManaFunction(11) * UNIT_COST,
     };
 
     public static double GetKeywordCost(KeywordAttribute keyword, int atk, int def)
@@ -438,4 +438,19 @@ public static class PowerBudget
 
         return 1.0;
     }
+
+    public static double GetDurationTypeModifier(DurationType duration)
+    {
+        switch (duration)
+        {
+            case DurationType.END_OF_TURN:
+                return 1.0;
+            case DurationType.AURA:
+                return 2.0;
+            case DurationType.FOREVER:
+                return 2.5;
+        }
+        return 1.0;
+    }
+
 }
