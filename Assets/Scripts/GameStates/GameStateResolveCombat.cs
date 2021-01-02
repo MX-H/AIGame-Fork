@@ -32,11 +32,12 @@ public class GameStateResolveCombat : IGameState
                 if (attackerIndex < attackers.Count)
                 {
                     CreatureState attackerState = attackers[attackerIndex].gameObject.GetComponent<CreatureState>();
-
+                    SoundLibrary.PlaySound("combat");
+                    
                     if (defenders[attackerIndex] != null)
                     {
                         CreatureState defenderState = defenders[attackerIndex].gameObject.GetComponent<CreatureState>();
-
+            
                         gameSession.ServerCreatureDoDamage(attackers[attackerIndex], attackerState.GetAttack(), defenders[attackerIndex]);
 
                         // Fast strike hits first, if it kills defender they can't do damage back
