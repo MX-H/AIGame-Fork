@@ -147,6 +147,13 @@ public class Arena : MonoBehaviour
             c.transform.SetParent(creatureZones.transform);
             c.transform.position = new Vector3(0, 0, 0);
             c.context = this;
+
+            GameSession gameSession = GameUtils.GetGameSession();
+            if (gameSession.isServer)
+            {
+                gameSession.ApplyStaticEffectsToTargettable(c);
+                gameSession.ServerAddStaticEffects(c);
+            }
         }
     }
 
@@ -156,6 +163,18 @@ public class Arena : MonoBehaviour
         creatures.Remove(c);
         c.context = null;
         c.gameObject.SetActive(false);
+
+        foreach (Targettable target in GameUtils.GetGameSession().GetPotentialTargets())
+        {
+            if (target is Creature targetCreature)
+            {
+                targetCreature.creatureState.RemoveAuraModifiers(c);
+            }
+            else if (target is Card targetCard)
+            {
+                targetCard.cardData.RemoveAuraModifiers(c);
+            }
+        }
     }
 
     public void DropCreature(Creature creature)

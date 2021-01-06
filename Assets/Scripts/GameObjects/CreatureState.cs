@@ -74,6 +74,12 @@ public class CreatureState : NetworkBehaviour
         else if (modifier is KeywordModifier keywordMod)
         {
             creature.card.cardData.AddModifier(modifier);
+
+            if (keywordMod.keywordAttribute == KeywordAttribute.EAGER)
+            {
+                summoningSick = false;
+            }
+
             RpcAddKeywordModifier(keywordMod);
         }
     }

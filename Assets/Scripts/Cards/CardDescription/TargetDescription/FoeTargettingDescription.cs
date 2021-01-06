@@ -32,12 +32,13 @@ public class FoeTargettingDescription : ITargettingDescription
         return false;
     }
 
-    public override Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    public override Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player, Targettable source)
     {
         EffectResolutionTask task = new EffectResolutionTask();
         task.effect = effect;
         task.target = player.GetOpponents()[0];
         task.player = player;
+        task.source = source;
 
         return new Queue<EffectResolutionTask>( new EffectResolutionTask[] { task });
     }

@@ -39,8 +39,21 @@ public class CardUI : MonoBehaviour
         if (cardDesc != null)
         {
             cardName.text = cardDesc.GetCardName();
-            mana.text = cardDesc.GetManaCost().ToString();
             typeText.text = CardParsing.Parse(cardDesc.GetCardType()).ToUpper();
+
+            int manaVal = cardDesc.GetManaCost();
+            int baseManaVal = cardDesc.GetBaseManaCost();
+
+            mana.text = manaVal.ToString();
+
+            if (manaVal < baseManaVal)
+            {
+                mana.text = "<color=green>" + mana.text + "</color>";
+            }
+            else if (manaVal > baseManaVal)
+            {
+                mana.text = "<color=red>" + mana.text + "</color>";
+            }
 
             string effectText = "";
 
@@ -101,7 +114,7 @@ public class CardUI : MonoBehaviour
                         }
                         else
                         {
-                            effectText += "<color=green>" + CardParsing.Parse(a) + "</color>";
+                            effectText += "<color=#009A35ff>" + CardParsing.Parse(a) + "</color>";
                         }
                     }
                     if (!first)

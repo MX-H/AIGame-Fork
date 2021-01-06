@@ -8,7 +8,6 @@ public class Card : Targettable
 {
     public CardInstance cardData;
 
-    public bool selected = false;
     public bool dragging = false;
     public bool hovering = false;
     public bool isRevealed = false;
@@ -26,6 +25,7 @@ public class Card : Targettable
     public PlayerController owner;
     public PlayerController controller;
     public Hand context;
+    public Targettable targettableUI;
 
 
     protected override void Start()
@@ -118,9 +118,59 @@ public class Card : Targettable
         }
     }
 
+    [Server]
+    public void ServerAddModifier(IModifier modifier)
+    {
+        if (modifier is StatModifier statMod)
+        {
+            cardData.AddModifier(modifier);
+
+            RpcAddStatModifier(statMod);
+        }
+        else if (modifier is KeywordModifier keywordMod)
+        {
+            cardData.AddModifier(modifier);
+
+            RpcAddKeywordModifier(keywordMod);
+        }
+        else if (modifier is ManaCostModifier manaMod)
+        {
+            cardData.AddModifier(modifier);
+
+            RpcAddManaCostModifier(manaMod);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcAddStatModifier(StatModifier modifier)
+    {
+        if (!isServer)
+        {
+            cardData.AddModifier(modifier);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcAddKeywordModifier(KeywordModifier modifier)
+    {
+        if (!isServer)
+        {
+            cardData.AddModifier(modifier);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcAddManaCostModifier(ManaCostModifier modifier)
+    {
+        if (!isServer)
+        {
+            cardData.AddModifier(modifier);
+        }
+    }
+
     public bool IsInteracting()
     {
-        return selected || dragging || hovering || selectorOption;
+        return dragging || hovering || selectorOption;
     }
 
     public void HoverZoom()
@@ -245,12 +295,16 @@ public class Card : Targettable
             switch (descToCheck.targettingType)
             {
                 case TargettingType.TARGET:
+                case TargettingType.TARGET_ALLY:
+                case TargettingType.TARGET_ENEMY:
                     {
                         TargetXDescription targetDesc = (TargetXDescription)descToCheck;
                         targetsNeeded = targetDesc.amount;
                     }
                     break;
                 case TargettingType.UP_TO_TARGET:
+                case TargettingType.UP_TO_TARGET_ALLY:
+                case TargettingType.UP_TO_TARGET_ENEMY:
                     // Up to is valid for 0 so we can skip uneccessary checks
                     continue;
             }
@@ -309,8 +363,10 @@ public class Card : Targettable
             IQualifiableTargettingDescription qualifiableDesc = (IQualifiableTargettingDescription)desc;
             if (qualifiableDesc != null)
             {
+                valid = qualifiableDesc.GetPlayerAlignment() == Alignment.NEUTRAL || (qualifiableDesc.GetPlayerAlignment() == GetAlignmentToPlayer(targetQuery.requestingPlayer));
+
                 IQualifierDescription qualifier = qualifiableDesc.qualifier;
-                if (qualifier != null)
+                if (valid && qualifier != null)
                 {
                     switch (qualifier.qualifierType)
                     {
@@ -337,5 +393,15 @@ public class Card : Targettable
         }
 
         return valid;
+    }
+
+    public override Targettable GetTargettableUI()
+    {
+        return targettableUI ? targettableUI : this;
+    }
+
+    public override Alignment GetAlignmentToPlayer(PlayerController player)
+    {
+        return (player == controller) ? Alignment.POSITIVE : Alignment.NEGATIVE;
     }
 }

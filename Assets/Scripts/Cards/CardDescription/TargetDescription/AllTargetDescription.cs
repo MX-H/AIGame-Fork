@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class AllTargetDescription : IQualifiableTargettingDescription
 {
-    public AllTargetDescription(TargetType target) : base(target, TargettingType.ALL)
+    public AllTargetDescription(TargetType target, Alignment alignment) 
+        : base(target, (alignment == Alignment.NEUTRAL) ? TargettingType.ALL : ((alignment == Alignment.POSITIVE) ? TargettingType.ALL_ALLY : TargettingType.ALL_ENEMY), alignment)
     {
     }
 
@@ -15,6 +16,7 @@ public class AllTargetDescription : IQualifiableTargettingDescription
         {
             return "each player";
         }
+
         return "all " + QualifierText() + CardParsing.Parse(targetType, true);
     }
 
@@ -37,10 +39,20 @@ public class AllTargetDescription : IQualifiableTargettingDescription
         return false;
     }
 
-    public override Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    public bool AppliesToTargettable(PlayerController player, Targettable target)
+    {
+        TargetXDescription targetDescription = new TargetXDescription(targetType, GetPlayerAlignment());
+        targetDescription.amount = 1;
+        targetDescription.qualifier = qualifier;
+
+        TargettingQuery query = new TargettingQuery(targetDescription, player, false);
+        return target.IsTargettable(query);
+    }
+
+    public override Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player, Targettable source)
     {
         Queue<EffectResolutionTask> tasks = new Queue<EffectResolutionTask>();
-        TargetXDescription targetDescription = new TargetXDescription(targetType);
+        TargetXDescription targetDescription = new TargetXDescription(targetType, GetPlayerAlignment());
         targetDescription.amount = 1;
         targetDescription.qualifier = qualifier;
 
@@ -56,6 +68,7 @@ public class AllTargetDescription : IQualifiableTargettingDescription
                 task.effect = effect;
                 task.target = t.GetTargettableEntity();
                 task.player = player;
+                task.source = source;
 
                 tasks.Enqueue(task);
             }
@@ -67,14 +80,21 @@ public class AllTargetDescription : IQualifiableTargettingDescription
 
 public class AllTargetProceduralGenerator : IProceduralTargettingGenerator
 {
+    Alignment alignment;
+
+    public AllTargetProceduralGenerator(Alignment a)
+    {
+        alignment = a;
+    }
+
     public override ITargettingDescription Generate()
     {
-        AllTargetDescription desc = new AllTargetDescription(targetType);
+        AllTargetDescription desc = new AllTargetDescription(targetType, alignment);
         return desc;
     }
 
     public override ITargettingDescription GetDescriptionType()
     {
-        return new AllTargetDescription(targetType);
+        return new AllTargetDescription(targetType, alignment);
     }
 }

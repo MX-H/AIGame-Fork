@@ -429,6 +429,12 @@ public class ProceduralCardGenerator : ICardGenerator
             {
                 Debug.Log("No valid effect could be generated for trigger <" + cardEffect.triggerCondition.ToString() + "> with budget " + -maxAllowableBudget);
             }
+
+            // Add to black list so we don't get multiple effects that trigger on same condition
+            if (cardEffect.triggerCondition != TriggerCondition.NONE)
+            {
+                triggerBlacklist.Add(cardEffect.triggerCondition);
+            }
         }
     }
 
@@ -536,6 +542,8 @@ public class ProceduralCardGenerator : ICardGenerator
             if (!positive)
             {
                 allowableTargetting.Remove(TargettingType.UP_TO_TARGET);
+                allowableTargetting.Remove(TargettingType.UP_TO_TARGET_ALLY);
+                allowableTargetting.Remove(TargettingType.UP_TO_TARGET_ENEMY);
             }
         }
 

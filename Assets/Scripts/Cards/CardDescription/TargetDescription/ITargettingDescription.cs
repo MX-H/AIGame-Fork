@@ -18,7 +18,7 @@ public abstract class ITargettingDescription : IDescription
     public abstract string CardText(bool plural = false);
     public abstract Alignment GetAlignment();
     public abstract double PowerLevel();
-    public abstract Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player);
+    public abstract Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player, Targettable source);
 }
 
 public struct EffectResolutionTask
@@ -26,16 +26,32 @@ public struct EffectResolutionTask
     public Targettable target;
     public IEffectDescription effect;
     public PlayerController player;
+    public Targettable source;
 }
 
 public abstract class IQualifiableTargettingDescription : ITargettingDescription
 {
-    protected IQualifiableTargettingDescription(TargetType target, TargettingType targetting) : base(target, targetting)
-    { }
+    Alignment playerAlignment;
+
+    protected IQualifiableTargettingDescription(TargetType target, TargettingType targetting, Alignment alignment) : base(target, targetting)
+    {
+        playerAlignment = alignment;
+    }
 
     protected string QualifierText()
     {
-        return (qualifier == null) ? "" : qualifier.CardText() + " ";
+        string alignmentText = "";
+        switch (GetPlayerAlignment())
+        {
+            case Alignment.POSITIVE:
+                alignmentText = "allied ";
+                break;
+            case Alignment.NEGATIVE:
+                alignmentText = "opposing ";
+                break;
+        }
+
+        return alignmentText + ((qualifier == null) ? "" : qualifier.CardText() + " ");
     }
 
     protected double QualifierPowerLevel()
@@ -48,10 +64,16 @@ public abstract class IQualifiableTargettingDescription : ITargettingDescription
         return (qualifier == null) ? Alignment.NEUTRAL : qualifier.GetAlignment();
     }
 
-    public sealed override Alignment GetAlignment()
+    public override Alignment GetAlignment()
     {
-        return QualifierAlignment();
+        return (GetPlayerAlignment() == Alignment.NEUTRAL) ? QualifierAlignment() : GetPlayerAlignment();
     }
+
+    public Alignment GetPlayerAlignment() // For targetting allied vs enemy things
+    {
+        return playerAlignment;
+    }
+
 
     public IQualifierDescription qualifier;
 }

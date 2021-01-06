@@ -7,7 +7,7 @@ public class NegateEffectDescription : IEffectDescription
     public NegateEffectDescription() : base(EffectType.NEGATE)
     { }
 
-    public override void ApplyToTarget(Targettable target, PlayerController player)
+    public override void ApplyToTarget(Targettable target, PlayerController player, Targettable source)
     {
         Effect effectTarget = target as Effect;
         if (effectTarget)

@@ -110,6 +110,12 @@ public class Hand : MonoBehaviour
             c.transform.localPosition = Vector3.zero;
             c.context = this;
             UpdateCardPositions();
+
+            GameSession gameSession = GameUtils.GetGameSession();
+            if (gameSession.isServer)
+            {
+                gameSession.ApplyStaticEffectsToTargettable(c);
+            }
         }
         else
         {

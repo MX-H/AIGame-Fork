@@ -56,7 +56,7 @@ public class GameStateResolveEffects : IGameState
                 else
                 {
                     EffectResolutionTask task = effectTasks.Dequeue();
-                    task.effect.ApplyToTarget(task.target, task.player);
+                    task.effect.ApplyToTarget(task.target, task.player, task.source);
                     acknowledgementType = task.effect.GetAcknowlegementType();
                     if (acknowledgementType != null)
                     {

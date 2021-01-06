@@ -146,6 +146,7 @@ public class Creature : Targettable
         c.transform.SetParent(transform);
         c.transform.localPosition = new Vector3(-1.5f, 0.0f, 0.0f);
         c.gameObject.SetActive(false);
+        c.cardData.ConvertHandModifiersToCreatureModifiers();
         if (c.cardData.GetImage())
         {
             Sprite[] sprites = Resources.LoadAll<Sprite>(GameConstants.PATHS.CARD_IMAGES + c.cardData.GetImage().name);
@@ -197,8 +198,10 @@ public class Creature : Targettable
             IQualifiableTargettingDescription qualifiableDesc = (IQualifiableTargettingDescription)desc;
             if (qualifiableDesc != null)
             {
+                valid = qualifiableDesc.GetPlayerAlignment() == Alignment.NEUTRAL || (qualifiableDesc.GetPlayerAlignment() == GetAlignmentToPlayer(targetQuery.requestingPlayer));
+
                 IQualifierDescription qualifier = qualifiableDesc.qualifier;
-                if (qualifier != null)
+                if (valid && qualifier != null)
                 {
                     switch (qualifier.qualifierType)
                     {
@@ -235,5 +238,10 @@ public class Creature : Targettable
             }
         }
         return false;
+    }
+
+    public override Alignment GetAlignmentToPlayer(PlayerController player)
+    {
+        return (player == controller) ? Alignment.POSITIVE : Alignment.NEGATIVE;
     }
 }

@@ -90,6 +90,8 @@ public abstract class Targettable : NetworkBehaviour
 
     public abstract bool IsTargettable();
     public abstract bool IsTargettable(TargettingQuery targetQuery);
+
+    public abstract Alignment GetAlignmentToPlayer(PlayerController player);
     public void SetTargettingQuery(TargettingQuery targettingDesc)
     {
         targettingQuery = targettingDesc;

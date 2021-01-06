@@ -7,7 +7,8 @@ public class ExceptTargetDescription : IQualifiableTargettingDescription
 {
     public ITargettingDescription targetDescription;
 
-    public ExceptTargetDescription(TargetType target) : base(target, TargettingType.EXCEPT)
+    public ExceptTargetDescription(TargetType target, Alignment alignment)
+        : base(target, (alignment == Alignment.NEUTRAL) ? TargettingType.EXCEPT : ((alignment == Alignment.POSITIVE) ? TargettingType.EXCEPT_ALLY : TargettingType.EXCEPT_ENEMY), alignment)
     {
     }
 
@@ -31,11 +32,11 @@ public class ExceptTargetDescription : IQualifiableTargettingDescription
         return targetDescription.RequiresSelection();
     }
 
-    public override Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    public override Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player, Targettable source)
     {
         Queue<EffectResolutionTask> tasks = new Queue<EffectResolutionTask>();
 
-        TargetXDescription targetDescription = new TargetXDescription(targetType);
+        TargetXDescription targetDescription = new TargetXDescription(targetType, GetPlayerAlignment());
         targetDescription.amount = 1;
         targetDescription.qualifier = qualifier;
 
@@ -63,6 +64,7 @@ public class ExceptTargetDescription : IQualifiableTargettingDescription
                     task.effect = effect;
                     task.target = targetableEntity;
                     task.player = player;
+                    task.source = source;
 
                     tasks.Enqueue(task);
                 }
@@ -74,17 +76,41 @@ public class ExceptTargetDescription : IQualifiableTargettingDescription
 
 public class ExceptTargetProceduralGenerator : IProceduralTargettingGenerator
 {
+    Alignment alignment;
+
+    public ExceptTargetProceduralGenerator(Alignment a)
+    {
+        alignment = a;
+    }
+
+
     public override ITargettingDescription Generate()
     {
-        ExceptTargetDescription desc = new ExceptTargetDescription(targetType);
-        IProceduralTargettingGenerator targetGen = ProceduralUtils.GetProceduralGenerator(TargettingType.TARGET);
+        ExceptTargetDescription desc = new ExceptTargetDescription(targetType, alignment);
+
+        TargettingType exceptTargetting = TargettingType.TARGET;
+        switch (desc.GetPlayerAlignment())
+        {
+            case Alignment.POSITIVE:
+                exceptTargetting = TargettingType.TARGET_ALLY;
+                break;
+            case Alignment.NEGATIVE:
+                exceptTargetting = TargettingType.TARGET_ENEMY;
+                break;
+        }
+
+        IProceduralTargettingGenerator targetGen = ProceduralUtils.GetProceduralGenerator(exceptTargetting);
         targetGen.SetupParameters(targetType, random, model, minAllocatedBudget, maxAllocatedBudget);
         desc.targetDescription = targetGen.Generate();
+        if (desc.targetDescription is IQualifiableTargettingDescription qualifiableDesc)
+        {
+            qualifiableDesc.qualifier = desc.qualifier;
+        }
         return desc;
     }
 
     public override ITargettingDescription GetDescriptionType()
     {
-        return new ExceptTargetDescription(targetType);
+        return new ExceptTargetDescription(targetType, alignment);
     }
 }

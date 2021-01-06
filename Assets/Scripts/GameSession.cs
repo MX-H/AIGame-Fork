@@ -75,6 +75,9 @@ public class GameSession : NetworkBehaviour
     NetworkIdentity pendingCard;
 
     [SyncVar]
+    NetworkIdentity pendingCreature;
+
+    [SyncVar]
     PendingType pendingAction;
 
     [SyncVar]
@@ -87,6 +90,8 @@ public class GameSession : NetworkBehaviour
 
     // Used to queue up triggers, triggers should be added on a game state update
     Queue<(Creature, TriggerCondition)> delayedTriggers;
+
+    List<(Creature, CardEffectDescription)> staticEffectList;
 
     [Serializable]
     public struct AssignableAreas
@@ -109,6 +114,7 @@ public class GameSession : NetworkBehaviour
         currState = GameState.NONE;
         pendingTriggers = new Queue<(Creature, Creature, TriggerCondition)>();
         delayedTriggers = new Queue<(Creature, TriggerCondition)>();
+        staticEffectList = new List<(Creature, CardEffectDescription)>();
     }
 
     // Start is called before the first frame update
@@ -398,6 +404,19 @@ public class GameSession : NetworkBehaviour
             if (card.controller == c)
             {
                 return card;
+            }
+        }
+        return null;
+    }
+
+    public Creature GetPendingCreature(PlayerController c)
+    {
+        if (IsGameReady() && pendingCard != null)
+        {
+            Creature creature = pendingCreature.GetComponent<Creature>();
+            if (creature.controller == c)
+            {
+                return creature;
             }
         }
         return null;
@@ -789,9 +808,16 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public void ServerApplyModifier(Creature target, IModifier modifier)
+    public void ServerApplyModifier(Targettable target, IModifier modifier)
     {
-        target.creatureState.ServerAddModifier(modifier);
+        if (target is Creature creature)
+        {
+            creature.creatureState.ServerAddModifier(modifier);
+        }
+        else if (target is Card card)
+        {
+            card.ServerAddModifier(modifier);
+        }
     }
 
     [Server]
@@ -902,7 +928,7 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public void ServerAddEffectToStack(Card source, TriggerCondition trigger, NetworkIdentity[] flattenedTargets, int[] indexes)
+    public void ServerAddEffectToStack(Targettable sourceEntity, Card sourceCard, TriggerCondition trigger, NetworkIdentity[] flattenedTargets, int[] indexes)
     {
         NetworkIdentity effectId = ServerCreateEffect();
         Effect effect = effectId.GetComponent<Effect>();
@@ -919,26 +945,26 @@ public class GameSession : NetworkBehaviour
             }
         }
 
-        effect.SetData(source, trigger, targets);
+        effect.SetData(sourceEntity, sourceCard, trigger, targets);
         effectStack.PushEffect(effect);
 
-        RpcAddEffectToStackWithTargets(effectId, source.netIdentity, trigger, flattenedTargets, indexes);
+        RpcAddEffectToStackWithTargets(effectId, sourceEntity.netIdentity, sourceCard.netIdentity, trigger, flattenedTargets, indexes);
     }
 
     [Server]
-    public void ServerAddEffectToStack(Card source, TriggerCondition trigger)
+    public void ServerAddEffectToStack(Targettable sourceEntity, Card sourceCard, TriggerCondition trigger)
     {
         NetworkIdentity effectId = ServerCreateEffect();
         Effect effect = effectId.GetComponent<Effect>();
 
-        effect.SetData(source.GetComponent<Card>(), trigger);
+        effect.SetData(sourceEntity, sourceCard, trigger);
         effectStack.PushEffect(effect);
 
-        RpcAddEffectToStack(effectId, source.netIdentity, trigger);
+        RpcAddEffectToStack(effectId, sourceEntity.netIdentity, sourceCard.netIdentity, trigger);
     }
 
     [ClientRpc]
-    public void RpcAddEffectToStackWithTargets(NetworkIdentity effectId, NetworkIdentity source, TriggerCondition trigger, NetworkIdentity[] flattenedTargets, int[] indexes)
+    public void RpcAddEffectToStackWithTargets(NetworkIdentity effectId, NetworkIdentity sourceEntity, NetworkIdentity sourceCard, TriggerCondition trigger, NetworkIdentity[] flattenedTargets, int[] indexes)
     {
         if (!isServer)
         {
@@ -956,21 +982,65 @@ public class GameSession : NetworkBehaviour
                 }
             }
 
-            effect.SetData(source.GetComponent<Card>(), trigger, targets);
+            effect.SetData(sourceEntity.GetComponent<Targettable>(), sourceCard.GetComponent<Card>(), trigger, targets);
             effectStack.PushEffect(effect);
         }
     }
 
     [ClientRpc]
-    public void RpcAddEffectToStack(NetworkIdentity effectId, NetworkIdentity source, TriggerCondition trigger)
+    public void RpcAddEffectToStack(NetworkIdentity effectId, NetworkIdentity sourceEntity, NetworkIdentity sourceCard, TriggerCondition trigger)
     {
         if (!isServer)
         {
             Effect effect = effectId.GetComponent<Effect>();
-            effect.SetData(source.GetComponent<Card>(), trigger);
+            effect.SetData(sourceEntity.GetComponent<Targettable>(), sourceCard.GetComponent<Card>(), trigger);
             effectStack.PushEffect(effect);
         }
     }
+
+    [Server]
+    public void ServerAddStaticEffects(Creature source)
+    {
+        List<CardEffectDescription> staticEffects = source.card.cardData.GetEffectsOnTrigger(TriggerCondition.IS_ALIVE);
+
+        foreach (CardEffectDescription desc in staticEffects)
+        {
+            // Static effects should not have targets, treat them as an etb effect first then apply them to new targets when applicable
+            Queue<EffectResolutionTask> resolutionTasks = desc.GetEffectTasks(null, source.controller, source);
+            while (resolutionTasks.Count > 0)
+            {
+                EffectResolutionTask task = resolutionTasks.Dequeue();
+                task.effect.ApplyToTarget(task.target, task.player, task.source);
+            }
+
+            staticEffectList.Add((source, desc));
+        }
+    }
+
+    [Server]
+    public void ServerRemoveStaticEffects(Creature source)
+    {
+        staticEffectList.RemoveAll(x => source == x.Item1);
+    }
+
+    [Server]
+    public void ApplyStaticEffectsToTargettable(Targettable t)
+    {
+        foreach ((Creature, CardEffectDescription) staticEffect in staticEffectList)
+        {
+            Creature creature = staticEffect.Item1;
+            CardEffectDescription cardEffectDesc = staticEffect.Item2;
+
+            if (cardEffectDesc.targettingType is AllTargetDescription allTargetting)
+            {
+                if (allTargetting.AppliesToTargettable(creature.controller, t))
+                {
+                    cardEffectDesc.effectType.ApplyToTarget(t, creature.controller, creature);
+                }
+            }
+        }
+    }
+
     public bool CanSelectTargets(PlayerController c)
     {
         if (IsGameReady())
@@ -1056,7 +1126,7 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public void StartSelectingTargets(Card card, PlayerController controller, TriggerCondition trigger)
+    public void StartSelectingTargets(Targettable source, Card card, PlayerController controller, TriggerCondition trigger)
     {
         if (card != null)
         {
@@ -1075,6 +1145,7 @@ public class GameSession : NetworkBehaviour
             else
             {
                 pendingAction = PendingType.TRIGGER_EFFECT;
+                pendingCreature = source.netIdentity;
             }
 
             for (int i = 0; i < playerList.Length; i++)

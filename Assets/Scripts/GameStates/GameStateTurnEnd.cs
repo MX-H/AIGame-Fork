@@ -16,6 +16,12 @@ public class GameStateTurnEnd : IGameState
             {
                 creature.creatureState.RemoveEndOfTurnModifiers();
             }
+
+            foreach (Targettable target in player.hand.GetTargettables())
+            {
+                Card card = target as Card;
+                card.cardData.RemoveEndOfTurnModifiers();
+            }
         }
     }
 

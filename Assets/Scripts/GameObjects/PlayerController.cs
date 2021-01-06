@@ -156,6 +156,7 @@ public class PlayerController : Targettable
                 {
                     ExceptTargetDescription exceptDesc = effectDescription.targettingType as ExceptTargetDescription;
                     ITargettingDescription targetDesc = exceptDesc.targetDescription;
+
                     selectMessage += exceptDesc.targetDescription.CardText() + " that " + (targetDesc.RequiresPluralEffect() ? "does not " : "do not "); 
                 }
                 selectMessage += effectDescription.effectType.CardText(effectDescription.targettingType.RequiresPluralEffect());
@@ -201,8 +202,10 @@ public class PlayerController : Targettable
             IQualifiableTargettingDescription qualifiableDesc = (IQualifiableTargettingDescription)desc;
             if (qualifiableDesc != null)
             {
+                valid = qualifiableDesc.GetPlayerAlignment() == Alignment.NEUTRAL || (qualifiableDesc.GetPlayerAlignment() == GetAlignmentToPlayer(targetQuery.requestingPlayer));
+
                 IQualifierDescription qualifier = qualifiableDesc.qualifier;
-                if (qualifier != null)
+                if (valid && qualifier != null)
                 {
                     switch (qualifier.qualifierType)
                     {
@@ -305,6 +308,21 @@ public class PlayerController : Targettable
         RpcAddCardToHand(source.netIdentity, card.netIdentity, seed, flags);
     }
 
+    [ClientRpc]
+    public void RpcAddCardToHand(NetworkIdentity playerId, NetworkIdentity cardId, int seed, CardGenerationFlags flags)
+    {
+        Card c = cardId.gameObject.GetComponent<Card>();
+
+        c.cardData = new CardInstance(playerId.GetComponent<PlayerController>(), seed, flags);
+
+        c.owner = this;
+        c.controller = this;
+        c.isRevealed = isLocalPlayer;
+        c.isDraggable = isLocalPlayer;
+        SoundLibrary.PlaySound("draw");
+        hand.AddCard(c);
+    }
+
     [Server]
     public void ServerAddExistingCardToHand(Card card)
     {
@@ -337,21 +355,6 @@ public class PlayerController : Targettable
     {
         Card c = cardId.GetComponent<Card>();
         arena.AddTrap(c, index);
-    }
-
-    [ClientRpc]
-    public void RpcAddCardToHand(NetworkIdentity playerId, NetworkIdentity cardId, int seed, CardGenerationFlags flags)
-    {
-        Card c = cardId.gameObject.GetComponent<Card>();
-
-        c.cardData = new CardInstance(playerId.GetComponent<PlayerController>(), seed, flags);
-
-        c.owner = this;
-        c.controller = this;
-        c.isRevealed = isLocalPlayer;
-        c.isDraggable = isLocalPlayer;
-        SoundLibrary.PlaySound("draw");
-        hand.AddCard(c);
     }
 
     [Server]
@@ -404,12 +407,12 @@ public class PlayerController : Targettable
 
         if (targets != null && indexes != null)
         {
-            gameSession.ServerAddEffectToStack(card, TriggerCondition.ON_SELF_ENTER, targets, indexes);
+            gameSession.ServerAddEffectToStack(creature, card, TriggerCondition.ON_SELF_ENTER, targets, indexes);
         }
         // If creature has an ETB effect with no targets add the effect to the stack
         else if (card.cardData.HasEffectsOnTrigger(TriggerCondition.ON_SELF_ENTER) && card.cardData.GetSelectableTargets(TriggerCondition.ON_SELF_ENTER).Count == 0)
         {
-            gameSession.ServerAddEffectToStack(card, TriggerCondition.ON_SELF_ENTER);
+            gameSession.ServerAddEffectToStack(creature, card, TriggerCondition.ON_SELF_ENTER);
         }
         gameSession.ServerTriggerEffects(creature, TriggerCondition.ON_CREATURE_ENTER);
 
@@ -444,11 +447,11 @@ public class PlayerController : Targettable
     {
         if (targets != null && indexes != null)
         {
-            gameSession.ServerAddEffectToStack(card, TriggerCondition.NONE, targets, indexes);
+            gameSession.ServerAddEffectToStack(card, card, TriggerCondition.NONE, targets, indexes);
         }
         else
         {
-            gameSession.ServerAddEffectToStack(card, TriggerCondition.NONE);
+            gameSession.ServerAddEffectToStack(card, card, TriggerCondition.NONE);
         }
         RpcPlaySpell(card.netIdentity);
     }
@@ -991,10 +994,13 @@ public class PlayerController : Targettable
             switch (desc.targettingType)
             {
                 case TargettingType.TARGET:
+                case TargettingType.TARGET_ALLY:
+                case TargettingType.TARGET_ENEMY:
                     TargetXDescription targetDesc = (TargetXDescription)desc;
                     return selectedTargets.Count == targetDesc.amount;
                 case TargettingType.UP_TO_TARGET:
-                    // 0 is valid for up to so selected targets is always valid
+                case TargettingType.UP_TO_TARGET_ALLY:
+                case TargettingType.UP_TO_TARGET_ENEMY:                    // 0 is valid for up to so selected targets is always valid
                     return true;
             }
         }
@@ -1015,9 +1021,13 @@ public class PlayerController : Targettable
             switch (desc.targettingType)
             {
                 case TargettingType.TARGET:
+                case TargettingType.TARGET_ALLY:
+                case TargettingType.TARGET_ENEMY:
                     TargetXDescription targetDesc = (TargetXDescription)desc;
                     return selectedTargets.Count < targetDesc.amount;
                 case TargettingType.UP_TO_TARGET:
+                case TargettingType.UP_TO_TARGET_ALLY:
+                case TargettingType.UP_TO_TARGET_ENEMY:
                     UpToXTargetDescription upToTargetDesc = (UpToXTargetDescription)desc;
                     return selectedTargets.Count < upToTargetDesc.amount;
             }
@@ -1074,5 +1084,10 @@ public class PlayerController : Targettable
     public override Targettable GetTargettableUI()
     {
         return playerUI;
+    }
+
+    public override Alignment GetAlignmentToPlayer(PlayerController player)
+    {
+        return (player == this) ? Alignment.POSITIVE : Alignment.NEGATIVE;
     }
 }

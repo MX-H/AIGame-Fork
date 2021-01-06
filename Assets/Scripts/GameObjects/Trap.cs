@@ -139,9 +139,9 @@ public class Trap : Targettable
 
     public override bool IsTargettable()
     {
-        if (owner)
+        if (owner && IsActive())
         {
-            if (owner.isLocalPlayer && owner.CanActivateTraps() && IsActive() && card.HasValidTargets(card.cardData.GetSelectableTargets(TriggerCondition.NONE)))
+            if (owner.isLocalPlayer && owner.CanActivateTraps() && card.HasValidTargets(card.cardData.GetSelectableTargets(TriggerCondition.NONE)))
             {
                 return true;
             }
@@ -175,8 +175,10 @@ public class Trap : Targettable
                 IQualifiableTargettingDescription qualifiableDesc = (IQualifiableTargettingDescription)desc;
                 if (qualifiableDesc != null)
                 {
+                    valid = qualifiableDesc.GetPlayerAlignment() == Alignment.NEUTRAL || (qualifiableDesc.GetPlayerAlignment() == GetAlignmentToPlayer(targetQuery.requestingPlayer));
+
                     IQualifierDescription qualifier = qualifiableDesc.qualifier;
-                    if (qualifier != null)
+                    if (valid && qualifier != null)
                     {
                         switch (qualifier.qualifierType)
                         {
@@ -191,5 +193,15 @@ public class Trap : Targettable
             }
         }
         return valid;
+    }
+
+    public override Targettable GetTargettableEntity()
+    {
+        return card;
+    }
+
+    public override Alignment GetAlignmentToPlayer(PlayerController player)
+    {
+        return GetTargettableEntity().GetAlignmentToPlayer(player);
     }
 }

@@ -52,12 +52,20 @@ public enum TargettingType
     FOE,
 
     ALL,
+    ALL_ALLY,
+    ALL_ENEMY,
 
     TARGET,
+    TARGET_ALLY,
+    TARGET_ENEMY,
 
     UP_TO_TARGET,
+    UP_TO_TARGET_ALLY,
+    UP_TO_TARGET_ENEMY,
 
-    EXCEPT
+    EXCEPT,
+    EXCEPT_ALLY,
+    EXCEPT_ENEMY
 }
 
 public enum TriggerCondition
@@ -105,11 +113,17 @@ public enum EffectType
     NEGATE,
 
     GIVE_POSITIVE_STATS,
-    GIVE_NEGATIVE_STATS,
-    GIVE_KEYWORD,
     AURA_POSITIVE_STATS,
+    GIVE_NEGATIVE_STATS,
     AURA_NEGATIVE_STATS,
+
+    GIVE_KEYWORD,
     AURA_KEYWORD,
+
+    GIVE_MANA_COST_REDUCTION,
+    AURA_MANA_COST_REDUCTION,
+    GIVE_MANA_COST_TAX,
+    AURA_MANA_COST_TAX,
 }
 
 public enum DrawModifier
@@ -148,7 +162,8 @@ public enum KeywordAttribute
 public enum ModifierType
 {
     STAT,
-    KEYWORD
+    KEYWORD,
+    MANA_COST
 }
 
 public enum DurationType
@@ -274,31 +289,50 @@ static class CardEnums
         RegisterFlags(EffectType.SUMMON_TOKEN, new TargetType[] { TargetType.PLAYERS });
         RegisterFlags(EffectType.NEGATE, new TargetType[] { TargetType.SPELLS, TargetType.ACTIVE_TRAPS, TargetType.EFFECTS,
             TargetType.SPELLS_AND_EFFECTS, TargetType.SPELLS_AND_TRAPS, TargetType.TRAPS_AND_EFFECTS, TargetType.STACK_ITEMS });
-        RegisterFlags(EffectType.GIVE_POSITIVE_STATS, new TargetType[] { TargetType.CREATURES });
+        RegisterFlags(EffectType.GIVE_POSITIVE_STATS, new TargetType[] { TargetType.CREATURES, TargetType.CREATURE_CARDS });
         RegisterFlags(EffectType.GIVE_NEGATIVE_STATS, new TargetType[] { TargetType.CREATURES });
-        RegisterFlags(EffectType.GIVE_KEYWORD, new TargetType[] { TargetType.CREATURES });
+        RegisterFlags(EffectType.GIVE_KEYWORD, new TargetType[] { TargetType.CREATURES, TargetType.CREATURE_CARDS });
+        RegisterFlags(EffectType.GIVE_MANA_COST_REDUCTION, new TargetType[] { TargetType.CARDS, TargetType.CREATURE_CARDS, TargetType.SPELL_CARDS, TargetType.TRAP_CARDS });
+        RegisterFlags(EffectType.GIVE_MANA_COST_TAX, new TargetType[] { TargetType.CARDS, TargetType.CREATURE_CARDS, TargetType.SPELL_CARDS, TargetType.TRAP_CARDS });
+        RegisterFlags(EffectType.AURA_POSITIVE_STATS, new TargetType[] { TargetType.CREATURES, TargetType.CREATURE_CARDS });
+        RegisterFlags(EffectType.AURA_NEGATIVE_STATS, new TargetType[] { TargetType.CREATURES });
+        RegisterFlags(EffectType.AURA_KEYWORD, new TargetType[] { TargetType.CREATURES, TargetType.CREATURE_CARDS });
+        RegisterFlags(EffectType.AURA_MANA_COST_REDUCTION, new TargetType[] { TargetType.CARDS, TargetType.CREATURE_CARDS, TargetType.SPELL_CARDS, TargetType.TRAP_CARDS });
+        RegisterFlags(EffectType.AURA_MANA_COST_TAX, new TargetType[] { TargetType.CARDS, TargetType.CREATURE_CARDS, TargetType.SPELL_CARDS, TargetType.TRAP_CARDS });
 
         // Valid trigger conditions to perform effects
         RemoveFlags(EffectType.DRAW_CARDS, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
         RemoveFlags(EffectType.DEAL_DAMAGE, new TriggerCondition[] { TriggerCondition.IS_ALIVE, TriggerCondition.ON_SELF_DAMAGE_TAKEN });
         RemoveFlags(EffectType.HEAL_DAMAGE, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
         RemoveFlags(EffectType.SUMMON_TOKEN, new TriggerCondition[] { TriggerCondition.IS_ALIVE, TriggerCondition.ON_CREATURE_ENTER, TriggerCondition.ON_CREATURE_DIES });
-        RemoveFlags(EffectType.NEGATE,  ((TriggerCondition[])System.Enum.GetValues(typeof(TriggerCondition))).Except(new TriggerCondition[] { TriggerCondition.ON_STACK_UPDATED }));
+        RemoveFlags(EffectType.NEGATE,  ((TriggerCondition[])Enum.GetValues(typeof(TriggerCondition))).Except(new TriggerCondition[] { TriggerCondition.ON_STACK_UPDATED }));
         RemoveFlags(EffectType.GIVE_POSITIVE_STATS, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
         RemoveFlags(EffectType.GIVE_NEGATIVE_STATS, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
         RemoveFlags(EffectType.GIVE_KEYWORD, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
+        RemoveFlags(EffectType.GIVE_MANA_COST_REDUCTION, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
+        RemoveFlags(EffectType.GIVE_MANA_COST_TAX, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
+        RemoveFlags(EffectType.AURA_POSITIVE_STATS, ((TriggerCondition[])Enum.GetValues(typeof(TriggerCondition))).Except(new TriggerCondition[] { TriggerCondition.IS_ALIVE }));
+        RemoveFlags(EffectType.AURA_NEGATIVE_STATS, ((TriggerCondition[])Enum.GetValues(typeof(TriggerCondition))).Except(new TriggerCondition[] { TriggerCondition.IS_ALIVE }));
+        RemoveFlags(EffectType.AURA_KEYWORD, ((TriggerCondition[])Enum.GetValues(typeof(TriggerCondition))).Except(new TriggerCondition[] { TriggerCondition.IS_ALIVE }));
+        RemoveFlags(EffectType.AURA_MANA_COST_REDUCTION, ((TriggerCondition[])Enum.GetValues(typeof(TriggerCondition))).Except(new TriggerCondition[] { TriggerCondition.IS_ALIVE }));
+        RemoveFlags(EffectType.AURA_MANA_COST_TAX, ((TriggerCondition[])Enum.GetValues(typeof(TriggerCondition))).Except(new TriggerCondition[] { TriggerCondition.IS_ALIVE }));
 
         // Valid targetting types for targets
-        RegisterFlags(TargetType.CREATURES, new TargettingType[] { TargettingType.ALL, TargettingType.TARGET, TargettingType.UP_TO_TARGET, TargettingType.EXCEPT });
-        RegisterFlags(TargetType.SET_TRAPS, new TargettingType[] { TargettingType.ALL, TargettingType.TARGET, TargettingType.UP_TO_TARGET, TargettingType.EXCEPT });
-        RegisterFlags(TargetType.CARDS, new TargettingType[] { TargettingType.ALL, TargettingType.TARGET, TargettingType.UP_TO_TARGET, TargettingType.EXCEPT });
+        RegisterFlags(TargetType.CREATURES, new TargettingType[] { TargettingType.ALL, TargettingType.ALL_ALLY, TargettingType.ALL_ENEMY, TargettingType.TARGET, TargettingType.TARGET_ALLY, TargettingType.TARGET_ENEMY,
+            TargettingType.UP_TO_TARGET, TargettingType.UP_TO_TARGET_ALLY, TargettingType.UP_TO_TARGET_ENEMY, TargettingType.EXCEPT, TargettingType.EXCEPT_ALLY, TargettingType.EXCEPT_ENEMY });
+        RegisterFlags(TargetType.SET_TRAPS, new TargettingType[] { TargettingType.ALL, TargettingType.ALL_ALLY, TargettingType.ALL_ENEMY, TargettingType.TARGET, TargettingType.TARGET_ALLY, TargettingType.TARGET_ENEMY,
+            TargettingType.UP_TO_TARGET, TargettingType.UP_TO_TARGET_ALLY, TargettingType.UP_TO_TARGET_ENEMY, TargettingType.EXCEPT, TargettingType.EXCEPT_ALLY, TargettingType.EXCEPT_ENEMY });
+        RegisterFlags(TargetType.CARDS, new TargettingType[] { TargettingType.TARGET_ALLY, TargettingType.UP_TO_TARGET_ALLY, TargettingType.ALL, TargettingType.ALL_ALLY, TargettingType.ALL_ENEMY });
         RegisterFlags(TargetType.PLAYERS, new TargettingType[] { TargettingType.SELF, TargettingType.FOE, TargettingType.ALL, TargettingType.TARGET });
-        RegisterFlags(TargetType.CREATURE_CARDS, new TargettingType[] { TargettingType.TARGET });
-        RegisterFlags(TargetType.SPELL_CARDS, new TargettingType[] { TargettingType.TARGET });
-        RegisterFlags(TargetType.TRAP_CARDS, new TargettingType[] { TargettingType.TARGET });
-        RegisterFlags(TargetType.PERMANENT, new TargettingType[] { TargettingType.ALL, TargettingType.TARGET, TargettingType.UP_TO_TARGET, TargettingType.EXCEPT });
-        RegisterFlags(TargetType.DAMAGEABLE, new TargettingType[] { TargettingType.ALL, TargettingType.TARGET, TargettingType.UP_TO_TARGET });
-        RegisterFlags(TargetType.ACTIVE_TRAPS, new TargettingType[] { TargettingType.ALL, TargettingType.TARGET });
+        RegisterFlags(TargetType.CREATURE_CARDS, new TargettingType[] { TargettingType.TARGET_ALLY, TargettingType.UP_TO_TARGET_ALLY, TargettingType.ALL, TargettingType.ALL_ALLY, TargettingType.ALL_ENEMY });
+        RegisterFlags(TargetType.SPELL_CARDS, new TargettingType[] { TargettingType.TARGET_ALLY, TargettingType.UP_TO_TARGET_ALLY, TargettingType.ALL, TargettingType.ALL_ALLY, TargettingType.ALL_ENEMY });
+        RegisterFlags(TargetType.TRAP_CARDS, new TargettingType[] { TargettingType.TARGET_ALLY, TargettingType.UP_TO_TARGET_ALLY, TargettingType.ALL, TargettingType.ALL_ALLY, TargettingType.ALL_ENEMY });
+        RegisterFlags(TargetType.PERMANENT, new TargettingType[] { TargettingType.ALL, TargettingType.ALL_ALLY, TargettingType.ALL_ENEMY, TargettingType.TARGET, TargettingType.TARGET_ALLY, TargettingType.TARGET_ENEMY,
+            TargettingType.UP_TO_TARGET, TargettingType.UP_TO_TARGET_ALLY, TargettingType.UP_TO_TARGET_ENEMY, TargettingType.EXCEPT, TargettingType.EXCEPT_ALLY, TargettingType.EXCEPT_ENEMY });
+        RegisterFlags(TargetType.DAMAGEABLE, new TargettingType[] { TargettingType.ALL, TargettingType.ALL_ALLY, TargettingType.ALL_ENEMY, TargettingType.TARGET, TargettingType.TARGET_ALLY, TargettingType.TARGET_ENEMY,
+            TargettingType.UP_TO_TARGET, TargettingType.UP_TO_TARGET_ALLY, TargettingType.UP_TO_TARGET_ENEMY });
+        RegisterFlags(TargetType.ACTIVE_TRAPS, new TargettingType[] { TargettingType.ALL, TargettingType.ALL_ALLY, TargettingType.ALL_ENEMY, TargettingType.TARGET, TargettingType.TARGET_ALLY, TargettingType.TARGET_ENEMY,
+            TargettingType.UP_TO_TARGET, TargettingType.UP_TO_TARGET_ALLY, TargettingType.UP_TO_TARGET_ENEMY });
         RegisterFlags(TargetType.SPELLS, new TargettingType[] { TargettingType.ALL, TargettingType.TARGET });
         RegisterFlags(TargetType.EFFECTS, new TargettingType[] { TargettingType.ALL, TargettingType.TARGET });
         RegisterFlags(TargetType.SPELLS_AND_TRAPS, new TargettingType[] { TargettingType.ALL, TargettingType.TARGET });
@@ -310,12 +344,12 @@ static class CardEnums
         RegisterFlags(CardType.CREATURE, new TriggerCondition[] { TriggerCondition.ON_SELF_ENTER, TriggerCondition.ON_CREATURE_ENTER, TriggerCondition.ON_SELF_DIES,
             TriggerCondition.ON_CREATURE_DIES, TriggerCondition.ON_SELF_DAMAGE_TAKEN, TriggerCondition.ON_SELF_DAMAGE_DEALT_TO_PLAYER, TriggerCondition.IS_ALIVE});
         RegisterFlags(CardType.SPELL, new TriggerCondition[] { TriggerCondition.NONE });
-        RegisterFlags(CardType.TRAP, new TriggerCondition[] { TriggerCondition.NONE, TriggerCondition.ON_CREATURE_ENTER, TriggerCondition.ON_CREATURE_DIES,
-            TriggerCondition.ON_STACK_UPDATED });
+        RegisterFlags(CardType.TRAP, new TriggerCondition[] { TriggerCondition.NONE, TriggerCondition.ON_STACK_UPDATED });
 
         // Targetting types for specific triggers
         RemoveFlags(TriggerCondition.ON_SELF_DAMAGE_DEALT_TO_PLAYER, new TargettingType[] { TargettingType.TARGET, TargettingType.UP_TO_TARGET });
         RemoveFlags(TriggerCondition.ON_SELF_DAMAGE_TAKEN, new TargettingType[] { TargettingType.TARGET, TargettingType.UP_TO_TARGET });
+        RemoveFlags(TriggerCondition.IS_ALIVE, ((TargettingType[])Enum.GetValues(typeof(TargettingType))).Except(new TargettingType[] { TargettingType.ALL, TargettingType.ALL_ALLY, TargettingType.ALL_ENEMY }));
 
         RegisterFlags(QualifierType.NONE, (TargetType[])Enum.GetValues(typeof(TargetType)));
         RegisterFlags(QualifierType.CREATURE_TYPE, new TargetType[] { TargetType.CREATURES, TargetType.CREATURE_CARDS });

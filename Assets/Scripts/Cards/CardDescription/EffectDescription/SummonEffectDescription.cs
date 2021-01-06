@@ -12,7 +12,7 @@ public class SummonEffectDescription : IEffectDescription
     public SummonEffectDescription() : base(EffectType.SUMMON_TOKEN)
     { }
 
-    public override void ApplyToTarget(Targettable target, PlayerController player)
+    public override void ApplyToTarget(Targettable target, PlayerController player, Targettable source)
     {
         PlayerController targetPlayer = target as PlayerController;
         if (targetPlayer)

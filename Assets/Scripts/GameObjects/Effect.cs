@@ -9,6 +9,7 @@ public class Effect : Targettable
     public Card source;
     public SpriteRenderer icon;
     public TextPrompt textPrompt;
+    public Targettable sourceEntity;
 
     private bool hovering;
 
@@ -86,10 +87,11 @@ public class Effect : Targettable
             }
         }
     }
-    public void SetData(Card c, TriggerCondition trigger, Targettable[][] targets = null)
+    public void SetData(Targettable entity, Card c, TriggerCondition trigger, Targettable[][] targets = null)
     {
         source.cardData = c.cardData.Clone();
         source.controller = c.controller;
+        sourceEntity = entity;
 
         if (c.cardData.GetImage() && icon)
         {
@@ -127,7 +129,7 @@ public class Effect : Targettable
         {
             if (effect.targettingType != null && effect.targettingType.RequiresSelection())
             {
-                Queue<EffectResolutionTask> effectTasks = effect.GetEffectTasks(targetList[targetIndex], source.controller);
+                Queue<EffectResolutionTask> effectTasks = effect.GetEffectTasks(targetList[targetIndex], source.controller, sourceEntity);
                 while (effectTasks.Count > 0)
                 {
                     tasks.Enqueue(effectTasks.Dequeue());
@@ -137,7 +139,7 @@ public class Effect : Targettable
             }
             else
             {
-                Queue<EffectResolutionTask> effectTasks = effect.GetEffectTasks(null, source.controller);
+                Queue<EffectResolutionTask> effectTasks = effect.GetEffectTasks(null, source.controller, sourceEntity);
                 while (effectTasks.Count > 0)
                 {
                     tasks.Enqueue(effectTasks.Dequeue());
@@ -145,5 +147,10 @@ public class Effect : Targettable
             }
         }
         return tasks;
+    }
+
+    public override Alignment GetAlignmentToPlayer(PlayerController player)
+    {
+        return (player == source.controller) ? Alignment.POSITIVE : Alignment.NEGATIVE;
     }
 }

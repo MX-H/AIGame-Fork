@@ -446,7 +446,7 @@ public static class PowerBudget
             case DurationType.END_OF_TURN:
                 return 1.0;
             case DurationType.AURA:
-                return 2.0;
+                return 1.0;
             case DurationType.FOREVER:
                 return 2.5;
         }

@@ -37,7 +37,7 @@ public class StatModifierDescription : IModifierDescription
 
     public override double PowerLevel()
     {
-        return (atk + def) * PowerBudget.UNIT_COST;
+        return ((atk + def) / 2.0) * PowerBudget.UNIT_COST;
     }
 }
 

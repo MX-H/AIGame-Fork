@@ -18,6 +18,17 @@ public class CardInstance
         modifiers.Add(modifier);
     }
 
+    public void ConvertHandModifiersToCreatureModifiers()
+    {
+        modifiers.RemoveAll(x => x is ManaCostModifier);
+
+        foreach (IModifier modifier in modifiers)
+        {
+            modifier.modifierDuration = DurationType.FOREVER;
+            modifier.auraSource = null;
+        }
+    }
+
     public CardInstance(PlayerController src, int seed, CardGenerationFlags flags = CardGenerationFlags.NONE)
     {
         srcPlayer = src;
@@ -30,11 +41,18 @@ public class CardInstance
     public CardInstance(CardDescription card)
     {
         baseCard = card;
+        modifiers = new List<IModifier>();
     }
 
     public CardInstance Clone()
     {
         CardInstance cardInstance = new CardInstance(srcPlayer, cardSeed, cardFlags);
+
+        foreach (IModifier modifier in modifiers)
+        {
+            cardInstance.AddModifier(modifier);
+        }
+
         return cardInstance;
     }
 
@@ -48,9 +66,22 @@ public class CardInstance
         return baseCard.cardName;
     }
 
-    public int GetManaCost()
+    public int GetBaseManaCost()
     {
         return baseCard.manaCost;
+    }
+
+    public int GetManaCost()
+    {
+        int manaCost = baseCard.manaCost;
+        foreach (IModifier mod in modifiers)
+        {
+            if (mod is ManaCostModifier manaMod)
+            {
+                manaCost += manaMod.manaCostChange;
+            }
+        }
+        return manaCost;
     }
 
     public List<CardEffectDescription> GetCardEffects()

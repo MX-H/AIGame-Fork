@@ -10,7 +10,7 @@ public class DamageEffectDescription : IEffectDescription
     {
     }
 
-    public override void ApplyToTarget(Targettable target, PlayerController player)
+    public override void ApplyToTarget(Targettable target, PlayerController player, Targettable source)
     {
         GameSession gameSession = GameUtils.GetGameSession();
         if (effectType == EffectType.HEAL_DAMAGE)

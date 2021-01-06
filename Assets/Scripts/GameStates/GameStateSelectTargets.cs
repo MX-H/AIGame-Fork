@@ -181,7 +181,7 @@ public class GameStateSelectTargets : IGameState
                         gameSession.ServerPopState();
                         break;
                     case GameSession.PendingType.TRIGGER_EFFECT:
-                        gameSession.ServerAddEffectToStack(card, triggerCondition, targetEvent.flattenedTargets, targetEvent.indexes);
+                        gameSession.ServerAddEffectToStack(gameSession.GetPendingCreature(player), card, triggerCondition, targetEvent.flattenedTargets, targetEvent.indexes);
                         gameSession.ServerPopState();
                         break;
                     case GameSession.PendingType.USE_TRAP:

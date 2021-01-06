@@ -41,7 +41,7 @@ public abstract class IGameStateWaitPlayer : IGameState
                 {
                     if (card.HasValidTargets(targets))
                     {
-                        gameSession.StartSelectingTargets(card, player, TriggerCondition.NONE);
+                        gameSession.StartSelectingTargets(card, card, player, TriggerCondition.NONE);
                         player.ServerRemoveTrapFromArena(card);
                     }
                 }

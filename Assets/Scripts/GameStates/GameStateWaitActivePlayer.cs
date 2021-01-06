@@ -98,7 +98,7 @@ public class GameStateWaitActivePlayer : IGameStateWaitPlayer
                                 List<ITargettingDescription> targets = card.cardData.GetSelectableTargets(TriggerCondition.ON_SELF_ENTER);
                                 if (targets.Count > 0 && card.HasValidTargets(targets))
                                 {
-                                    gameSession.StartSelectingTargets(card, player, TriggerCondition.ON_SELF_ENTER);
+                                    gameSession.StartSelectingTargets(card, card, player, TriggerCondition.ON_SELF_ENTER);
                                 }
                                 else
                                 {
@@ -129,7 +129,7 @@ public class GameStateWaitActivePlayer : IGameStateWaitPlayer
                                     if (card.HasValidTargets(targets))
                                     {
                                         player.ServerRemoveCardFromHand(card);
-                                        gameSession.StartSelectingTargets(card, player, TriggerCondition.NONE);
+                                        gameSession.StartSelectingTargets(card, card, player, TriggerCondition.NONE);
                                     }
                                 }
                                 else

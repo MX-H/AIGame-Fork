@@ -79,4 +79,9 @@ public class PlayerUI : Targettable
             }
         }
     }
+
+    public override Alignment GetAlignmentToPlayer(PlayerController player)
+    {
+        return GetTargettableEntity().GetAlignmentToPlayer(player);
+    }
 }

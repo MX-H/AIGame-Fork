@@ -8,7 +8,8 @@ public class UpToXTargetDescription : IQualifiableTargettingDescription
 {
     public int amount;
 
-    public UpToXTargetDescription(TargetType target) : base(target, TargettingType.UP_TO_TARGET)
+    public UpToXTargetDescription(TargetType target, Alignment alignment)
+        : base(target, (alignment == Alignment.NEUTRAL) ? TargettingType.UP_TO_TARGET : ((alignment == Alignment.POSITIVE) ? TargettingType.UP_TO_TARGET_ALLY : TargettingType.UP_TO_TARGET_ENEMY), alignment)
     {
     }
 
@@ -18,7 +19,7 @@ public class UpToXTargetDescription : IQualifiableTargettingDescription
     }
     public override double PowerLevel()
     {
-        return QualifierPowerLevel() * (amount + 0.5);
+        return ((GetPlayerAlignment() == Alignment.NEUTRAL) ? 1.25 : 1) * QualifierPowerLevel() * (amount + 0.5);
     }
     public override bool RequiresPluralEffect()
     {
@@ -30,7 +31,7 @@ public class UpToXTargetDescription : IQualifiableTargettingDescription
         return true;
     }
 
-    public override Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player)
+    public override Queue<EffectResolutionTask> GetEffectTasksWithTargets(IEffectDescription effect, Targettable[] targets, PlayerController player, Targettable source)
     {
         Queue<EffectResolutionTask> tasks = new Queue<EffectResolutionTask>();
 
@@ -40,6 +41,7 @@ public class UpToXTargetDescription : IQualifiableTargettingDescription
             task.effect = effect;
             task.target = target.GetTargettableEntity();
             task.player = player;
+            task.source = source;
 
             tasks.Enqueue(task);
         }
@@ -50,6 +52,13 @@ public class UpToXTargetDescription : IQualifiableTargettingDescription
 
 public class UpToXProceduralGenerator : IProceduralTargettingGenerator
 {
+    Alignment alignment;
+
+    public UpToXProceduralGenerator(Alignment playerAlignment)
+    {
+        alignment = playerAlignment;
+    }
+
     private int MinTargets()
     {
         return 1;
@@ -66,7 +75,7 @@ public class UpToXProceduralGenerator : IProceduralTargettingGenerator
     }
     public override ITargettingDescription Generate()
     {
-        UpToXTargetDescription desc = new UpToXTargetDescription(targetType);
+        UpToXTargetDescription desc = new UpToXTargetDescription(targetType, alignment);
 
         // Find the bounds of card amounts
         int max = ProceduralUtils.GetUpperBound(desc, ref desc.amount, MinTargets(), MaxTargets(), maxAllocatedBudget);
@@ -80,12 +89,12 @@ public class UpToXProceduralGenerator : IProceduralTargettingGenerator
 
     public override ITargettingDescription GetDescriptionType()
     {
-        return new UpToXTargetDescription(targetType);
+        return new UpToXTargetDescription(targetType, alignment);
     }
 
     public override double GetMinCost()
     {
-        UpToXTargetDescription desc = new UpToXTargetDescription(targetType);
+        UpToXTargetDescription desc = new UpToXTargetDescription(targetType, alignment);
         desc.amount = 1;
         return desc.PowerLevel();
     }

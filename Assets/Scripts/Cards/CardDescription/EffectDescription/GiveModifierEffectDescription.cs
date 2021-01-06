@@ -12,10 +12,10 @@ public class GiveModifierEffectDescription : IEffectDescription
     {
         modifierType = modifier;
     }
-    public override void ApplyToTarget(Targettable target, PlayerController player)
+    public override void ApplyToTarget(Targettable target, PlayerController player, Targettable source)
     {
         GameSession gameSession = GameUtils.GetGameSession();
-        gameSession.ServerApplyModifier(target.GetComponent<Creature>(), modifierDescription.GetModifier(durationType));
+        gameSession.ServerApplyModifier(target, modifierDescription.GetModifier(durationType));
     }
 
     public override string CardText(bool plural)
@@ -56,6 +56,14 @@ public class GiveModifierEffectProceduralGenerator : IProceduralEffectGenerator
                 modifierGenerator = new KeywordModifierProceduralGenerator();
                 modifierType = ModifierType.KEYWORD;
                 break;
+            case EffectType.GIVE_MANA_COST_REDUCTION:
+                modifierGenerator = new ManaCostModifierProceduralGenerator(true);
+                modifierType = ModifierType.MANA_COST;
+                break;
+            case EffectType.GIVE_MANA_COST_TAX:
+                modifierGenerator = new ManaCostModifierProceduralGenerator(false);
+                modifierType = ModifierType.MANA_COST;
+                break;
         }
     }
     public override IEffectDescription Generate()
@@ -63,6 +71,12 @@ public class GiveModifierEffectProceduralGenerator : IProceduralEffectGenerator
         GiveModifierEffectDescription desc = new GiveModifierEffectDescription(effectType, modifierType);
 
         desc.durationType = (random.NextDouble() > 0.5) ? DurationType.END_OF_TURN : DurationType.FOREVER;
+
+        if (effectType == EffectType.GIVE_MANA_COST_TAX)
+        {
+            // Taxing effects for your turn only won't really work
+            desc.durationType = DurationType.FOREVER;
+        }
 
         double durationMod = PowerBudget.GetDurationTypeModifier(desc.durationType);
         modifierGenerator.SetupParameters(random, model, minAllocatedBudget / durationMod, maxAllocatedBudget / durationMod);

@@ -12,7 +12,7 @@ public class CardEffectDescription : IDescription
     public string CardText(bool plural = false)
     {
         string text = ((triggerCondition == TriggerCondition.NONE) ? "" : CardParsing.Parse(triggerCondition) + ": ");
-        if (effectType is DrawEffectDescription || effectType is SummonEffectDescription)
+        if (effectType is DrawEffectDescription || effectType is SummonEffectDescription || effectType is AuraModifierEffectDescription)
         {
             if (targettingType is SelfTargettingDescription)
             {
@@ -41,8 +41,8 @@ public class CardEffectDescription : IDescription
         return PowerBudget.FLAT_EFFECT_COST + targettingType.PowerLevel() * effectType.PowerLevel();
     }
 
-    public Queue<EffectResolutionTask> GetEffectTasks(Targettable[] targets, PlayerController player)
+    public Queue<EffectResolutionTask> GetEffectTasks(Targettable[] targets, PlayerController player, Targettable source)
     {
-        return targettingType.GetEffectTasksWithTargets(effectType, targets, player);
+        return targettingType.GetEffectTasksWithTargets(effectType, targets, player, source);
     }
 }

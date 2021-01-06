@@ -380,13 +380,28 @@ public static class ProceduralUtils
         RegisterProceduralGenerator(EffectType.GIVE_POSITIVE_STATS, new GiveModifierEffectProceduralGenerator(EffectType.GIVE_POSITIVE_STATS));
         RegisterProceduralGenerator(EffectType.GIVE_NEGATIVE_STATS, new GiveModifierEffectProceduralGenerator(EffectType.GIVE_NEGATIVE_STATS));
         RegisterProceduralGenerator(EffectType.GIVE_KEYWORD, new GiveModifierEffectProceduralGenerator(EffectType.GIVE_KEYWORD));
+        RegisterProceduralGenerator(EffectType.GIVE_MANA_COST_REDUCTION, new GiveModifierEffectProceduralGenerator(EffectType.GIVE_MANA_COST_REDUCTION));
+        RegisterProceduralGenerator(EffectType.GIVE_MANA_COST_TAX, new GiveModifierEffectProceduralGenerator(EffectType.GIVE_MANA_COST_TAX));
+        RegisterProceduralGenerator(EffectType.AURA_POSITIVE_STATS, new AuraModifierEffectProceduralGenerator(EffectType.AURA_POSITIVE_STATS));
+        RegisterProceduralGenerator(EffectType.AURA_NEGATIVE_STATS, new AuraModifierEffectProceduralGenerator(EffectType.AURA_NEGATIVE_STATS));
+        RegisterProceduralGenerator(EffectType.AURA_KEYWORD, new AuraModifierEffectProceduralGenerator(EffectType.AURA_KEYWORD));
+        RegisterProceduralGenerator(EffectType.AURA_MANA_COST_REDUCTION, new AuraModifierEffectProceduralGenerator(EffectType.AURA_MANA_COST_REDUCTION));
+        RegisterProceduralGenerator(EffectType.AURA_MANA_COST_TAX, new AuraModifierEffectProceduralGenerator(EffectType.AURA_MANA_COST_TAX));
 
-        RegisterProceduralGenerator(TargettingType.TARGET, new TargetXProceduralGenerator());
-        RegisterProceduralGenerator(TargettingType.UP_TO_TARGET, new UpToXProceduralGenerator());
-        RegisterProceduralGenerator(TargettingType.ALL, new AllTargetProceduralGenerator());
-        RegisterProceduralGenerator(TargettingType.EXCEPT, new ExceptTargetProceduralGenerator());
         RegisterProceduralGenerator(TargettingType.SELF, new SelfTargettingProceduralGenerator());
         RegisterProceduralGenerator(TargettingType.FOE, new FoeTargettingProceduralGenerator());
+        RegisterProceduralGenerator(TargettingType.TARGET, new TargetXProceduralGenerator(Alignment.NEUTRAL));
+        RegisterProceduralGenerator(TargettingType.TARGET_ALLY, new TargetXProceduralGenerator(Alignment.POSITIVE));
+        RegisterProceduralGenerator(TargettingType.TARGET_ENEMY, new TargetXProceduralGenerator(Alignment.NEGATIVE));
+        RegisterProceduralGenerator(TargettingType.UP_TO_TARGET, new UpToXProceduralGenerator(Alignment.NEUTRAL));
+        RegisterProceduralGenerator(TargettingType.UP_TO_TARGET_ALLY, new UpToXProceduralGenerator(Alignment.POSITIVE));
+        RegisterProceduralGenerator(TargettingType.UP_TO_TARGET_ENEMY, new UpToXProceduralGenerator(Alignment.NEGATIVE));
+        RegisterProceduralGenerator(TargettingType.ALL, new AllTargetProceduralGenerator(Alignment.NEUTRAL));
+        RegisterProceduralGenerator(TargettingType.ALL_ALLY, new AllTargetProceduralGenerator(Alignment.POSITIVE));
+        RegisterProceduralGenerator(TargettingType.ALL_ENEMY, new AllTargetProceduralGenerator(Alignment.NEGATIVE));
+        RegisterProceduralGenerator(TargettingType.EXCEPT, new ExceptTargetProceduralGenerator(Alignment.NEUTRAL));
+        RegisterProceduralGenerator(TargettingType.EXCEPT_ALLY, new ExceptTargetProceduralGenerator(Alignment.POSITIVE));
+        RegisterProceduralGenerator(TargettingType.EXCEPT_ENEMY, new ExceptTargetProceduralGenerator(Alignment.NEGATIVE));
 
         RegisterProceduralGenerator(QualifierType.CREATURE_TYPE, new CreatureQualifierProceduralGenerator());
         RegisterProceduralGenerator(QualifierType.CARD_TYPE, new CardTypeQualifierProceduralGenerator());

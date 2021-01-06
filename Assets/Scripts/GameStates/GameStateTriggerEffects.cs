@@ -37,12 +37,12 @@ public class GameStateTriggerEffects : IGameState
                 {
                     if (creature.card.HasValidTargets(targets))
                     {
-                        gameSession.StartSelectingTargets(creature.card, creature.controller, trigger);
+                        gameSession.StartSelectingTargets(creature, creature.card, creature.controller, trigger);
                     }
                 }
                 else
                 {
-                    gameSession.ServerAddEffectToStack(creature.card, trigger);
+                    gameSession.ServerAddEffectToStack(creature, creature.card, trigger);
                 }
             }
 

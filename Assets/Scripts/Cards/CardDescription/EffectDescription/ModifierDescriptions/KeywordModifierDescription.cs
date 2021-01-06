@@ -40,7 +40,7 @@ public class KeywordModifierProceduralGenerator : IProceduralModifierGenerator
     public override IModifierDescription Generate()
     {
         KeywordModifierDescription desc = new KeywordModifierDescription();
-        desc.keyword = ProceduralUtils.GetRandomValue<KeywordAttribute>(random, model);
+        desc.keyword = ProceduralUtils.GetRandomValueExcluding(random, model, new KeywordAttribute[] { KeywordAttribute.NONE });
 
         return desc;
     }
