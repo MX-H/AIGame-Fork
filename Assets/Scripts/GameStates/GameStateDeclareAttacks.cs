@@ -49,7 +49,7 @@ public class GameStateDeclareAttacks : IGameState
             if (eventInfo is CreatureMoveToCombatEvent combatAddEvent)
             {
                 Creature creature = combatAddEvent.creatureId.GetComponent<Creature>();
-                if (!creature.creatureState.IsSummoningSick())
+                if (!creature.GetCreatureState().IsSummoningSick())
                 {
                     gameSession.GetActivePlayer().ServerMoveToCombat(combatAddEvent.creatureId, combatAddEvent.arenaPosition, false);
                 }

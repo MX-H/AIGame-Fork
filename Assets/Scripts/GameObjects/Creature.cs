@@ -21,7 +21,7 @@ public class Creature : Targettable
     public TextMeshProUGUI atkText;
     public TextMeshProUGUI hpText;
 
-    public CreatureState creatureState;
+    private CreatureState creatureState;
 
     protected override void Start()
     {
@@ -30,6 +30,7 @@ public class Creature : Targettable
         {
             SetCard(card);
         }
+
         creatureState = gameObject.GetComponent<CreatureState>();
     }
 
@@ -243,5 +244,14 @@ public class Creature : Targettable
     public override Alignment GetAlignmentToPlayer(PlayerController player)
     {
         return (player == controller) ? Alignment.POSITIVE : Alignment.NEGATIVE;
+    }
+
+    public CreatureState GetCreatureState()
+    {
+        if (creatureState == null)
+        {
+            creatureState = gameObject.GetComponent<CreatureState>();
+        }
+        return creatureState;
     }
 }

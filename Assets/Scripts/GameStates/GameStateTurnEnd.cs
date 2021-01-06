@@ -14,7 +14,7 @@ public class GameStateTurnEnd : IGameState
         {
             foreach (Creature creature in player.arena.GetAllCreatures())
             {
-                creature.creatureState.RemoveEndOfTurnModifiers();
+                creature.GetCreatureState().RemoveEndOfTurnModifiers();
             }
 
             foreach (Targettable target in player.hand.GetTargettables())

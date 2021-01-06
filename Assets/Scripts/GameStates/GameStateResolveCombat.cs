@@ -41,7 +41,7 @@ public class GameStateResolveCombat : IGameState
                         gameSession.ServerCreatureDoDamage(attackers[attackerIndex], attackerState.GetAttack(), defenders[attackerIndex]);
 
                         // Fast strike hits first, if it kills defender they can't do damage back
-                        if (!attackers[attackerIndex].HasKeyword(KeywordAttribute.FAST_STRIKE) || !defenders[attackerIndex].creatureState.IsDead())
+                        if (!attackers[attackerIndex].HasKeyword(KeywordAttribute.FAST_STRIKE) || !defenders[attackerIndex].GetCreatureState().IsDead())
                         {
                             gameSession.ServerCreatureDoDamage(defenders[attackerIndex], defenderState.GetAttack(), attackers[attackerIndex]);
                         }

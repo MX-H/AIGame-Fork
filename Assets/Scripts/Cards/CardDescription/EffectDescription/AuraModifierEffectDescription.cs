@@ -14,7 +14,7 @@ public class AuraModifierEffectDescription : IEffectDescription
     public override void ApplyToTarget(Targettable target, PlayerController player, Targettable source)
     {
         GameSession gameSession = GameUtils.GetGameSession();
-        gameSession.ServerApplyModifier(target.GetComponent<Creature>(), modifierDescription.GetModifier(source as Creature));
+        gameSession.ServerApplyModifier(target, modifierDescription.GetModifier(source as Creature));
     }
 
     public override string CardText(bool plural)

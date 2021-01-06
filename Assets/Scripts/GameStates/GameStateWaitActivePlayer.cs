@@ -75,7 +75,7 @@ public class GameStateWaitActivePlayer : IGameStateWaitPlayer
             if (eventInfo is CreatureMoveToCombatEvent combatEvent)
             {
                 Creature creature = combatEvent.creatureId.GetComponent<Creature>();
-                if (!gameSession.WasCombatDeclared() && !creature.creatureState.IsSummoningSick())
+                if (!gameSession.WasCombatDeclared() && !creature.GetCreatureState().IsSummoningSick())
                 {
                     gameSession.GetActivePlayer().ServerMoveToCombat(combatEvent.creatureId, combatEvent.arenaPosition, true);
                     ChangeState(GameSession.GameState.DECLARE_ATTACKS);

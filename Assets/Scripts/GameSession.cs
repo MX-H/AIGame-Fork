@@ -658,7 +658,7 @@ public class GameSession : NetworkBehaviour
             Creature targetCreature = target as Creature;
             if (targetCreature && source.HasKeyword(KeywordAttribute.PIERCING))
             {
-                int excess = -targetCreature.creatureState.GetHealth();
+                int excess = -targetCreature.GetCreatureState().GetHealth();
                 if (excess > 0)
                 {
                     ServerCreatureDoDamage(source, excess, targetCreature.controller);
@@ -785,7 +785,7 @@ public class GameSession : NetworkBehaviour
             Creature creature = target as Creature;
             if (creature)
             {
-                creature.creatureState.ServerDoDamage(amount);
+                creature.GetCreatureState().ServerDoDamage(amount);
                 ServerTriggerEffects(creature, TriggerCondition.ON_SELF_DAMAGE_TAKEN);
             }
         }
@@ -803,7 +803,7 @@ public class GameSession : NetworkBehaviour
         Creature creature = target as Creature;
         if (creature)
         {
-            creature.creatureState.ServerHealDamage(amount);
+            creature.GetCreatureState().ServerHealDamage(amount);
         }
     }
 
@@ -812,7 +812,7 @@ public class GameSession : NetworkBehaviour
     {
         if (target is Creature creature)
         {
-            creature.creatureState.ServerAddModifier(modifier);
+            creature.GetCreatureState().ServerAddModifier(modifier);
         }
         else if (target is Card card)
         {
@@ -855,7 +855,7 @@ public class GameSession : NetworkBehaviour
 
         foreach (Creature creature in creaturesToUpdate)
         {
-            if (creature.creatureState.IsDead())
+            if (creature.GetCreatureState().IsDead())
             {
                 // Remove the creature
                 creature.controller.ServerDestroyCreature(creature.netIdentity);

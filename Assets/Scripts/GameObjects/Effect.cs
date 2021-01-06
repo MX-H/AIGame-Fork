@@ -10,6 +10,10 @@ public class Effect : Targettable
     public SpriteRenderer icon;
     public TextPrompt textPrompt;
     public Targettable sourceEntity;
+    public SpriteRenderer border;
+
+    public Color allyColor;
+    public Color enemyColor;
 
     private bool hovering;
 
@@ -117,6 +121,15 @@ public class Effect : Targettable
 
         triggerCondition = trigger;
         targetList = targets;
+
+        if (source.controller.isLocalPlayer)
+        {
+            border.color = allyColor;
+        }
+        else
+        {
+            border.color = enemyColor;
+        }
     }
 
     public Queue<EffectResolutionTask> GetEffectTasks()

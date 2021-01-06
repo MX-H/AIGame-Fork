@@ -168,7 +168,7 @@ public class Arena : MonoBehaviour
         {
             if (target is Creature targetCreature)
             {
-                targetCreature.creatureState.RemoveAuraModifiers(c);
+                targetCreature.GetCreatureState().RemoveAuraModifiers(c);
             }
             else if (target is Card targetCard)
             {
@@ -224,7 +224,7 @@ public class Arena : MonoBehaviour
                     player.ClientRequestMoveToCombat(creature, closestInd);
                 }
             }
-            else if (!creature.creatureState.IsSummoningSick())
+            else if (!creature.GetCreatureState().IsSummoningSick())
             {
                 int ind = 0;
                 for (; ind < inCombatCreatures.Count; ind++)

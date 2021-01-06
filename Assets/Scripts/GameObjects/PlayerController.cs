@@ -147,7 +147,11 @@ public class PlayerController : Targettable
         {
             if (effectDescription != null)
             {
-                string selectMessage = ((index < 0) ? "" : "<sprite=" + index + "> ") + "Select ";
+                string selectMessage = ((index < 0) ? "" : "<sprite=" + index + "> ");
+                selectMessage += effectDescription.CardText();
+
+                /*
+                selectMessage += "Select ";
                 if (effectDescription.targettingType.targettingType != TargettingType.EXCEPT)
                 {
                     selectMessage += effectDescription.targettingType.CardText() + " that ";
@@ -160,6 +164,8 @@ public class PlayerController : Targettable
                     selectMessage += exceptDesc.targetDescription.CardText() + " that " + (targetDesc.RequiresPluralEffect() ? "does not " : "do not "); 
                 }
                 selectMessage += effectDescription.effectType.CardText(effectDescription.targettingType.RequiresPluralEffect());
+                */
+
                 selectingTextPrompt.SetText(selectMessage);
                 selectingTextPrompt.gameObject.SetActive(true);
             }
@@ -552,7 +558,7 @@ public class PlayerController : Targettable
 
         foreach (Creature creature in arena.GetAllCreatures())
         {
-            creature.creatureState.SetSummoningSick(false);
+            creature.GetCreatureState().SetSummoningSick(false);
         }
     }
 
