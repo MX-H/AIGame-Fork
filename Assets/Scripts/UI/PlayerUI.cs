@@ -7,6 +7,8 @@ public class PlayerUI : Targettable
 {
     public PlayerController player;
     public TextMeshProUGUI healthDisplay;
+    public TextMeshProUGUI manaCount;
+
     public ManaUI[] manaDisplay;
 
     public override bool IsTargettable()
@@ -60,6 +62,8 @@ public class PlayerUI : Targettable
                 healthDisplay.text = player.health.ToString();
 
             }
+
+            manaCount.text = player.currMana.ToString();
 
             for (int i = 0; i < GameConstants.MAX_MANA; i++)
             {
