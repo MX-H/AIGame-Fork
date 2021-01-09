@@ -10,422 +10,422 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 72eebb8ee9da02843ab77bb77bd7623b, type: 3}
-  m_Name: GoblinModel
+  m_Name: GoblinAggroModel
   m_EditorClassIdentifier: 
   histograms:
   - id: CardType
     values:
     - enumVal: 0
-      value: 1
+      value: 20
       enumType: CardType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 3
+      total: 35
     - enumVal: 1
-      value: 1
+      value: 10
       enumType: CardType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 3
+      total: 35
     - enumVal: 2
-      value: 1
+      value: 5
       enumType: CardType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 3
+      total: 35
   - id: TargetType
     values:
     - enumVal: 0
-      value: 1
+      value: 10
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 1
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 2
-      value: 1
+      value: 5
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 3
-      value: 1
+      value: 10
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 4
-      value: 1
+      value: 10
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 5
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 6
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 7
-      value: 1
+      value: 10
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 8
-      value: 1
+      value: 15
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 9
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 10
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 11
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 12
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 13
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 14
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
     - enumVal: 15
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 16
+      total: 70
   - id: TargettingType
     values:
     - enumVal: 0
-      value: 1
+      value: 10
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 1
-      value: 1
+      value: 10
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 2
-      value: 1
+      value: 5
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 3
-      value: 1
+      value: 10
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 4
-      value: 1
+      value: 10
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 5
-      value: 1
+      value: 15
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 6
-      value: 1
+      value: 15
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 7
-      value: 1
+      value: 20
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 8
-      value: 1
+      value: 10
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 9
-      value: 1
+      value: 5
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 10
-      value: 1
+      value: 15
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 11
       value: 1
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 12
       value: 1
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
     - enumVal: 13
-      value: 1
+      value: 5
       enumType: TargettingType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 14
+      total: 132
   - id: CreatureType
     values:
     - enumVal: 0
+      value: 3
+      enumType: CreatureType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      total: 29
+    - enumVal: 1
+      value: 25
+      enumType: CreatureType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      total: 29
+    - enumVal: 2
       value: 1
       enumType: CreatureType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 11
-    - enumVal: 1
-      value: 10
-      enumType: CreatureType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-        PublicKeyToken=null
-      total: 11
-    - enumVal: 2
-      value: 0
-      enumType: CreatureType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-        PublicKeyToken=null
-      total: 11
+      total: 29
   - id: QualifierType
     values:
     - enumVal: 0
-      value: 1
+      value: 10
       enumType: QualifierType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 3
+      total: 16
     - enumVal: 1
       value: 1
       enumType: QualifierType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 3
+      total: 16
     - enumVal: 2
-      value: 1
+      value: 5
       enumType: QualifierType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 3
+      total: 16
   - id: EffectType
     values:
     - enumVal: 0
-      value: 0
-      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
-    - enumVal: 1
       value: 1
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
-    - enumVal: 2
-      value: 30
-      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
-    - enumVal: 3
-      value: 0
-      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
-    - enumVal: 4
-      value: 30
-      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
-    - enumVal: 5
-      value: 0
-      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
-    - enumVal: 6
-      value: 10
-      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
-    - enumVal: 7
+      total: 99
+    - enumVal: 1
       value: 5
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
+      total: 99
+    - enumVal: 2
+      value: 25
+      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      total: 99
+    - enumVal: 3
+      value: 1
+      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      total: 99
+    - enumVal: 4
+      value: 20
+      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      total: 99
+    - enumVal: 5
+      value: 1
+      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      total: 99
+    - enumVal: 6
+      value: 15
+      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      total: 99
+    - enumVal: 7
+      value: 10
+      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      total: 99
     - enumVal: 8
       value: 1
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
+      total: 99
     - enumVal: 9
       value: 1
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
+      total: 99
     - enumVal: 10
+      value: 10
+      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      total: 99
+    - enumVal: 11
       value: 5
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
-    - enumVal: 11
+      total: 99
+    - enumVal: 12
       value: 1
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
-    - enumVal: 12
-      value: 0
-      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
+      total: 99
     - enumVal: 13
-      value: 0
+      value: 1
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
+      total: 99
     - enumVal: 14
-      value: 0
+      value: 1
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
+      total: 99
     - enumVal: 15
-      value: 0
+      value: 1
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 84
+      total: 99
   - id: ManaCost
     values:
     - enumVal: 0
-      value: 0
+      value: 5
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 45
+      total: 118
     - enumVal: 1
-      value: 5
+      value: 20
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 45
+      total: 118
     - enumVal: 2
-      value: 10
+      value: 25
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 45
+      total: 118
     - enumVal: 3
+      value: 25
+      enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      total: 118
+    - enumVal: 4
+      value: 20
+      enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      total: 118
+    - enumVal: 5
       value: 10
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 45
-    - enumVal: 4
-      value: 7
-      enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 45
-    - enumVal: 5
+      total: 118
+    - enumVal: 6
       value: 5
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 45
-    - enumVal: 6
+      total: 118
+    - enumVal: 7
       value: 3
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 45
-    - enumVal: 7
-      value: 2
-      enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 45
+      total: 118
     - enumVal: 8
-      value: 1
+      value: 3
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 45
+      total: 118
     - enumVal: 9
       value: 1
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 45
+      total: 118
     - enumVal: 10
       value: 1
       enumType: ManaCost, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 45
+      total: 118
   - id: DrawModifier
     values:
     - enumVal: 0
-      value: 1
+      value: 5
       enumType: DrawModifier, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 4
+      total: 17
     - enumVal: 1
       value: 1
       enumType: DrawModifier, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 4
+      total: 17
     - enumVal: 2
-      value: 1
+      value: 10
       enumType: DrawModifier, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 4
+      total: 17
     - enumVal: 3
       value: 1
       enumType: DrawModifier, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 4
+      total: 17
   - id: KeywordAttribute
     values:
     - enumVal: 0
-      value: 20
-      enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-        PublicKeyToken=null
-      total: 51
-    - enumVal: 1
-      value: 0
-      enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
-        PublicKeyToken=null
-      total: 51
-    - enumVal: 2
       value: 10
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 51
-    - enumVal: 3
+      total: 59
+    - enumVal: 1
       value: 1
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 51
+      total: 59
+    - enumVal: 2
+      value: 15
+      enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      total: 59
+    - enumVal: 3
+      value: 3
+      enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      total: 59
     - enumVal: 4
       value: 10
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 51
+      total: 59
     - enumVal: 5
-      value: 10
+      value: 20
       enumType: KeywordAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 51
+      total: 59
   - id: TriggerCondition
     values:
     - enumVal: 0
       value: 1
       enumType: TriggerCondition, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 9
+      total: 58
     - enumVal: 1
-      value: 1
+      value: 15
       enumType: TriggerCondition, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 9
+      total: 58
     - enumVal: 2
-      value: 1
+      value: 5
       enumType: TriggerCondition, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 9
+      total: 58
     - enumVal: 3
-      value: 1
+      value: 10
       enumType: TriggerCondition, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 9
+      total: 58
     - enumVal: 4
-      value: 1
+      value: 5
       enumType: TriggerCondition, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 9
+      total: 58
     - enumVal: 5
       value: 1
       enumType: TriggerCondition, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 9
+      total: 58
     - enumVal: 6
-      value: 1
+      value: 15
       enumType: TriggerCondition, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 9
+      total: 58
     - enumVal: 7
       value: 1
       enumType: TriggerCondition, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 9
+      total: 58
     - enumVal: 8
-      value: 1
+      value: 5
       enumType: TriggerCondition, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 9
+      total: 58
   - id: ModifierType
     values:
     - enumVal: 0
-      value: 1
+      value: 20
       enumType: ModifierType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 3
+      total: 31
     - enumVal: 1
-      value: 1
+      value: 10
       enumType: ModifierType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 3
+      total: 31
     - enumVal: 2
       value: 1
       enumType: ModifierType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
-      total: 3
+      total: 31
