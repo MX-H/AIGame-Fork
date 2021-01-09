@@ -53,55 +53,66 @@ public class Arena : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float center = (creatures.Count - 1) / 2.0f;
-        for (int i = 0; i < creatures.Count; i++)
+        if (GameUtils.GetGameSession().GetCurrState() == GameSession.GameState.RESOLVING_COMBAT)
         {
-            if (!creatures[i].dragging)
+            float step = 10f*Time.deltaTime;
+            foreach(Creature attacker in incomingAttackers)
             {
-                creatures[i].transform.localPosition = new Vector3((i - center) * 5.0f, 0, 0);
-                creatures[i].transform.localRotation = Quaternion.identity;
+                Transform creatureTransform = attacker.transform;
+                creatureTransform.position = Vector3.MoveTowards(creatureTransform.position, new Vector3(creatureTransform.position.x, (0 - creatureTransform.position.y)/2, creatureTransform.position.z), step);
             }
         }
-
-        if (arenaState == State.ATTACKING)
+        else 
         {
-            int onField = 0;
-            foreach (Creature c in inCombatCreatures)
+            float center = (creatures.Count - 1) / 2.0f;
+            for (int i = 0; i < creatures.Count; i++)
             {
-                if (!c.dragging)
+                if (!creatures[i].dragging)
                 {
-                    onField++;
+                    creatures[i].transform.localPosition = new Vector3((i - center) * 5.0f, 0, 0);
+                    creatures[i].transform.localRotation = Quaternion.identity;
                 }
             }
 
-            if (onField > 0)
+            if (arenaState == State.ATTACKING)
             {
-                int ind = 0;
-                center = (onField - 1) / 2.0f;
-                for (int i = 0; i < inCombatCreatures.Count; i++)
+                int onField = 0;
+                foreach (Creature c in inCombatCreatures)
                 {
-                    if (!inCombatCreatures[i].dragging)
+                    if (!c.dragging)
                     {
-                        inCombatCreatures[i].transform.localPosition = new Vector3((ind - center) * 5.0f, 0, 0);
-                        inCombatCreatures[i].transform.localRotation = Quaternion.identity;
-                        ind++;
+                        onField++;
+                    }
+                }
+
+                if (onField > 0)
+                {
+                    int ind = 0;
+                    center = (onField - 1) / 2.0f;
+                    for (int i = 0; i < inCombatCreatures.Count; i++)
+                    {
+                        if (!inCombatCreatures[i].dragging)
+                        {
+                            inCombatCreatures[i].transform.localPosition = new Vector3((ind - center) * 5.0f, 0, 0);
+                            inCombatCreatures[i].transform.localRotation = Quaternion.identity;
+                            ind++;
+                        }
+                    }
+                }
+            }
+            else if (arenaState == State.BLOCKING)
+            {
+                center = (incomingAttackers.Count - 1) / 2.0f;
+                for (int i = 0; i < defenders.Length; i++)
+                {
+                    if (defenders[i] != null && !defenders[i].dragging)
+                    {
+                        defenders[i].transform.localPosition = new Vector3((i - center) * 5.0f, 0, 0);
+                        defenders[i].transform.localRotation = Quaternion.identity;
                     }
                 }
             }
         }
-        else if (arenaState == State.BLOCKING)
-        {
-            center = (incomingAttackers.Count - 1) / 2.0f;
-            for (int i = 0; i < defenders.Length; i++)
-            {
-                if (defenders[i] != null && !defenders[i].dragging)
-                {
-                    defenders[i].transform.localPosition = new Vector3((i - center) * 5.0f, 0, 0);
-                    defenders[i].transform.localRotation = Quaternion.identity;
-                }
-            }
-        }
-
     }
 
     public void SetState(State state)
