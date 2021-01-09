@@ -19,6 +19,7 @@ public class GameStateResolveCombat : IGameState
         defenders = gameSession.GetNonActivePlayer().arena.GetDefenders();
         attackerIndex = 0;
         timeElapsed = 0.0f;
+        SoundLibrary.PlaySound("combat");
     }
 
     public override void Update(float frameDelta)
@@ -32,8 +33,7 @@ public class GameStateResolveCombat : IGameState
                 if (attackerIndex < attackers.Count)
                 {
                     CreatureState attackerState = attackers[attackerIndex].gameObject.GetComponent<CreatureState>();
-                    SoundLibrary.PlaySound("combat");
-                    
+
                     if (defenders[attackerIndex] != null)
                     {
                         CreatureState defenderState = defenders[attackerIndex].gameObject.GetComponent<CreatureState>();
