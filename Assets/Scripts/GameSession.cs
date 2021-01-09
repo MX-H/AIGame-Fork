@@ -1176,4 +1176,9 @@ public class GameSession : NetworkBehaviour
     {
         return playerAreas.Length;
     }
+
+    public GameState GetCurrState()
+    {
+        return currState;
+    }
 }
