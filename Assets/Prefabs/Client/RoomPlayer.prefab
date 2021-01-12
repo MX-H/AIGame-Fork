@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3549949346896965779}
   - component: {fileID: 4231696490108203663}
-  - component: {fileID: 2659178602679785534}
+  - component: {fileID: 2969294987796050872}
   m_Layer: 0
   m_Name: RoomPlayer
   m_TagString: Untagged
@@ -48,7 +48,7 @@ MonoBehaviour:
   serverOnly: 0
   m_AssetId: 
   hasSpawned: 0
---- !u!114 &2659178602679785534
+--- !u!114 &2969294987796050872
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -57,7 +57,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4937002812359228613}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 79874ac94d5b1314788ecf0e86bd23fd, type: 3}
+  m_Script: {fileID: 11500000, guid: 1c0d4919c9a3b0048bafff1e9cc4ebac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
@@ -65,3 +65,12 @@ MonoBehaviour:
   showRoomGUI: 1
   readyToBegin: 0
   index: 0
+  deckModels:
+  - {fileID: 11400000, guid: bcbec90c9ba264943b094db842f9c18b, type: 2}
+  - {fileID: 11400000, guid: 410e79d57af9e6449b65aa80ab7c90f7, type: 2}
+  - {fileID: 11400000, guid: b4485bcca97145d45843ff0eb2195785, type: 2}
+  avatarSprites:
+  - {fileID: 5136440944217051053, guid: 3130ae0b3e11ef844971a5ac83f4c47d, type: 3}
+  - {fileID: 6235265925870878208, guid: 8d1d658c941c4fa4182c8281876a0bb6, type: 3}
+  - {fileID: -2826670317225955018, guid: ef6de36842e464d4991c4e8519188415, type: 3}
+  - {fileID: -4596402384755529911, guid: a274e0f939e62794ba0a8bcff2969e3f, type: 3}

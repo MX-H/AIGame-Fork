@@ -8,6 +8,7 @@ public class PlayerUI : Targettable
     public PlayerController player;
     public TextMeshProUGUI healthDisplay;
     public TextMeshProUGUI manaCount;
+    public SpriteRenderer avatar;
 
     public ManaUI[] manaDisplay;
 
@@ -38,6 +39,7 @@ public class PlayerUI : Targettable
     {
         player = p;
         p.playerUI = this;
+        avatar.sprite = p.avatar;
     }
 
     // Start is called before the first frame update
