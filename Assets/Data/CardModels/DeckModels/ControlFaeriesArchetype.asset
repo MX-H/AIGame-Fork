@@ -30,69 +30,69 @@ MonoBehaviour:
   - id: TargetType
     values:
     - enumVal: 0
-      value: 15
+      value: 25
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 1
       value: 5
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 2
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 3
       value: 15
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 4
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 5
-      value: 5
+      value: 10
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 6
       value: 5
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 7
       value: 10
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 8
       value: 1
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 9
       value: 5
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 10
       value: 5
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 11
       value: 5
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 12
       value: 5
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 13
       value: 5
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 14
       value: 5
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
     - enumVal: 15
       value: 10
       enumType: TargetType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 98
+      total: 113
   - id: TargettingType
     values:
     - enumVal: 0
@@ -204,67 +204,71 @@ MonoBehaviour:
     - enumVal: 0
       value: 1
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
+      total: 150
     - enumVal: 1
       value: 20
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
+      total: 150
     - enumVal: 2
       value: 5
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
+      total: 150
     - enumVal: 3
       value: 15
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
+      total: 150
     - enumVal: 4
       value: 5
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
+      total: 150
     - enumVal: 5
       value: 15
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
+      total: 150
     - enumVal: 6
-      value: 1
+      value: 20
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
+      total: 150
     - enumVal: 7
       value: 1
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
+      total: 150
     - enumVal: 8
-      value: 10
+      value: 1
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
+      total: 150
     - enumVal: 9
-      value: 5
-      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
-    - enumVal: 10
       value: 10
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
-    - enumVal: 11
+      total: 150
+    - enumVal: 10
       value: 5
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
+      total: 150
+    - enumVal: 11
+      value: 10
+      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      total: 150
     - enumVal: 12
+      value: 5
+      enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+      total: 150
+    - enumVal: 13
       value: 15
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
-    - enumVal: 13
+      total: 150
+    - enumVal: 14
       value: 7
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
-    - enumVal: 14
+      total: 150
+    - enumVal: 15
       value: 10
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
-    - enumVal: 15
+      total: 150
+    - enumVal: 16
       value: 5
       enumType: EffectType, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-      total: 130
+      total: 150
   - id: ManaCost
     values:
     - enumVal: 0
