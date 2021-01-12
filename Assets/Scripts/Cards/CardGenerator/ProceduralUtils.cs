@@ -375,6 +375,7 @@ public static class ProceduralUtils
         RegisterProceduralGenerator(EffectType.DRAW_CARDS, new DrawEffectProceduralGenerator());
         RegisterProceduralGenerator(EffectType.DEAL_DAMAGE, new DamageEffectProceduralGenerator(false));
         RegisterProceduralGenerator(EffectType.HEAL_DAMAGE, new DamageEffectProceduralGenerator(true));
+        RegisterProceduralGenerator(EffectType.DESTROY_CARD, new DestroyEffectProceduralGenerator());
         RegisterProceduralGenerator(EffectType.NEGATE, new NegateEffectProceduralGenerator());
         RegisterProceduralGenerator(EffectType.SUMMON_TOKEN, new SummonEffectProceduralGenerator());
         RegisterProceduralGenerator(EffectType.GIVE_POSITIVE_STATS, new GiveModifierEffectProceduralGenerator(EffectType.GIVE_POSITIVE_STATS));

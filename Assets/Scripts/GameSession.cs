@@ -808,6 +808,16 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
+    public void ServerDestroyCard(Targettable target)
+    {
+        Creature creature = target as Creature;
+        if (creature)
+        {
+            creature.GetCreatureState().ServerDestroyCard();
+        }
+    }
+
+    [Server]
     public void ServerApplyModifier(Targettable target, IModifier modifier)
     {
         if (target is Creature creature)

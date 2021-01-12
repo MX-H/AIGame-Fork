@@ -10,6 +10,9 @@ public class CreatureState : NetworkBehaviour
 
     [SyncVar]
     int currHealthVal;
+    
+    [SyncVar]
+    bool beenDestroyed;
 
     [SyncVar]
     bool summoningSick;
@@ -36,6 +39,7 @@ public class CreatureState : NetworkBehaviour
     {
         creature = gameObject.GetComponent<Creature>();
         currHealthVal = GetMaxHealth();
+        beenDestroyed = false;
         summoningSick = !creature.HasKeyword(KeywordAttribute.EAGER);
     }
 
@@ -53,6 +57,12 @@ public class CreatureState : NetworkBehaviour
         {
             currHealthVal = GetMaxHealth();
         }
+    }
+
+    [Server]
+    public void ServerDestroyCard()
+    {
+        beenDestroyed = true;
     }
 
     [Server]
@@ -158,7 +168,7 @@ public class CreatureState : NetworkBehaviour
 
     public bool IsDead()
     {
-        return currHealthVal <= 0;
+        return currHealthVal <= 0 || beenDestroyed;
     }
 
 }

@@ -111,6 +111,7 @@ public enum EffectType
     HEAL_DAMAGE,
     SUMMON_TOKEN,
     NEGATE,
+    DESTROY_CARD,
 
     GIVE_POSITIVE_STATS,
     AURA_POSITIVE_STATS,
@@ -286,6 +287,7 @@ static class CardEnums
         RegisterFlags(EffectType.DRAW_CARDS, new TargetType[] { TargetType.PLAYERS });
         RegisterFlags(EffectType.DEAL_DAMAGE, new TargetType[] { TargetType.CREATURES, TargetType.PLAYERS, TargetType.DAMAGEABLE });
         RegisterFlags(EffectType.HEAL_DAMAGE, new TargetType[] { TargetType.CREATURES, TargetType.PLAYERS, TargetType.DAMAGEABLE });
+        RegisterFlags(EffectType.DESTROY_CARD, new TargetType[] { TargetType.CREATURES, TargetType.SET_TRAPS });
         RegisterFlags(EffectType.SUMMON_TOKEN, new TargetType[] { TargetType.PLAYERS });
         RegisterFlags(EffectType.NEGATE, new TargetType[] { TargetType.SPELLS, TargetType.ACTIVE_TRAPS, TargetType.EFFECTS,
             TargetType.SPELLS_AND_EFFECTS, TargetType.SPELLS_AND_TRAPS, TargetType.TRAPS_AND_EFFECTS, TargetType.STACK_ITEMS });
@@ -304,6 +306,7 @@ static class CardEnums
         RemoveFlags(EffectType.DRAW_CARDS, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
         RemoveFlags(EffectType.DEAL_DAMAGE, new TriggerCondition[] { TriggerCondition.IS_ALIVE, TriggerCondition.ON_SELF_DAMAGE_TAKEN });
         RemoveFlags(EffectType.HEAL_DAMAGE, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
+        RemoveFlags(EffectType.DESTROY_CARD, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
         RemoveFlags(EffectType.SUMMON_TOKEN, new TriggerCondition[] { TriggerCondition.IS_ALIVE, TriggerCondition.ON_CREATURE_ENTER, TriggerCondition.ON_CREATURE_DIES });
         RemoveFlags(EffectType.NEGATE,  ((TriggerCondition[])Enum.GetValues(typeof(TriggerCondition))).Except(new TriggerCondition[] { TriggerCondition.ON_STACK_UPDATED }));
         RemoveFlags(EffectType.GIVE_POSITIVE_STATS, new TriggerCondition[] { TriggerCondition.IS_ALIVE });
