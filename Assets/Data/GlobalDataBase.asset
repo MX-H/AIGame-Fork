@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa6614a7b7580b54dac69b7f2f20ef47, type: 3}
+  m_Name: GlobalDataBase
+  m_EditorClassIdentifier: 
+  avatarSprites: {fileID: 11400000, guid: 59c11e52b832a4540a789bca39149c88, type: 2}
+  deckModels: {fileID: 11400000, guid: f1bf8d102796d3a4695daceed7359a1d, type: 2}

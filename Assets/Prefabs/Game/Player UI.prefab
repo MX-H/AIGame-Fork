@@ -303,6 +303,7 @@ MonoBehaviour:
   player: {fileID: 0}
   healthDisplay: {fileID: 7303246354227345699}
   manaCount: {fileID: 5034162329061913401}
+  avatar: {fileID: 5409864941289332547}
   manaDisplay:
   - {fileID: 4743214176045697581}
   - {fileID: 1509017687097053431}

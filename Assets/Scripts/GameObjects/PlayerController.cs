@@ -22,12 +22,16 @@ public class PlayerController : Targettable
     [SyncVar]
     public int totalMana;
 
+    [SyncVar]
+    private MatchSettings matchSettings;
+
     public ICardGenerator cardGenerator;
     public IHistogram model;
     public ImageGlossary imageGlossary;
     public NameModel nameModel;
     public Card cardPrefab;
     public Creature creaturePrefab;
+    public Sprite avatar;
     GameSession gameSession;
 
     List<Targettable> selectedTargets; // Targets for current condition
@@ -62,6 +66,9 @@ public class PlayerController : Targettable
         ClientScene.RegisterPrefab(cardPrefab.gameObject);
         ClientScene.RegisterPrefab(creaturePrefab.gameObject);
 
+        avatar = Resources.LoadAll<Sprite>(GameConstants.PATHS.CARD_IMAGES + GameUtils.GetDatabase().GetAvatarTexture(matchSettings.avatarIndex).name)[1];
+        model = GameUtils.GetDatabase().GetDeckModel(matchSettings.deckModelIndex);
+
         cardGenerator = new ProceduralCardGenerator(model, imageGlossary, gameSession.creatureModelIndex, nameModel);
         if (isLocalPlayer)
         {
@@ -76,6 +83,12 @@ public class PlayerController : Targettable
             surrenderButton.localPlayer = this;
         }
         turnTimer = FindObjectOfType<TurnTimer>();
+    }
+
+    [Server]
+    public void ServerSetupPlayer(MatchSettings settings)
+    {
+        matchSettings = settings;
     }
 
     // Update is called once per frame

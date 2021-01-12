@@ -8,6 +8,7 @@ public static class GameUtils
     private static CreatureModelIndex creatureModelIndex;
     private static TurnTimer turnTimer;
     private static CardSelector cardSelector;
+    private static GlobalDatabase database;
     public static void SetGameSession(GameSession game)
     {
         gameSession = game;
@@ -46,5 +47,15 @@ public static class GameUtils
     public static CardSelector GetCardSelector()
     {
         return cardSelector;
+    }
+
+    public static void SetDatabase(GlobalDatabase data)
+    {
+        database = data;
+    }
+
+    public static GlobalDatabase GetDatabase()
+    {
+        return database;
     }
 }

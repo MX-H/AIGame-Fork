@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2992835255359102010
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 681304622389617814}
+  - component: {fileID: 6895181376989874339}
+  - component: {fileID: 3298699453481049122}
+  m_Layer: 0
+  m_Name: Player
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &681304622389617814
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2992835255359102010}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6895181376989874339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2992835255359102010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
+--- !u!114 &3298699453481049122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2992835255359102010}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6845d1b36f5da849a0b7c9ae497ba6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  isTargettable: 0
+  isSelected: 0
+  text: {fileID: 0}
+  hand: {fileID: 0}
+  deck: {fileID: 0}
+  arena: {fileID: 0}
+  discard: {fileID: 0}
+  playerUI: {fileID: 0}
+  hasSentTargets: 0
+  health: 0
+  currMana: 0
+  totalMana: 0
+  model: {fileID: 11400000, guid: 410e79d57af9e6449b65aa80ab7c90f7, type: 2}
+  imageGlossary: {fileID: 11400000, guid: 9730a333d1475fd488f7a8e43a6b6b5c, type: 2}
+  nameModel: {fileID: 11400000, guid: 0038c7d304ab60c449b2d39ec217a1d5, type: 2}
+  cardPrefab: {fileID: 7826359536346464351, guid: a230248f1058d0d4d900b14ac753a656,
+    type: 3}
+  creaturePrefab: {fileID: 5119441606187241201, guid: 8b7d9804acfd9514e83f65cc9fafa99f,
+    type: 3}
+  avatar: {fileID: -4596402384755529911, guid: a274e0f939e62794ba0a8bcff2969e3f, type: 3}
