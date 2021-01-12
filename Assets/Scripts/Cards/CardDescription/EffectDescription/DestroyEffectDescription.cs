@@ -16,7 +16,7 @@ public class DestroyEffectDescription : IEffectDescription
 
     public override string CardText(bool plural)
     {
-        return plural ? "destroy" : "destroys";
+        return "destroy";
     }
     public override Alignment GetAlignment()
     {

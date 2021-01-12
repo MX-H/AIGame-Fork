@@ -776,14 +776,12 @@ public class GameSession : NetworkBehaviour
     {
         if (amount > 0)
         {
-            PlayerController player = target as PlayerController;
-            if (player)
+            if (target is PlayerController player)
             {
                 player.ServerDoDamage(amount);
             }
 
-            Creature creature = target as Creature;
-            if (creature)
+            if (target is Creature creature)
             {
                 creature.GetCreatureState().ServerDoDamage(amount);
                 ServerTriggerEffects(creature, TriggerCondition.ON_SELF_DAMAGE_TAKEN);
@@ -794,14 +792,12 @@ public class GameSession : NetworkBehaviour
     [Server]
     public void ServerHealDamage(Targettable target, int amount)
     {
-        PlayerController player = target as PlayerController;
-        if (player)
+        if (target is PlayerController player)
         {
             player.ServerHealDamage(amount);
         }
 
-        Creature creature = target as Creature;
-        if (creature)
+        if (target is Creature creature)
         {
             creature.GetCreatureState().ServerHealDamage(amount);
         }
@@ -810,10 +806,14 @@ public class GameSession : NetworkBehaviour
     [Server]
     public void ServerDestroyCard(Targettable target)
     {
-        Creature creature = target as Creature;
-        if (creature)
+        if (target is Creature creature)
         {
             creature.GetCreatureState().ServerDestroyCard();
+        }
+
+        if (target is Card card)
+        {
+            card.controller.ServerDestroyTrap(card.netIdentity);
         }
     }
 

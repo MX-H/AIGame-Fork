@@ -861,22 +861,45 @@ public class PlayerController : Targettable
     [Server]
     public void ServerDestroyCreature(NetworkIdentity creatureId)
     {
-        if (isServerOnly)
-        {
-            Creature creature = creatureId.gameObject.GetComponent<Creature>();
-            arena.RemoveCreature(creature);
-            discard.AddCreature(creature);
-        }
+        Creature creature = creatureId.gameObject.GetComponent<Creature>();
+        arena.RemoveCreature(creature);
+        discard.AddCreature(creature);
+
         RpcDestroyCreature(creatureId);
     }
 
     [ClientRpc]
     public void RpcDestroyCreature(NetworkIdentity creatureId)
     {
-        Creature creature = creatureId.gameObject.GetComponent<Creature>();
-        arena.RemoveCreature(creature);
-        discard.AddCreature(creature);
+        if (!isServer)
+        {
+            Creature creature = creatureId.gameObject.GetComponent<Creature>();
+            arena.RemoveCreature(creature);
+            discard.AddCreature(creature);
+        }
     }
+
+    [Server]
+    public void ServerDestroyTrap(NetworkIdentity cardId)
+    {
+        Card card = cardId.gameObject.GetComponent<Card>();
+        arena.RemoveTrap(card);
+        discard.AddCard(card);
+
+        RpcDestroyTrap(cardId);
+    }
+
+    [ClientRpc]
+    public void RpcDestroyTrap(NetworkIdentity cardId)
+    {
+        if (!isServer)
+        {
+            Card card = cardId.gameObject.GetComponent<Card>();
+            arena.RemoveTrap(card);
+            discard.AddCard(card);
+        }
+    }
+
 
     [TargetRpc]
     public void TargetEndGame(NetworkConnection target, bool winner)

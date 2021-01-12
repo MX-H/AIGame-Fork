@@ -25,7 +25,9 @@ public class Card : Targettable
     public PlayerController owner;
     public PlayerController controller;
     public Hand context;
-    public Targettable targettableUI;
+
+    private Targettable targettableUI;
+    private bool isSetTrap;
 
 
     protected override void Start()
@@ -334,6 +336,58 @@ public class Card : Targettable
 
     public override bool IsTargettable(TargettingQuery targetQuery)
     {
+        if (isSetTrap)
+        {
+            return IsTargettableTrap(targetQuery);
+        }
+        return IsTargettableCard(targetQuery);
+    }
+
+
+    private bool IsTargettableTrap(TargettingQuery targetQuery)
+    {
+        bool valid = false;
+        ITargettingDescription desc = targetQuery.targettingDesc;
+        if (desc.targettingType == TargettingType.EXCEPT)
+        {
+            ExceptTargetDescription exceptDesc = (ExceptTargetDescription)desc;
+            desc = exceptDesc.targetDescription;
+        }
+
+        switch (desc.targetType)
+        {
+            case TargetType.PERMANENT:
+            case TargetType.SET_TRAPS:
+                valid = true;
+                break;
+        }
+
+        if (valid)
+        {
+            IQualifiableTargettingDescription qualifiableDesc = (IQualifiableTargettingDescription)desc;
+            if (qualifiableDesc != null)
+            {
+                valid = qualifiableDesc.GetPlayerAlignment() == Alignment.NEUTRAL || (qualifiableDesc.GetPlayerAlignment() == GetAlignmentToPlayer(targetQuery.requestingPlayer));
+
+                IQualifierDescription qualifier = qualifiableDesc.qualifier;
+                if (valid && qualifier != null)
+                {
+                    switch (qualifier.qualifierType)
+                    {
+                        case QualifierType.NONE:
+                            break;
+                        default:
+                            valid = false;
+                            break;
+                    }
+                }
+            }
+        }
+        return valid;
+    }
+
+    private bool IsTargettableCard(TargettingQuery targetQuery)
+    {
         bool valid = false;
 
         ITargettingDescription desc = targetQuery.targettingDesc;
@@ -393,6 +447,23 @@ public class Card : Targettable
         }
 
         return valid;
+    }
+
+    public void SetTrapContext(Trap trap)
+    {
+        isSetTrap = true;
+        targettableUI = trap;
+    }
+
+    public void ResetTrapContext()
+    {
+        isSetTrap = false;
+        targettableUI = null;
+    }
+
+    public bool IsSetTrap()
+    {
+        return isSetTrap;
     }
 
     public override Targettable GetTargettableUI()

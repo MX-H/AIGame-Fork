@@ -287,7 +287,7 @@ static class CardEnums
         RegisterFlags(EffectType.DRAW_CARDS, new TargetType[] { TargetType.PLAYERS });
         RegisterFlags(EffectType.DEAL_DAMAGE, new TargetType[] { TargetType.CREATURES, TargetType.PLAYERS, TargetType.DAMAGEABLE });
         RegisterFlags(EffectType.HEAL_DAMAGE, new TargetType[] { TargetType.CREATURES, TargetType.PLAYERS, TargetType.DAMAGEABLE });
-        RegisterFlags(EffectType.DESTROY_CARD, new TargetType[] { TargetType.CREATURES, TargetType.SET_TRAPS });
+        RegisterFlags(EffectType.DESTROY_CARD, new TargetType[] { TargetType.CREATURES, TargetType.SET_TRAPS, TargetType.PERMANENT });
         RegisterFlags(EffectType.SUMMON_TOKEN, new TargetType[] { TargetType.PLAYERS });
         RegisterFlags(EffectType.NEGATE, new TargetType[] { TargetType.SPELLS, TargetType.ACTIVE_TRAPS, TargetType.EFFECTS,
             TargetType.SPELLS_AND_EFFECTS, TargetType.SPELLS_AND_TRAPS, TargetType.TRAPS_AND_EFFECTS, TargetType.STACK_ITEMS });

@@ -116,6 +116,7 @@ public class Trap : Targettable
         if (card != null)
         {
             card.gameObject.SetActive(false);
+            card.ResetTrapContext();
         }
 
         card = c;
@@ -125,6 +126,7 @@ public class Trap : Targettable
             c.transform.localPosition = new Vector3(2.0f, 0.0f, 0.0f);
             c.gameObject.SetActive(false);
             trapVisual.SetActive(true);
+            card.SetTrapContext(this);
         }
         else
         {
@@ -155,42 +157,7 @@ public class Trap : Targettable
 
         if (IsActive())
         {
-            ITargettingDescription desc = targetQuery.targettingDesc;
-            if (desc.targettingType == TargettingType.EXCEPT)
-            {
-                ExceptTargetDescription exceptDesc = (ExceptTargetDescription)desc;
-                desc = exceptDesc.targetDescription;
-            }
-
-            switch (desc.targetType)
-            {
-                case TargetType.PERMANENT:
-                case TargetType.SET_TRAPS:
-                    valid = true;
-                    break;
-            }
-
-            if (valid)
-            {
-                IQualifiableTargettingDescription qualifiableDesc = (IQualifiableTargettingDescription)desc;
-                if (qualifiableDesc != null)
-                {
-                    valid = qualifiableDesc.GetPlayerAlignment() == Alignment.NEUTRAL || (qualifiableDesc.GetPlayerAlignment() == GetAlignmentToPlayer(targetQuery.requestingPlayer));
-
-                    IQualifierDescription qualifier = qualifiableDesc.qualifier;
-                    if (valid && qualifier != null)
-                    {
-                        switch (qualifier.qualifierType)
-                        {
-                            case QualifierType.NONE:
-                                break;
-                            default:
-                                valid = false;
-                                break;
-                        }
-                    }
-                }
-            }
+            valid = GetTargettableEntity().IsTargettable(targetQuery);
         }
         return valid;
     }
