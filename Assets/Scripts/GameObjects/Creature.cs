@@ -173,61 +173,63 @@ public class Creature : Targettable
     {
         bool valid = false;
 
-        ITargettingDescription desc = targetQuery.targettingDesc;
-        if (desc.targettingType == TargettingType.EXCEPT)
+        if (!creatureState.IsDead())
         {
-            ExceptTargetDescription exceptDesc = (ExceptTargetDescription)desc;
-            desc = exceptDesc.targetDescription;
-        }
-
-        switch (desc.targetType)
-        {
-            case TargetType.CREATURES:
-            case TargetType.PERMANENT:
-            case TargetType.DAMAGEABLE:
-                valid = true;
-                break;
-        }
-
-        if (!targetQuery.ignoreUntouchable && HasKeyword(KeywordAttribute.UNTOUCHABLE))
-        {
-            valid = false;
-        }
-
-        if (valid)
-        {
-            IQualifiableTargettingDescription qualifiableDesc = (IQualifiableTargettingDescription)desc;
-            if (qualifiableDesc != null)
+            ITargettingDescription desc = targetQuery.targettingDesc;
+            if (desc.targettingType == TargettingType.EXCEPT)
             {
-                valid = qualifiableDesc.GetPlayerAlignment() == Alignment.NEUTRAL || (qualifiableDesc.GetPlayerAlignment() == GetAlignmentToPlayer(targetQuery.requestingPlayer));
+                ExceptTargetDescription exceptDesc = (ExceptTargetDescription)desc;
+                desc = exceptDesc.targetDescription;
+            }
 
-                IQualifierDescription qualifier = qualifiableDesc.qualifier;
-                if (valid && qualifier != null)
+            switch (desc.targetType)
+            {
+                case TargetType.CREATURES:
+                case TargetType.PERMANENT:
+                case TargetType.DAMAGEABLE:
+                    valid = true;
+                    break;
+            }
+
+            if (!targetQuery.ignoreUntouchable && HasKeyword(KeywordAttribute.UNTOUCHABLE))
+            {
+                valid = false;
+            }
+
+            if (valid)
+            {
+                IQualifiableTargettingDescription qualifiableDesc = (IQualifiableTargettingDescription)desc;
+                if (qualifiableDesc != null)
                 {
-                    switch (qualifier.qualifierType)
+                    valid = qualifiableDesc.GetPlayerAlignment() == Alignment.NEUTRAL || (qualifiableDesc.GetPlayerAlignment() == GetAlignmentToPlayer(targetQuery.requestingPlayer));
+
+                    IQualifierDescription qualifier = qualifiableDesc.qualifier;
+                    if (valid && qualifier != null)
                     {
-                        case QualifierType.NONE:
-                            break;
-                        case QualifierType.CREATURE_TYPE:
-                            {
-                                CreatureTypeQualifierDescription creatureQualifier = (CreatureTypeQualifierDescription)qualifier;
-                                valid = creatureQualifier.creatureType == card.cardData.GetCreatureType();
-                            }
-                            break;
-                        default:
-                            valid = false;
-                            break;
+                        switch (qualifier.qualifierType)
+                        {
+                            case QualifierType.NONE:
+                                break;
+                            case QualifierType.CREATURE_TYPE:
+                                {
+                                    CreatureTypeQualifierDescription creatureQualifier = (CreatureTypeQualifierDescription)qualifier;
+                                    valid = creatureQualifier.creatureType == card.cardData.GetCreatureType();
+                                }
+                                break;
+                            default:
+                                valid = false;
+                                break;
+                        }
                     }
                 }
             }
         }
-
         return valid;
     }
 
     public bool IsDraggable()
     {
-        if (controller)
+        if (controller && !creatureState.IsDead())
         {
             if (controller.isLocalPlayer && controller.CanMoveCreatures())
             {

@@ -10,8 +10,9 @@ public class GameLobbyNetworkManager : NetworkRoomManager
     private GlobalDatabase database;
 
     // Start is called before the first frame update
-    void Start()
+    public override void Start()
     {
+        base.Start();
         GameUtils.SetDatabase(database);
     }
 

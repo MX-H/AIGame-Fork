@@ -29,7 +29,8 @@ public class GameSession : NetworkBehaviour
     {
         PLAY_CARD,
         USE_TRAP,
-        TRIGGER_EFFECT
+        TRIGGER_EFFECT,
+        REPLACE_CREATURE
     }
 
     private enum StateStatus
@@ -75,7 +76,7 @@ public class GameSession : NetworkBehaviour
     NetworkIdentity pendingCard;
 
     [SyncVar]
-    NetworkIdentity pendingCreature;
+    NetworkIdentity pendingCreature;    // use this for triggered effects and keeping track of replaced creatures
 
     [SyncVar]
     PendingType pendingAction;
@@ -411,7 +412,7 @@ public class GameSession : NetworkBehaviour
 
     public Creature GetPendingCreature(PlayerController c)
     {
-        if (IsGameReady() && pendingCard != null)
+        if (IsGameReady() && pendingCreature != null)
         {
             Creature creature = pendingCreature.GetComponent<Creature>();
             if (creature.controller == c)
@@ -868,7 +869,7 @@ public class GameSession : NetworkBehaviour
             if (creature.GetCreatureState().IsDead())
             {
                 // Remove the creature
-                creature.controller.ServerDestroyCreature(creature.netIdentity);
+                creature.controller.ServerDestroyCreature(creature);
                 creaturesToTrigger.Add(creature);
             }
         }
@@ -1136,7 +1137,32 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public void StartSelectingTargets(Targettable source, Card card, PlayerController controller, TriggerCondition trigger)
+    public void SelectReplaceCreature(Card card, PlayerController controller)
+    {
+        pendingCard = card.netIdentity;
+        pendingTrapIndex = -1;
+        pendingTriggerCondition = TriggerCondition.NONE;
+        pendingAction = PendingType.REPLACE_CREATURE;
+        pendingCreature = null;
+
+        controller.TargetNotifySelectTargets(controller.connectionToClient, pendingCard, pendingAction, TriggerCondition.NONE);
+        ServerPushState(GameState.SELECTING_TARGETS);
+    }
+
+    [Server]
+    public void SetPendingCreature(Creature creature)
+    {
+        pendingCreature = creature.netIdentity;
+    }
+
+    [Server]
+    public void ResetPendingCreature()
+    {
+        pendingCreature = null;
+    }
+
+    [Server]
+    public void StartSelectingTargets(Targettable source, Card card, PlayerController controller, TriggerCondition trigger, bool isReplacement = false)
     {
         if (card != null)
         {
@@ -1144,6 +1170,12 @@ public class GameSession : NetworkBehaviour
             pendingTrapIndex = controller.arena.GetTrapIndex(card);
             pendingTriggerCondition = trigger;
 
+            // If replacement then pending creature holds the id of the creature being replaced
+            // Need this if we cancel playing the creature, so don't clear it
+            if (!isReplacement)
+            {
+                pendingCreature = null;
+            }
             if (pendingTrapIndex >= 0)
             {
                 pendingAction = PendingType.USE_TRAP;
@@ -1166,7 +1198,7 @@ public class GameSession : NetworkBehaviour
                 }
             }
 
-            controller.TargetNotifySelectTargets(controller.connectionToClient);
+            controller.TargetNotifySelectTargets(controller.connectionToClient, pendingCard, pendingAction, pendingTriggerCondition);
             ServerPushState(GameState.SELECTING_TARGETS);
         }
         else

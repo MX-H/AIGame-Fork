@@ -261,8 +261,9 @@ public class Card : Targettable
                         case CardType.SPELL:
                             return HasValidTargets(cardData.GetSelectableTargets(TriggerCondition.NONE));
                         case CardType.CREATURE:
-                        case CardType.TRAP:
                             return true;
+                        case CardType.TRAP:
+                            return controller.arena.HasSpaceTrap();
                     }
                     return true;
                 }

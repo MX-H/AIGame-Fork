@@ -89,32 +89,75 @@ public class GameStateWaitActivePlayer : IGameStateWaitPlayer
                 switch (card.cardData.GetCardType())
                 {
                     case CardType.CREATURE:
+                        Creature pendingCreature = gameSession.GetPendingCreature(player);
+                        bool replacingCreatureSelected = pendingCreature != null;
+
                         if (playCardEvent.flattenedTargets == null)
                         {
-                            if (player.CanPlayCard(card))
+                            if (!replacingCreatureSelected)
                             {
-                                player.ServerRemoveCardFromHand(card);
+                                if (player.CanPlayCard(card))
+                                {
+                                    player.ServerRemoveCardFromHand(card);
+
+                                    if (player.arena.IsFull() && !replacingCreatureSelected)
+                                    {
+                                        gameSession.SelectReplaceCreature(card, player);
+                                    }
+                                    else
+                                    {
+                                        List<ITargettingDescription> targets = card.cardData.GetSelectableTargets(TriggerCondition.ON_SELF_ENTER);
+                                        if (targets.Count > 0 && card.HasValidTargets(targets))
+                                        {
+                                            gameSession.StartSelectingTargets(card, card, player, TriggerCondition.ON_SELF_ENTER);
+                                        }
+                                        else
+                                        {
+                                            player.ServerPayCost(card);
+                                            Creature creature = gameSession.ServerCreateCreature(player, card);
+                                            player.ServerPlayCreature(creature, card);
+                                            gameSession.ResetPriorityPasses();
+                                            gameSession.ServerUpdateGameState();
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Don't check CanPlayCard, we already did and the card has already been removed from hand so it would fail
 
                                 List<ITargettingDescription> targets = card.cardData.GetSelectableTargets(TriggerCondition.ON_SELF_ENTER);
                                 if (targets.Count > 0 && card.HasValidTargets(targets))
                                 {
-                                    gameSession.StartSelectingTargets(card, card, player, TriggerCondition.ON_SELF_ENTER);
+                                    gameSession.StartSelectingTargets(card, card, player, TriggerCondition.ON_SELF_ENTER, true);
                                 }
                                 else
                                 {
+                                    // Destroy creature to be replaced now, note that we do not trigger on die effects when replaced
+                                    player.ServerDestroyCreature(pendingCreature);
+                                    gameSession.ResetPendingCreature();
+
                                     player.ServerPayCost(card);
                                     Creature creature = gameSession.ServerCreateCreature(player, card);
                                     player.ServerPlayCreature(creature, card);
                                     gameSession.ResetPriorityPasses();
+                                    gameSession.ServerUpdateGameState();
                                 }
                             }
                         }
                         else
                         {
+                            if (replacingCreatureSelected)
+                            {
+                                // Destroy creature to be replaced now, note that we do not trigger on die effects when replaced
+                                player.ServerDestroyCreature(pendingCreature);
+                                gameSession.ResetPendingCreature();
+                            }
                             player.ServerPayCost(card);
                             Creature creature = gameSession.ServerCreateCreature(player, card);
                             player.ServerPlayCreature(creature, card, playCardEvent.flattenedTargets, playCardEvent.indexes);
                             gameSession.ResetPriorityPasses();
+                            gameSession.ServerUpdateGameState();
                         }
 
                         break;
@@ -138,6 +181,7 @@ public class GameStateWaitActivePlayer : IGameStateWaitPlayer
                                     player.ServerPayCost(card);
                                     player.ServerPlaySpell(card);
                                     gameSession.ResetPriorityPasses();
+                                    gameSession.ServerUpdateGameState();
                                 }
                             }
                         }
@@ -146,6 +190,7 @@ public class GameStateWaitActivePlayer : IGameStateWaitPlayer
                             player.ServerPayCost(card);
                             player.ServerPlaySpell(card, playCardEvent.flattenedTargets, playCardEvent.indexes);
                             gameSession.ResetPriorityPasses();
+                            gameSession.ServerUpdateGameState();
                         }
                         break;
                     case CardType.TRAP:
@@ -155,11 +200,10 @@ public class GameStateWaitActivePlayer : IGameStateWaitPlayer
                             player.ServerPayCost(card);
                             player.ServerPlayTrap(card);
                             gameSession.ResetPriorityPasses();
+                            gameSession.ServerUpdateGameState();
                         }
                         break;
                 }
-
-                gameSession.ServerUpdateGameState();
             }
 
             if (eventInfo is UseTrapEvent trapEvent)

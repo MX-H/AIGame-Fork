@@ -397,6 +397,11 @@ public class Arena : MonoBehaviour
         return creatureList;
     }
 
+    public bool IsFull()
+    {
+        return GetAllCreatures().Count >= GameConstants.MAX_CREATURES;
+    }
+
     public Creature[] GetDefenders()
     {
         return defenders;
