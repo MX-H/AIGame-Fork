@@ -11,7 +11,6 @@ public class PlayerController : Targettable
     public Arena arena;
     public DiscardPile discard;
     public PlayerUI playerUI;
-    public bool hasSentTargets;
 
     [SyncVar]
     public int health;
@@ -38,6 +37,9 @@ public class PlayerController : Targettable
     List<List<Targettable>> allSelectedTargets;
     List<ITargettingDescription> selectableTargetDescriptions;
     List<CardEffectDescription> selectableEffectDescriptions;
+
+    private bool hasSentTargets;
+    private GameSession.PendingType expectedPendingAction;
 
     private TextPrompt selectingTextPrompt;
 
@@ -97,36 +99,8 @@ public class PlayerController : Targettable
         base.Update();
         if (gameSession.CanSelectTargets(this) && isLocalPlayer)
         {
-            // Start target selections
-            if (selectableTargetDescriptions == null && !hasSentTargets)
-            {
-                Card card = gameSession.GetPendingCard(this);
-                if (card != null)
-                {
-                    switch (card.cardData.GetCardType())
-                    {
-                        case CardType.CREATURE:
-                            selectableTargetDescriptions = card.cardData.GetSelectableTargets(gameSession.GetPendingTriggerCondition());
-                            selectableEffectDescriptions = card.cardData.GetSelectableEffectsOnTrigger(gameSession.GetPendingTriggerCondition());
-                            break;
-                        case CardType.SPELL:
-                        case CardType.TRAP:
-                            selectableTargetDescriptions = card.cardData.GetSelectableTargets(TriggerCondition.NONE);
-                            selectableEffectDescriptions = card.cardData.GetSelectableEffectsOnTrigger(TriggerCondition.NONE);
-                            break;
-                    }
-
-                    selectedTargets = new List<Targettable>();
-                    allSelectedTargets = new List<List<Targettable>>();
-
-                    SetTargettingQuery(selectableTargetDescriptions[0]);
-                    SetSelectionPrompt(selectableEffectDescriptions[0], 0);
-                }
-
-            }
-
             // Cancel actions when right click detected (undo target select, then playing card)
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetMouseButtonDown(1) && !hasSentTargets)
             {
                 // Back out of target select to the previous selection
                 if (allSelectedTargets.Count > 0)
@@ -347,6 +321,7 @@ public class PlayerController : Targettable
     {
         if (isServerOnly)
         {
+            card.gameObject.SetActive(true);
             hand.AddCard(card);
         }
         RpcAddExistingCardToHand(card.netIdentity);
@@ -355,8 +330,9 @@ public class PlayerController : Targettable
     [ClientRpc]
     public void RpcAddExistingCardToHand(NetworkIdentity cardId)
     {
-        Card c = cardId.GetComponent<Card>();
-        hand.AddCard(c);
+        Card card = cardId.GetComponent<Card>();
+        card.gameObject.SetActive(true);
+        hand.AddCard(card);
     }
 
     [Server]
@@ -406,7 +382,15 @@ public class PlayerController : Targettable
             creature.controller = this;
             creature.owner = this;
             creature.SetCard(card);
-            arena.AddCreature(creature);
+
+            if (!arena.IsFull())
+            {
+                arena.AddCreature(creature);
+            }
+            else
+            {
+                discard.AddCreature(creature);
+            }
         }
     }
 
@@ -422,18 +406,26 @@ public class PlayerController : Targettable
         creature.controller = this;
         creature.owner = this;
         creature.SetCard(card);
-        arena.AddCreature(creature);
 
-        if (targets != null && indexes != null)
+        if (!arena.IsFull())
         {
-            gameSession.ServerAddEffectToStack(creature, card, TriggerCondition.ON_SELF_ENTER, targets, indexes);
+            arena.AddCreature(creature);
+
+            if (targets != null && indexes != null)
+            {
+                gameSession.ServerAddEffectToStack(creature, card, TriggerCondition.ON_SELF_ENTER, targets, indexes);
+            }
+            // If creature has an ETB effect with no targets add the effect to the stack
+            else if (card.cardData.HasEffectsOnTrigger(TriggerCondition.ON_SELF_ENTER) && card.cardData.GetSelectableTargets(TriggerCondition.ON_SELF_ENTER).Count == 0)
+            {
+                gameSession.ServerAddEffectToStack(creature, card, TriggerCondition.ON_SELF_ENTER);
+            }
+            gameSession.ServerTriggerEffects(creature, TriggerCondition.ON_CREATURE_ENTER);
         }
-        // If creature has an ETB effect with no targets add the effect to the stack
-        else if (card.cardData.HasEffectsOnTrigger(TriggerCondition.ON_SELF_ENTER) && card.cardData.GetSelectableTargets(TriggerCondition.ON_SELF_ENTER).Count == 0)
+        else
         {
-            gameSession.ServerAddEffectToStack(creature, card, TriggerCondition.ON_SELF_ENTER);
+            discard.AddCreature(creature);
         }
-        gameSession.ServerTriggerEffects(creature, TriggerCondition.ON_CREATURE_ENTER);
 
         if (rpc)
         {
@@ -451,7 +443,15 @@ public class PlayerController : Targettable
             creature.controller = this;
             creature.owner = this;
             creature.SetCard(card);
-            arena.AddCreature(creature);
+
+            if (!arena.IsFull())
+            {
+                arena.AddCreature(creature);
+            }
+            else
+            {
+                discard.AddCreature(creature);
+            }
         }
     }
 
@@ -859,13 +859,12 @@ public class PlayerController : Targettable
     }
 
     [Server]
-    public void ServerDestroyCreature(NetworkIdentity creatureId)
+    public void ServerDestroyCreature(Creature creature)
     {
-        Creature creature = creatureId.gameObject.GetComponent<Creature>();
         arena.RemoveCreature(creature);
         discard.AddCreature(creature);
 
-        RpcDestroyCreature(creatureId);
+        RpcDestroyCreature(creature.netIdentity);
     }
 
     [ClientRpc]
@@ -929,9 +928,41 @@ public class PlayerController : Targettable
     }
 
     [TargetRpc]
-    public void TargetNotifySelectTargets(NetworkConnection target)
+    public void TargetNotifySelectTargets(NetworkConnection target, NetworkIdentity cardId, GameSession.PendingType pendingType, TriggerCondition triggerCondition)
     {
         hasSentTargets = false;
+        expectedPendingAction = pendingType;
+
+        Card card = cardId.GetComponent<Card>();
+        if (card != null)
+        {
+            if (pendingType == GameSession.PendingType.REPLACE_CREATURE)
+            {
+                selectableTargetDescriptions = GameUtils.ReplaceCreatureTargetDescriptions();
+                selectableEffectDescriptions = GameUtils.ReplaceCreatureEffectDescriptions();
+            }
+            else
+            {
+                switch (card.cardData.GetCardType())
+                {
+                    case CardType.CREATURE:
+                        selectableTargetDescriptions = card.cardData.GetSelectableTargets(triggerCondition);
+                        selectableEffectDescriptions = card.cardData.GetSelectableEffectsOnTrigger(triggerCondition);
+                        break;
+                    case CardType.SPELL:
+                    case CardType.TRAP:
+                        selectableTargetDescriptions = card.cardData.GetSelectableTargets(TriggerCondition.NONE);
+                        selectableEffectDescriptions = card.cardData.GetSelectableEffectsOnTrigger(TriggerCondition.NONE);
+                        break;
+                }
+            }
+
+            selectedTargets = new List<Targettable>();
+            allSelectedTargets = new List<List<Targettable>>();
+
+            SetTargettingQuery(selectableTargetDescriptions[0]);
+            SetSelectionPrompt(selectableEffectDescriptions[0], 0);
+        }
     }
 
     public void StopSelectingTargets()
@@ -992,7 +1023,7 @@ public class PlayerController : Targettable
     }
     public bool CanPlayCards()
     {
-        return gameSession.IsActivePlayer(this) && gameSession.IsWaitingOnPlayer(this) && gameSession.IsStackEmpty() && !IsInCombat() && !IsSelectingTargets();
+        return gameSession.IsActivePlayer(this) && gameSession.GetCurrState() == GameSession.GameState.WAIT_ACTIVE && gameSession.IsStackEmpty() && !IsInCombat() && !IsSelectingTargets();
     }
 
     public bool CanActivateTraps()
@@ -1008,6 +1039,12 @@ public class PlayerController : Targettable
     public void SetTargettingQuery(ITargettingDescription desc)
     {
         TargettingQuery query = new TargettingQuery(desc, this);
+
+        if (gameSession.GetPendingActionType() == GameSession.PendingType.REPLACE_CREATURE)
+        {
+            query.ignoreUntouchable = true;
+        }
+
         foreach (Targettable t in gameSession.GetPotentialTargets())
         {
             t.SetTargettingQuery(query);

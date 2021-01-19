@@ -65,6 +65,14 @@ public class CreatureState : NetworkBehaviour
         beenDestroyed = true;
     }
 
+    // We use destroy for replacing creatures when the arena is full
+    // If cancelled we need to undo the destroy before the gamestate is updated
+    [Server]
+    public void ServerUndoDestroyCard()
+    {
+        beenDestroyed = false;
+    }
+
     [Server]
     public void SetSummoningSick(bool sick)
     {

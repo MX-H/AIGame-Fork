@@ -50,9 +50,8 @@ public class GameStateSelectTargets : IGameState
                 switch (gameSession.GetPendingActionType())
                 {
                     case GameSession.PendingType.PLAY_CARD:
-                        CancelPlayCard();
-                        break;
                     case GameSession.PendingType.USE_TRAP:
+                    case GameSession.PendingType.REPLACE_CREATURE:
                         CancelPlayCard();
                         break;
                     case GameSession.PendingType.TRIGGER_EFFECT:
@@ -93,15 +92,24 @@ public class GameStateSelectTargets : IGameState
             NetworkIdentity[][] targets = targetEvent.ReconstructTargets();
 
             List<ITargettingDescription> selectableTargetDescriptions = null;
-            switch (card.cardData.GetCardType())
+            GameSession.PendingType pendingType = gameSession.GetPendingActionType();
+
+            if (pendingType == GameSession.PendingType.REPLACE_CREATURE)
             {
-                case CardType.CREATURE:
-                    selectableTargetDescriptions = card.cardData.GetSelectableTargets(triggerCondition);
-                    break;
-                case CardType.SPELL:
-                case CardType.TRAP:
-                    selectableTargetDescriptions = card.cardData.GetSelectableTargets(TriggerCondition.NONE);
-                    break;
+                selectableTargetDescriptions = GameUtils.ReplaceCreatureTargetDescriptions();
+            }
+            else
+            {
+                switch (card.cardData.GetCardType())
+                {
+                    case CardType.CREATURE:
+                        selectableTargetDescriptions = card.cardData.GetSelectableTargets(triggerCondition);
+                        break;
+                    case CardType.SPELL:
+                    case CardType.TRAP:
+                        selectableTargetDescriptions = card.cardData.GetSelectableTargets(TriggerCondition.NONE);
+                        break;
+                }
             }
 
             if (selectableTargetDescriptions != null && selectableTargetDescriptions.Count == targets.Length)
@@ -123,7 +131,7 @@ public class GameStateSelectTargets : IGameState
                                 TargetXDescription targetDesc = (TargetXDescription)desc;
                                 if (targetDesc.amount == targets[i].Length)
                                 {
-                                    TargettingQuery query = new TargettingQuery(targetDesc, player);
+                                    TargettingQuery query = new TargettingQuery(targetDesc, player, pendingType != GameSession.PendingType.REPLACE_CREATURE);
                                     for (int j = 0; j < targets[i].Length; j++)
                                     {
                                         Targettable targettable = targets[i][j].GetComponent<Targettable>();
@@ -145,7 +153,7 @@ public class GameStateSelectTargets : IGameState
                                 UpToXTargetDescription targetDesc = (UpToXTargetDescription)desc;
                                 if (targetDesc.amount >= targets[i].Length)
                                 {
-                                    TargettingQuery query = new TargettingQuery(targetDesc, player);
+                                    TargettingQuery query = new TargettingQuery(targetDesc, player, pendingType != GameSession.PendingType.REPLACE_CREATURE);
                                     for (int j = 0; j < targets[i].Length; j++)
                                     {
                                         Targettable targettable = targets[i][j].GetComponent<Targettable>();
@@ -173,7 +181,7 @@ public class GameStateSelectTargets : IGameState
 
             if (isValid)
             {
-                switch (gameSession.GetPendingActionType())
+                switch (pendingType)
                 {
                     case GameSession.PendingType.PLAY_CARD:
                         PlayCardEvent playCardEvent = new PlayCardEvent(player, card, targetEvent.flattenedTargets, targetEvent.indexes);
@@ -182,6 +190,7 @@ public class GameStateSelectTargets : IGameState
                         break;
                     case GameSession.PendingType.TRIGGER_EFFECT:
                         gameSession.ServerAddEffectToStack(gameSession.GetPendingCreature(player), card, triggerCondition, targetEvent.flattenedTargets, targetEvent.indexes);
+                        gameSession.ResetPendingCreature();
                         gameSession.ServerPopState();
                         break;
                     case GameSession.PendingType.USE_TRAP:
@@ -189,6 +198,19 @@ public class GameStateSelectTargets : IGameState
                         gameSession.HandleEvent(trapEvent);
                         gameSession.ServerPopState();
                         break;
+                    case GameSession.PendingType.REPLACE_CREATURE:
+                        // Replace creature should only have one target
+                        Creature creatureToReplace = targets[0][0].GetComponent<Creature>();
+
+                        // Destroying the creature makes it so we can't target it for the on enter effect of the replacing creature which is what we want
+                        creatureToReplace.GetCreatureState().ServerDestroyCard();
+                        gameSession.SetPendingCreature(creatureToReplace);
+
+                        PlayCardEvent playReplaceCreatureEvent = new PlayCardEvent(player, card);
+                        gameSession.HandleEvent(playReplaceCreatureEvent);
+                        gameSession.ServerPopState();
+                        break;
+
                 }
             }
             else
@@ -208,6 +230,13 @@ public class GameStateSelectTargets : IGameState
             case GameSession.PendingType.PLAY_CARD:
                 player.ServerAddExistingCardToHand(card);
                 player.TargetCancelPlayCard(player.connectionToClient);
+                Creature replacedCreature = gameSession.GetPendingCreature(player);
+                if (replacedCreature != null)
+                {
+                    // don't destroy the creature to be replaced!
+                    replacedCreature.GetCreatureState().ServerUndoDestroyCard();
+                    gameSession.ResetPendingCreature();
+                }
 
                 gameSession.ServerPopState();
 
@@ -218,6 +247,12 @@ public class GameStateSelectTargets : IGameState
 
                 gameSession.ServerPopState();
 
+                break;
+            case GameSession.PendingType.REPLACE_CREATURE:
+                player.ServerAddExistingCardToHand(card);
+                player.TargetCancelPlayCard(player.connectionToClient);
+
+                gameSession.ServerPopState();
                 break;
             default:
                 // We can't do anything about triggered effects, these are mandatory so do nothing

@@ -58,4 +58,35 @@ public static class GameUtils
     {
         return database;
     }
+
+    public static List<ITargettingDescription> ReplaceCreatureTargetDescriptions()
+    {
+        TargetXDescription targetDesc = new TargetXDescription(TargetType.CREATURES, Alignment.POSITIVE);
+        targetDesc.amount = 1;
+        targetDesc.qualifier = null;
+
+        List<ITargettingDescription> list = new List<ITargettingDescription>();
+        list.Add(targetDesc);
+
+        return list;
+    }
+
+    public static List<CardEffectDescription> ReplaceCreatureEffectDescriptions()
+    {
+        List<CardEffectDescription> list = new List<CardEffectDescription>();
+
+        TargetXDescription targetDesc = new TargetXDescription(TargetType.CREATURES, Alignment.POSITIVE);
+        targetDesc.amount = 1;
+        targetDesc.qualifier = null;
+
+        ReplaceCreatureEffectDescription effectDesc = new ReplaceCreatureEffectDescription();
+
+        CardEffectDescription cardEffectDesc = new CardEffectDescription();
+
+        cardEffectDesc.targettingType = targetDesc;
+        cardEffectDesc.effectType = effectDesc;
+
+        list.Add(cardEffectDesc);
+        return list;
+    }
 }
