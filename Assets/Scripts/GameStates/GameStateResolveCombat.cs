@@ -30,12 +30,15 @@ public class GameStateResolveCombat : IGameState
             while (timeElapsed > delayBetweenAttacks)
             {
                 timeElapsed -= delayBetweenAttacks;
-                if (attackerIndex < attackers.Count)
+                while (attackerIndex < attackers.Count)
                 {
+                    Debug.Log("Index: " + attackerIndex.ToString());
+                    Debug.Log("Attacker name: " + attackers[attackerIndex].card.cardData.GetCardName());
                     CreatureState attackerState = attackers[attackerIndex].gameObject.GetComponent<CreatureState>();
 
                     if (defenders[attackerIndex] != null)
                     {
+                        Debug.Log("Defender name: " + defenders[attackerIndex].card.cardData.GetCardName());
                         CreatureState defenderState = defenders[attackerIndex].gameObject.GetComponent<CreatureState>();
             
                         gameSession.ServerCreatureDoDamage(attackers[attackerIndex], attackerState.GetAttack(), defenders[attackerIndex]);
@@ -52,7 +55,7 @@ public class GameStateResolveCombat : IGameState
                     }
                     attackerIndex++;
                 }
-                else
+                if (attackerIndex >= attackers.Count)
                 {
                     ChangeState(GameSession.GameState.WAIT_ACTIVE);
                 }
